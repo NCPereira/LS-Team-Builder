@@ -597,7 +597,7 @@
                                 <!-- Header row: position icon centred over pet (96px), stat badge centred over gem grid (96px) -->
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                        <img src="Icons/position_backward.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Backward">
                                     </div>
                                     <div id="gem-stat-badge-0" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_0_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -631,7 +631,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                        <img src="Icons/position_center.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Center">
                                     </div>
                                     <div id="gem-stat-badge-1" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_1_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -662,7 +662,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                        <img src="Icons/position_forward.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Forward">
                                     </div>
                                     <div id="gem-stat-badge-2" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_2_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -702,15 +702,15 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">TOP</span>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                    <img src="Icons/position_backward.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Backward">
                                     <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                    <img src="Icons/position_center.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Center">
                                     <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                    <img src="Icons/position_forward.webp" crossorigin="anonymous" class="w-5 h-5 object-contain opacity-80" title="Forward">
                                     <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
                                 </div>
                             </div>
@@ -751,7 +751,7 @@
     </div>
 
     <footer id="page-footer" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
-        <div class="text-xs text-slate-400">Layout Engine v3.0 | LSTB Local Directory Mode</div>
+        <div class="text-xs text-slate-400">Layout Engine v3.0 | LSTB Web Edition</div>
         <div class="flex gap-3 flex-wrap justify-end items-center">
             <button id="export-png-btn" class="bg-[#1a1e2e] border border-emerald-700 hover:bg-emerald-900/40 text-emerald-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="exportCapturePNG()" title="Export team view as PNG"><i class="fa-solid fa-image"></i>Export PNG</button>
             <button class="bg-[#1c1e29] border border-slate-700 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-4 rounded-lg transition-all" onclick="clearAllSlots()"><i class="fa-solid fa-trash-can mr-2"></i>Clear</button>
@@ -943,6 +943,7 @@
         function _probeImage(url) {
             return new Promise(resolve => {
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.onload  = () => resolve(true);
                 img.onerror = () => resolve(false);
                 img.src = url;
@@ -1040,6 +1041,7 @@
         function _loadImg(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
+                img.crossOrigin = 'anonymous';
                 img.onload  = () => resolve(img);
                 img.onerror = () => reject(new Error('load failed'));
                 img.src = src;
@@ -1226,7 +1228,7 @@
         }
 
         const pet = db.pets.find(p => p.name === petName);
-        el.innerHTML = `<img src="${pet?.img || ''}" class="w-full h-full object-cover rounded-lg">`;
+        el.innerHTML = `<img src="${pet?.img || ''}" crossorigin="anonymous" class="w-full h-full object-cover rounded-lg">`;
     });
 
     // Render gem slots
@@ -1236,7 +1238,7 @@
             const gemEl = document.getElementById(`gem-p${petIdx + 1}-${gemIdx}`);
             if (gemEl) {
                 if (gemName) {
-                    gemEl.innerHTML = `<img src="gems/${gemName}.webp" class="w-7 h-7 object-contain" alt="${gemName}">`;
+                    gemEl.innerHTML = `<img src="gems/${gemName}.webp" crossorigin="anonymous" class="w-7 h-7 object-contain" alt="${gemName}">`;
                 } else {
                     gemEl.innerHTML = `<span class="text-xs font-bold text-slate-500 leading-none">+</span>`;
                 }
@@ -1298,6 +1300,7 @@
                     <img 
                         src="${imgSrc || ''}" 
                         alt="${slot.character}"
+                        crossorigin="anonymous"
                         class="w-full h-full object-cover"
                         style="object-position:${getFacePosition(imgSrc)};"
                         onerror="this.style.display='none'"
@@ -1346,7 +1349,7 @@
                                     <div id="gear-display-${index}-${cat}" class="gear-display">
                                         ${slot.gear[cat] ? (() => {
                                             const gearData = db[cat].find(g => g.name === slot.gear[cat]);
-                                            return gearData ? `<img src="${gearData.img}" alt="${slot.gear[cat]}" class="rounded" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"><span class="text-xs text-slate-200" style="display:none">${slot.gear[cat]}</span>` : `<span class="text-xs text-slate-200">${slot.gear[cat]}</span>`;
+                                            return gearData ? `<img src="${gearData.img}" alt="${slot.gear[cat]}" crossorigin="anonymous" class="rounded" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'"><span class="text-xs text-slate-200" style="display:none">${slot.gear[cat]}</span>` : `<span class="text-xs text-slate-200">${slot.gear[cat]}</span>`;
                                         })() : `<span class="text-[10px] text-slate-400 font-mono">${cat}</span>`}
                                     </div>
                                 </div>
@@ -1365,6 +1368,7 @@
                     <img 
                         src="${cardData?.img || ''}" 
                         alt="${slot.card}"
+                        crossorigin="anonymous"
                         class="w-full h-full object-cover"
                     >
 
@@ -2754,7 +2758,7 @@ function togglePetFilter(cat, val) {
                 const imgFit = (isChar || isPet) ? 'object-cover object-top' : 'object-contain';
                 itemBox.innerHTML = isChar ? `
                     <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
-                        <img src="${item.img}" alt="${item.name}" class="w-full h-full ${imgFit}" loading="lazy" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-full ${imgFit}" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none';this.nextSibling.style.display='flex'">
                         <div style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;color:#475569;font-size:9px">${item.name[0]}</div>
                         ${rar ? `<span style="position:absolute;top:3px;right:3px;font-size:8px;font-weight:700;color:${rarColor};text-shadow:0 1px 3px #000">${rar}★</span>` : ''}
                         ${isSelected ? '<div style="position:absolute;inset:0;background:rgba(75,107,251,0.25);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-check text-white" style="font-size:20px;filter:drop-shadow(0 1px 3px #000)"></i></div>' : ''}
@@ -2763,7 +2767,7 @@ function togglePetFilter(cat, val) {
                     ${el ? `<span class="char-el-badge badge-${el} mt-0.5">${el}</span>` : ''}
                 ` : isPet ? `
                     <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
-                        <img src="${item.img}" alt="${item.name}" class="w-full h-full ${imgFit}" loading="lazy" onerror="this.style.display='none'">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-full ${imgFit}" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none'">
                         ${rar ? `<span style="position:absolute;top:3px;right:3px;font-size:8px;font-weight:700;color:${rarColor};text-shadow:0 1px 3px #000">${rar}★</span>` : ''}
                         ${isSelected ? '<div style="position:absolute;inset:0;background:rgba(75,107,251,0.25);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-check text-white" style="font-size:20px;filter:drop-shadow(0 1px 3px #000)"></i></div>' : ''}
                     </div>
@@ -2771,7 +2775,7 @@ function togglePetFilter(cat, val) {
                     ${el ? `<span class="char-el-badge badge-${el} mt-0.5">${el}</span>` : ''}
                 ` : `
                     <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
-                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-contain" loading="lazy" onerror="this.style.display='none'">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-contain" loading="lazy" crossorigin="anonymous" onerror="this.style.display='none'">
                         ${isSelected ? '<div style="position:absolute;inset:0;background:rgba(75,107,251,0.25);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-check text-white" style="font-size:20px;filter:drop-shadow(0 1px 3px #000)"></i></div>' : ''}
                     </div>
                     <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${item.name}</span>
@@ -3227,6 +3231,7 @@ function togglePetFilter(cat, val) {
                         const img = document.createElement('img');
                         img.src = charEntry.img;
                         img.alt = slot.character;
+                        img.crossOrigin = 'anonymous';
                         img.style.objectPosition = getFacePosition(charEntry.img);
                         iconDiv.innerHTML = '';
                         iconDiv.appendChild(img);
@@ -3876,7 +3881,7 @@ function togglePetFilter(cat, val) {
                     const yPct = facePos.split(' ')[1] || '22%';
                     const borderColor = elColors ? elColors[0] : '#2d3142';
                     iconHtml = `<div class="dmg-char-icon-wrap" title="Slot ${teamSlotIdx+1}: ${slotChar}" style="border-color:${borderColor};">` +
-                        `<img src="${charEntry.img}" class="dmg-char-icon" ` +
+                        `<img src="${charEntry.img}" class="dmg-char-icon" crossorigin="anonymous"` +
                         `style="transform-origin:50% ${yPct};object-position:${facePos};" ` +
                         `alt="${slotChar}" ` +
                         `onerror="this.parentElement.outerHTML='<div class=\\'dmg-char-placeholder\\'>${teamSlotIdx+1}</div>'">` +
@@ -4734,8 +4739,25 @@ function togglePetFilter(cat, val) {
 
     <script>
     // ── Export PNG via html2canvas ─────────────────────────────────────────────
-    // Captures #capture-area at 1:1 scale. Temporarily removes the zoom-lock
-    // transform so html2canvas sees an unscaled layout, then restores it.
+    // Server-safe version: pre-converts all <img> tags inside the capture area
+    // to data-URLs so html2canvas never has to fetch cross-origin resources.
+    // Font Awesome <i> icons are replaced with neutral Unicode glyphs before
+    // capture so webfont-loading issues don't produce blank squares.
+
+    // Fetch a URL and return a base64 data-URL (same-origin assets only).
+    async function _imgToDataURL(src) {
+        try {
+            const resp = await fetch(src, { cache: 'force-cache' });
+            if (!resp.ok) return null;
+            const blob = await resp.blob();
+            return new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror   = () => resolve(null);
+                reader.readAsDataURL(blob);
+            });
+        } catch { return null; }
+    }
 
     async function exportCapturePNG() {
         const btn = document.getElementById('export-png-btn');
@@ -4748,35 +4770,90 @@ function togglePetFilter(cat, val) {
         }
 
         const origHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Rendering…';
+        btn.innerHTML = '⏳ Preparing…';
         btn.disabled = true;
 
-        // Snapshot current zoom-lock styles
+        // Snapshot zoom-lock styles
         const savedTransform  = zoomLock.style.transform;
         const savedWidth      = zoomLock.style.width;
         const savedMinHeight  = zoomLock.style.minHeight;
 
+        // Map to track original src → data URL so we can restore after capture
+        const imgRestoreMap = [];
+        // Track FA icon replacements
+        const faRestoreList = [];
+
         try {
-            // Temporarily neutralise the transform so html2canvas
-            // sees a 1:1 unscaled layout with correct element positions.
+            // 1. Remove zoom transform so html2canvas sees a 1:1 layout
             zoomLock.style.transform = 'none';
             zoomLock.style.width     = 'auto';
             zoomLock.style.minHeight = 'auto';
-
-            // Wait for two paint frames so the browser reflows at scale(1)
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+            // 2. Pre-convert all <img> inside capture area to data URLs
+            btn.innerHTML = '⏳ Loading images…';
+            const imgs = captureEl.querySelectorAll('img');
+            await Promise.all([...imgs].map(async img => {
+                const src = img.src;
+                if (!src || src.startsWith('data:')) return;
+                const dataUrl = await _imgToDataURL(src);
+                if (dataUrl) {
+                    imgRestoreMap.push({ img, src });
+                    img.src = dataUrl;
+                }
+            }));
+
+            // 3. Replace Font Awesome <i> icons with visible Unicode spans
+            //    so they render even if the webfont isn't available to html2canvas.
+            //    Map: fa class keyword → unicode fallback character
+            const FA_FALLBACKS = {
+                'fa-fire':          '🔥', 'fa-shield-halved': '🛡',
+                'fa-shirt':         '👕', 'fa-user-plus':     '👤',
+                'fa-chart-bar':     '📊', 'fa-chart-area':    '📈',
+                'fa-upload':        '⬆', 'fa-clipboard':     '📋',
+                'fa-arrow-rotate-right': '↻', 'fa-trash':    '🗑',
+                'fa-redo':          '↺', 'fa-spinner':       '⏳',
+                'fa-arrow-up':      '▲', 'fa-arrow-down':    '▼',
+                'fa-check':         '✓', 'fa-xmark':         '✕',
+                'fa-image':         '🖼', 'fa-floppy-disk':   '💾',
+                'fa-folder-open':   '📂', 'fa-folder':        '📁',
+                'fa-chevron-down':  '▾', 'fa-trash-can':     '🗑',
+                'fa-dragon':        '🐉', 'fa-arrows-rotate': '↻',
+                'fa-lock':          '🔒', 'fa-layer-group':   '⊞',
+                'fa-clone':         '⧉', 'fa-file-code':     '📄',
+                'fa-chevron-right': '›',  'fa-square-check':  '☑',
+                'fa-check-square':  '☑',
+            };
+            const faIcons = captureEl.querySelectorAll('i[class*="fa-"]');
+            faIcons.forEach(icon => {
+                const cls = icon.className;
+                let glyph = '•';
+                for (const [key, val] of Object.entries(FA_FALLBACKS)) {
+                    if (cls.includes(key)) { glyph = val; break; }
+                }
+                const span = document.createElement('span');
+                span.textContent = glyph;
+                span.style.cssText = 'font-style:normal;font-family:system-ui,sans-serif;';
+                icon.parentNode.insertBefore(span, icon);
+                icon.style.display = 'none';
+                faRestoreList.push({ icon, span });
+            });
+
+            // 4. Wait one more frame for DOM to settle after replacements
+            btn.innerHTML = '⏳ Rendering…';
+            await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+            // 5. Capture
             const canvas = await html2canvas(captureEl, {
                 useCORS:         true,
-                allowTaint:      true,   // allow local file:// images
+                allowTaint:      false,
                 backgroundColor: '#0f111a',
-                scale:           1,      // 1:1, no scaling
+                scale:           1,
                 logging:         false,
-                imageTimeout:    0,      // no timeout — wait for all images
+                imageTimeout:    0,
             });
 
             const dataUrl = canvas.toDataURL('image/png');
-
             const title = (document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'LSTB_Team')
                 .replace(/[^a-zA-Z0-9\s_-]/g, '').replace(/\s+/g, '_').substring(0, 40) || 'LSTB_Team';
             const dateStr = new Date().toISOString().slice(0, 10);
@@ -4785,7 +4862,7 @@ function togglePetFilter(cat, val) {
             link.href = dataUrl;
             link.click();
 
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            btn.innerHTML = '✓ Saved!';
             btn.style.borderColor = '#059669';
             btn.style.color = '#34d399';
             setTimeout(() => {
@@ -4805,6 +4882,13 @@ function togglePetFilter(cat, val) {
             zoomLock.style.transform = savedTransform;
             zoomLock.style.width     = savedWidth;
             zoomLock.style.minHeight = savedMinHeight;
+            // Restore original image srcs
+            imgRestoreMap.forEach(({ img, src }) => { img.src = src; });
+            // Restore FA icons
+            faRestoreList.forEach(({ icon, span }) => {
+                icon.style.display = '';
+                if (span.parentNode) span.parentNode.removeChild(span);
+            });
         }
     }
     </script>
