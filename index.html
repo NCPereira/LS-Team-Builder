@@ -29,24 +29,10 @@
             background-color: #0f111a;
             color: #f8fafc;
             font-family: system-ui, sans-serif;
-            /* Prevent horizontal reflow at any zoom level */
-            min-width: 1200px;
-            overflow-x: auto;
         }
 
-        /* ── Zoom-lock wrapper ── */
-        #zoom-lock {
-            width: 1600px;
-            transform-origin: top left;
-            /* JS will set transform: scale() to counter browser zoom */
-        }
-
-        /* ── Global crisp image rendering at all zoom levels ── */
+        /* ── Global crisp image rendering ── */
         img {
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
             image-rendering: -webkit-optimize-contrast;
             -ms-interpolation-mode: bicubic;
         }
@@ -519,7 +505,7 @@
     </style>
 </head>
 <body class="min-h-screen p-0 m-0" style="overflow-x:hidden;">
-<div id="zoom-lock" class="flex flex-col p-4 gap-4" style="min-height:100vh;">
+<div class="flex flex-col p-4 gap-4" style="min-height:100vh;">
 
     <div id="capture-area" class="bg-[#0f111a]">
         <header class="text-center mb-6">
@@ -597,7 +583,7 @@
                                 <!-- Header row: position icon centred over pet (96px), stat badge centred over gem grid (96px) -->
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                        <img src="icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
                                     </div>
                                     <div id="gem-stat-badge-0" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_0_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -631,7 +617,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                        <img src="icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
                                     </div>
                                     <div id="gem-stat-badge-1" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_1_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -662,7 +648,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="Icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                        <img src="icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
                                     </div>
                                     <div id="gem-stat-badge-2" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_2_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -702,15 +688,15 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">TOP</span>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                    <img src="icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
                                     <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                    <img src="icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
                                     <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="Icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                    <img src="icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
                                     <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
                                 </div>
                             </div>
@@ -1269,10 +1255,10 @@
                     <!-- Off/Def buttons above the character portrait -->
                     <div class="flex gap-1.5">
                         <button id="slot-off-btn-${index}" onclick="applySlotAutoGear(${index},'offensive')" title="Auto-equip offensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#ef4444';this.style.color='#f87171'" onmouseout="resetSlotOffBtn(${index})"` : ''}>
-                            <i class="fa-solid fa-fire" style="font-size:9px;"></i>Off
+                            Off
                         </button>
                         <button id="slot-def-btn-${index}" onclick="applySlotAutoGear(${index},'defensive')" title="Auto-equip defensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#3b82f6';this.style.color='#60a5fa'" onmouseout="resetSlotDefBtn(${index})"` : ''}>
-                            <i class="fa-solid fa-shield-halved" style="font-size:9px;"></i>Def
+                            Def
                         </button>
                     </div>
                     <div class="relative bg-slotBg border-2 border-dashed border-slate-700 rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all hover:border-accentBlue" onclick="openModal('${index}', 'character')">
@@ -4684,127 +4670,87 @@ function togglePetFilter(cat, val) {
     </script>
 
     <script>
-        // ── Zoom Lock ────────────────────────────────────────────────────────
-        // Allows zooming OUT freely, but prevents zooming IN past the base (100%).
-        (function() {
-            const wrapper = document.getElementById('zoom-lock');
-            if (!wrapper) return;
-
-            // Capture the "base" zoom at page load.
-            const baseZoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100 || 1;
-
-            // Default render scale — page starts at 90%
-            const DEFAULT_SCALE = 0.92;
-
-            function applyZoomLock() {
-                const browserZoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100 || 1;
-                const relativeZoom = browserZoom / baseZoom;
-
-                // Apply default 90% scale, only counter zoom-IN past base (relativeZoom > 1)
-                const scale = relativeZoom > 1 ? DEFAULT_SCALE / relativeZoom : DEFAULT_SCALE;
-
-                wrapper.style.transform = `scale(${scale})`;
-                wrapper.style.transformOrigin = 'top left';
-                wrapper.style.width     = `${window.innerWidth  / scale}px`;
-                wrapper.style.minHeight = `${window.innerHeight / scale}px`;
-            }
-
-            applyZoomLock();
-            window.addEventListener('resize', applyZoomLock);
-
-            // Intercept Ctrl+Wheel — only block zoom-IN, let zoom-OUT through
-            window.addEventListener('wheel', function(e) {
-                if (!e.ctrlKey) return;
-                const browserZoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100 || 1;
-                const relativeZoom = browserZoom / baseZoom;
-                // e.deltaY < 0 = zooming in; block only if already at/above base
-                if (e.deltaY < 0 && relativeZoom >= 1) {
-                    e.preventDefault();
-                } else {
-                    setTimeout(applyZoomLock, 50);
-                }
-            }, { passive: false });
-
-            // Intercept Ctrl+Plus — block zoom-in, allow zoom-out (Ctrl+Minus) and reset (Ctrl+0)
-            window.addEventListener('keydown', function(e) {
-                if (!e.ctrlKey) return;
-                const browserZoom = Math.round((window.outerWidth / window.innerWidth) * 100) / 100 || 1;
-                const relativeZoom = browserZoom / baseZoom;
-                if ((e.key === '+' || e.key === '=') && relativeZoom >= 1) {
-                    e.preventDefault(); // Block zoom-in at base level
-                } else if (e.key === '-' || e.key === '0') {
-                    setTimeout(applyZoomLock, 100); // Allow zoom-out / reset
-                }
-            });
-        })();
-    </script>
-
-    <script>
     // ── Export PNG via html2canvas ─────────────────────────────────────────────
-    // All game assets are same-origin. The only cross-origin issue is the
-    // Font Awesome webfont (cdnjs CDN) — html2canvas can't read it, so FA <i>
-    // icons become blank squares. We simply hide them during capture since the
-    // buttons they're in also have text labels ("Off", "Def", etc.).
+    // Captures only the team grid + pets/formation/ult section (no header, no stats panel).
+    // No zoom transforms applied — html2canvas sees the raw 1:1 layout.
 
     async function exportCapturePNG() {
         const btn = document.getElementById('export-png-btn');
-        const captureEl = document.getElementById('capture-area');
-        const zoomLock  = document.getElementById('zoom-lock');
 
-        if (!captureEl || typeof html2canvas === 'undefined') {
+        // Capture the main content section: team grid row + the pets/formation/ult card
+        // We build a temporary wrapper that clones just those two elements.
+        const teamWrapper = document.getElementById('team-stats-wrapper');
+        const petsSection = teamWrapper ? teamWrapper.nextElementSibling : null; // the section after team-stats-wrapper
+
+        // Fallback to full capture-area if structure unexpected
+        const primaryTarget = document.getElementById('team-grid');
+
+        if (!primaryTarget || typeof html2canvas === 'undefined') {
             alert('html2canvas not loaded yet — try again in a moment.');
             return;
         }
 
         const origHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Rendering…';
+        btn.innerHTML = 'Rendering…';
         btn.disabled = true;
 
-        // Snapshot zoom-lock styles
-        const savedTransform  = zoomLock.style.transform;
-        const savedWidth      = zoomLock.style.width;
-        const savedMinHeight  = zoomLock.style.minHeight;
-
-        // Things to restore after capture
         const restoreList = [];
 
         try {
-            // 1. Remove zoom transform so html2canvas sees a 1:1 layout
-            zoomLock.style.transform = 'none';
-            zoomLock.style.width     = 'auto';
-            zoomLock.style.minHeight = 'auto';
+            // Build a temporary off-screen container with just the elements we want.
+            // This avoids capturing the header, battle stats panel, footer etc.
+            const tempWrap = document.createElement('div');
+            tempWrap.style.cssText = [
+                'position:fixed',
+                'top:-99999px',
+                'left:0',
+                'width:' + (teamWrapper ? teamWrapper.offsetWidth : 1200) + 'px',
+                'background:#0f111a',
+                'padding:16px',
+                'box-sizing:border-box',
+                'z-index:-1'
+            ].join(';');
+
+            // Clone team-stats-wrapper (character slots + damage dealt panel)
+            if (teamWrapper) {
+                const clone1 = teamWrapper.cloneNode(true);
+                // Keep the battle-stats panel — it's part of the export
+                tempWrap.appendChild(clone1);
+            }
+
+            // Clone the pets/formation/ult section
+            if (petsSection && petsSection.tagName === 'SECTION') {
+                const clone2 = petsSection.cloneNode(true);
+                clone2.style.marginTop = '16px';
+                tempWrap.appendChild(clone2);
+            }
+
+            document.body.appendChild(tempWrap);
+
+            // Hide all FA icons in the temp wrap (cross-origin webfont)
+            tempWrap.querySelectorAll('i[class*="fa-"]').forEach(icon => {
+                icon.style.display = 'none';
+            });
+
+            // Fix semi-transparent formation slot backgrounds
+            tempWrap.querySelectorAll('.form-slot-forward, .form-slot-center, .form-slot-backward').forEach(el => {
+                el.style.background = 'transparent';
+            });
+
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-            // 2. Hide all Font Awesome <i> icons inside the capture area.
-            //    FA webfont is cross-origin so html2canvas can't render it.
-            //    Hiding is cleaner than emoji replacement — no size-shift artifacts.
-            captureEl.querySelectorAll('i[class*="fa-"]').forEach(icon => {
-                const prev = icon.style.display;
-                icon.style.display = 'none';
-                restoreList.push(() => { icon.style.display = prev; });
-            });
-
-            // 3. Fix formation slot semi-transparent coloured backgrounds.
-            //    The tiny alpha backgrounds (#1a0a0a22 etc.) composite oddly in
-            //    html2canvas and produce a visible dark patch. Replace with
-            //    transparent for the capture only.
-            captureEl.querySelectorAll('.form-slot-forward, .form-slot-center, .form-slot-backward').forEach(el => {
-                const prev = el.style.background;
-                el.style.background = 'transparent';
-                restoreList.push(() => { el.style.background = prev; });
-            });
-
-            // 4. One frame for DOM to settle, then capture
-            await new Promise(r => requestAnimationFrame(r));
-
-            const canvas = await html2canvas(captureEl, {
+            const canvas = await html2canvas(tempWrap, {
                 useCORS:         true,
                 allowTaint:      false,
                 backgroundColor: '#0f111a',
-                scale:           1,
+                scale:           window.devicePixelRatio || 1,
                 logging:         false,
                 imageTimeout:    0,
+                width:           tempWrap.offsetWidth,
+                height:          tempWrap.scrollHeight,
             });
+
+            document.body.removeChild(tempWrap);
 
             const dataUrl = canvas.toDataURL('image/png');
             const title = (document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'LSTB_Team')
@@ -4815,7 +4761,7 @@ function togglePetFilter(cat, val) {
             link.href = dataUrl;
             link.click();
 
-            btn.innerHTML = '<i class="fa-solid fa-check"></i> Saved!';
+            btn.innerHTML = 'Saved!';
             btn.style.borderColor = '#059669';
             btn.style.color = '#34d399';
             setTimeout(() => {
@@ -4830,12 +4776,9 @@ function togglePetFilter(cat, val) {
             alert('Export failed: ' + err.message);
             btn.innerHTML = origHTML;
             btn.disabled  = false;
-        } finally {
-            // Restore zoom-lock transform
-            zoomLock.style.transform = savedTransform;
-            zoomLock.style.width     = savedWidth;
-            zoomLock.style.minHeight = savedMinHeight;
-            // Restore everything we temporarily changed
+            // Clean up temp wrap if it exists
+            const tw = document.body.querySelector('[style*="top:-99999px"]');
+            if (tw) document.body.removeChild(tw);
             restoreList.forEach(fn => fn());
         }
     }
@@ -4862,16 +4805,16 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('class','Knight')" id="fbtn-class-Knight" class="filter-btn" title="Knight">
-                    <img src="Icons/class_knight.webp" class="filter-icon-img" alt="Knight">
+                    <img src="icons/class_knight.webp" class="filter-icon-img" alt="Knight">
                 </button>
                 <button onclick="toggleFilter('class','Archer')" id="fbtn-class-Archer" class="filter-btn" title="Archer">
-                    <img src="Icons/class_archer.webp" class="filter-icon-img" alt="Archer">
+                    <img src="icons/class_archer.webp" class="filter-icon-img" alt="Archer">
                 </button>
                 <button onclick="toggleFilter('class','Wizard')" id="fbtn-class-Wizard" class="filter-btn" title="Wizard">
-                    <img src="Icons/class_wizard.webp" class="filter-icon-img" alt="Wizard">
+                    <img src="icons/class_wizard.webp" class="filter-icon-img" alt="Wizard">
                 </button>
                 <button onclick="toggleFilter('class','Healer')" id="fbtn-class-Healer" class="filter-btn" title="Healer">
-                    <img src="Icons/class_healer.webp" class="filter-icon-img" alt="Healer">
+                    <img src="icons/class_healer.webp" class="filter-icon-img" alt="Healer">
                 </button>
                 <!-- Divider -->
                 <div class="w-px h-6 bg-slate-700 mx-1 flex-shrink-0"></div>
@@ -4896,13 +4839,13 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('position','Forward')" id="fbtn-position-Forward" class="filter-btn" title="Forward">
-                    <img src="Icons/position_forward.webp" class="filter-icon-img" alt="Forward">
+                    <img src="icons/position_forward.webp" class="filter-icon-img" alt="Forward">
                 </button>
                 <button onclick="toggleFilter('position','Center')" id="fbtn-position-Center" class="filter-btn" title="Center">
-                    <img src="Icons/position_center.webp" class="filter-icon-img" alt="Center">
+                    <img src="icons/position_center.webp" class="filter-icon-img" alt="Center">
                 </button>
                 <button onclick="toggleFilter('position','Backward')" id="fbtn-position-Backward" class="filter-btn" title="Backward">
-                    <img src="Icons/position_backward.webp" class="filter-icon-img" alt="Backward">
+                    <img src="icons/position_backward.webp" class="filter-icon-img" alt="Backward">
                 </button>
                 <!-- Divider -->
                 <div class="w-px h-6 bg-slate-700 mx-1 flex-shrink-0"></div>
@@ -4911,25 +4854,25 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('element','Fire')" id="fbtn-element-Fire" class="filter-btn" title="Fire">
-                    <img src="Icons/element_fire.webp" class="filter-icon-img" alt="Fire">
+                    <img src="icons/element_fire.webp" class="filter-icon-img" alt="Fire">
                 </button>
                 <button onclick="toggleFilter('element','Frost')" id="fbtn-element-Frost" class="filter-btn" title="Frost">
-                    <img src="Icons/element_frost.webp" class="filter-icon-img" alt="Frost">
+                    <img src="icons/element_frost.webp" class="filter-icon-img" alt="Frost">
                 </button>
                 <button onclick="toggleFilter('element','Nature')" id="fbtn-element-Nature" class="filter-btn" title="Nature">
-                    <img src="Icons/element_nature.webp" class="filter-icon-img" alt="Nature">
+                    <img src="icons/element_nature.webp" class="filter-icon-img" alt="Nature">
                 </button>
                 <button onclick="toggleFilter('element','Holy')" id="fbtn-element-Holy" class="filter-btn" title="Holy">
-                    <img src="Icons/element_holy.webp" class="filter-icon-img" alt="Holy">
+                    <img src="icons/element_holy.webp" class="filter-icon-img" alt="Holy">
                 </button>
                 <button onclick="toggleFilter('element','Shock')" id="fbtn-element-Shock" class="filter-btn" title="Shock">
-                    <img src="Icons/element_shock.webp" class="filter-icon-img" alt="Shock">
+                    <img src="icons/element_shock.webp" class="filter-icon-img" alt="Shock">
                 </button>
                 <button onclick="toggleFilter('element','Chaos')" id="fbtn-element-Chaos" class="filter-btn" title="Chaos">
-                    <img src="Icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
+                    <img src="icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
                 </button>
                 <button onclick="toggleFilter('element','Radiance')" id="fbtn-element-Radiance" class="filter-btn" title="Radiance">
-                    <img src="Icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
+                    <img src="icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
                 </button>
                 <!-- Count + Reset pushed to end -->
                 <div class="flex items-center gap-2 ml-auto">
@@ -4962,25 +4905,25 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="togglePetFilter('element','Fire')" id="pfbtn-element-Fire" class="filter-btn" title="Fire">
-                    <img src="Icons/element_fire.webp" class="filter-icon-img" alt="Fire">
+                    <img src="icons/element_fire.webp" class="filter-icon-img" alt="Fire">
                 </button>
                 <button onclick="togglePetFilter('element','Frost')" id="pfbtn-element-Frost" class="filter-btn" title="Frost">
-                    <img src="Icons/element_frost.webp" class="filter-icon-img" alt="Frost">
+                    <img src="icons/element_frost.webp" class="filter-icon-img" alt="Frost">
                 </button>
                 <button onclick="togglePetFilter('element','Nature')" id="pfbtn-element-Nature" class="filter-btn" title="Nature">
-                    <img src="Icons/element_nature.webp" class="filter-icon-img" alt="Nature">
+                    <img src="icons/element_nature.webp" class="filter-icon-img" alt="Nature">
                 </button>
                 <button onclick="togglePetFilter('element','Holy')" id="pfbtn-element-Holy" class="filter-btn" title="Holy">
-                    <img src="Icons/element_holy.webp" class="filter-icon-img" alt="Holy">
+                    <img src="icons/element_holy.webp" class="filter-icon-img" alt="Holy">
                 </button>
                 <button onclick="togglePetFilter('element','Shock')" id="pfbtn-element-Shock" class="filter-btn" title="Shock">
-                    <img src="Icons/element_shock.webp" class="filter-icon-img" alt="Shock">
+                    <img src="icons/element_shock.webp" class="filter-icon-img" alt="Shock">
                 </button>
                 <button onclick="togglePetFilter('element','Chaos')" id="pfbtn-element-Chaos" class="filter-btn" title="Chaos">
-                    <img src="Icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
+                    <img src="icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
                 </button>
                 <button onclick="togglePetFilter('element','Radiance')" id="pfbtn-element-Radiance" class="filter-btn" title="Radiance">
-                    <img src="Icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
+                    <img src="icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
                 </button>
                 <!-- Count + Reset pushed to end -->
                 <div class="flex items-center gap-2 ml-auto">
