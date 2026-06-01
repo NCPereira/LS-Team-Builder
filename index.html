@@ -32,7 +32,10 @@
         }
 
         /* ── Global crisp image rendering ── */
+        /* display:inline-block overrides Tailwind preflight's display:block on img,
+           preventing html2canvas from rendering unwanted line-breaks below images */
         img {
+            display: inline-block;
             image-rendering: -webkit-optimize-contrast;
             -ms-interpolation-mode: bicubic;
         }
