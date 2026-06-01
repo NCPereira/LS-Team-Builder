@@ -766,7 +766,7 @@
                         <button onclick="scanPresets()" class="text-slate-500 hover:text-slate-300 transition text-xs" title="Refresh"><i class="fa-solid fa-arrows-rotate"></i></button>
                     </div>
                     <div id="preset-list" class="max-h-64 overflow-y-auto py-1">
-                        <div class="px-3 py-3 text-xs text-slate-500 text-center italic">Grant folder access to see presets</div>
+                        <div class="px-3 py-3 text-xs text-slate-500 text-center italic">Click Load Preset to grant folder access</div>
                     </div>
                 </div>
             </div>
@@ -3984,7 +3984,6 @@ function togglePetFilter(cat, val) {
             try {
                 const root = await window.showDirectoryPicker({ mode: 'readwrite' });
                 _presetsDir = await root.getDirectoryHandle('presets', { create: true });
-                document.getElementById('folder-banner')?.remove();
                 await scanPresets();
             } catch (e) {
                 if (e.name !== 'AbortError') console.warn('Folder access error:', e);
@@ -3996,7 +3995,7 @@ function togglePetFilter(cat, val) {
             const list = document.getElementById('preset-list');
             if (!list) return;
             if (!_presetsDir) {
-                list.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500 text-center italic">Grant folder access to see presets</div>';
+                list.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500 text-center italic">Click Load Preset to grant folder access</div>';
                 return;
             }
 
@@ -4104,8 +4103,8 @@ function togglePetFilter(cat, val) {
 
         async function savePreset() {
             if (!_presetsDir) {
-                alert('No folder access yet. Click "Select Folder" in the banner at the bottom of the page first.');
-                return;
+                await initPresetsFolder();
+                if (!_presetsDir) return; // user cancelled
             }
             _pendingSaveTitle = document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'My Lost Sword Team';
 
@@ -4249,6 +4248,12 @@ function togglePetFilter(cat, val) {
 
         function togglePresetDropdown(e) {
             e.stopPropagation();
+            if (!_presetsDir) {
+                initPresetsFolder().then(() => {
+                    if (_presetsDir) document.getElementById('preset-dropdown').classList.remove('hidden');
+                });
+                return;
+            }
             document.getElementById('preset-dropdown').classList.toggle('hidden');
         }
 
@@ -4400,7 +4405,7 @@ function togglePetFilter(cat, val) {
         // ── Load most recent score from each raid folder ───────────────────
         window.dtgLoadAllRaids = async function () {
             if (typeof _presetsDir === 'undefined' || !_presetsDir) {
-                alert('Grant folder access first.');
+                alert('Grant folder access first — click Select Folder.');
                 return;
             }
 
@@ -5080,22 +5085,7 @@ function togglePetFilter(cat, val) {
     </div>
 </div>
 
-<!-- Folder access banner — lives OUTSIDE zoom-lock so position:fixed works correctly.
-     CSS transform on a parent breaks fixed positioning; elements become positioned
-     relative to the transformed ancestor instead of the viewport. -->
-<div id="folder-banner" class="fixed bottom-0 left-0 right-0 z-[90] bg-[#1a1e2e] border-t border-blue-800 px-6 py-3 flex items-center justify-between gap-4 shadow-2xl">
-    <div class="flex items-center gap-3">
-        <i class="fa-solid fa-folder-open text-blue-400 text-lg"></i>
-        <div>
-            <div class="text-sm font-semibold text-slate-200">Grant Folder Access</div>
-            <div class="text-xs text-slate-400">Select your <span class="text-blue-400 font-mono">LSTB_Ciri</span> folder to enable preset saving and loading.</div>
-        </div>
-    </div>
-    <div class="flex gap-2 flex-shrink-0">
-        <button onclick="initPresetsFolder()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold py-2 px-4 rounded-lg transition-all"><i class="fa-solid fa-folder-open mr-2"></i>Select Folder</button>
-        <button onclick="document.getElementById('folder-banner').remove()" class="text-slate-500 hover:text-slate-300 text-xs px-2 transition-all" title="Dismiss"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-</div>
+
 
 </body>
 </html>
