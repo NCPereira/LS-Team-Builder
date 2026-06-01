@@ -938,8 +938,6 @@
             });
         }
 
-        // Kick off async probing for a character's skin candidates.
-        // Re-renders the team grid once probing completes so the button appears.
         async function _probeSkins(charName) {
             if (_resolvedSkins[charName] !== undefined) return; // already probing/done
             _resolvedSkins[charName] = 'pending';
@@ -1002,9 +1000,6 @@
         }
 
         // ── Face Detection & Smart Crop ────────────────────────────────────
-        // Cache: imgUrl → 'pending' | { x: pct, y: pct } | null
-        // x/y are CSS object-position percentages (0–100).
-        // null means detection ran but found no face → fall back to object-top.
         const _faceCache = {};
 
         // face-api.js model state
@@ -1025,7 +1020,7 @@
             _faceApiLoading = false;
         }
 
-        // Load an image into an offscreen HTMLImageElement (crossOrigin ok for local files)
+        // Load an image into an offscreen HTMLImageElement
         function _loadImg(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -1091,10 +1086,6 @@
             renderTeamGrid();
         }
 
-        // Return CSS object-position string for an image URL.
-        // 'pending' / undefined → use default (50% 10%)
-        // null  → no face found, use 50% 10% (safe top-centre)
-        // {...} → use detected position
         function getFacePosition(imgUrl) {
             if (!imgUrl) return '50% 10%';
             const cached = _faceCache[imgUrl];
@@ -1115,8 +1106,8 @@
 
         // Gem stat presets (same 2 options for all pets)
         const GEM_STAT_PRESETS = [
-            { id: 'gs-2atk2hp', label: '2×ATK/HP', color: '#fb923c', stats: ['ATK','ATK','HP','HP'] },
-            { id: 'gs-2cd2hp',  label: '2×CD/HP',  color: '#f472b6', stats: ['CD','CD','HP','HP'] },
+            { id: 'gs-4atk4hp', label: '4×ATK/4×HP', color: '#fb923c', stats: ['ATK','ATK','ATK','ATK','HP','HP','HP','HP'] },
+            { id: 'gs-4cd4hp',  label: '4×CD/4×HP',  color: '#f472b6', stats: ['CD','CD','CD','CD','HP','HP','HP','HP'] },
         ];
         // Formation mapping: form-slot-idx -> team slot index (or -1 for empty)
         // Default: Slot 2->Top1, Slot 4->Top2, Slot 5->Top3, Slot 1->Bot1, Slot 3->Bot2, empty->Bot3
@@ -3406,7 +3397,6 @@ function togglePetFilter(cat, val) {
             const W = bitmap.width, H = bitmap.height;
 
             // ── Shared grayscale + contrast helper ──
-            // Applied to every canvas after drawing/transforming the bitmap.
             function applyGray(cx, w, h, threshold, mult) {
                 const id = cx.getImageData(0, 0, w, h);
                 const d  = id.data;
@@ -3432,10 +3422,6 @@ function togglePetFilter(cat, val) {
             }
 
             // ── Generic canvas builder ──
-            // angle: CSS-transform-style rotation in radians (0, π/2, π, 3π/2).
-            // flipX: mirror horizontally before rotation (gives left↔right flip).
-            // flipY: mirror vertically before rotation (gives top↔bottom flip).
-            // After rotation the canvas dimensions are swapped when angle is ±90°.
             function buildCanvas(angle, flipX, flipY, threshold, mult, inverted) {
                 const TARGET = 1600;
                 // For 90°/270° rotations the output canvas has swapped W/H
@@ -3468,7 +3454,6 @@ function togglePetFilter(cat, val) {
             // ── Run all 7 passes concurrently ──
             // Each pass sees the image from a different geometric viewpoint, so
             // Tesseract's text-flow parser encounters rows in a different order.
-            //
             //  P1 — top → bottom   (normal,       gentle contrast)
             //  P2 — top → bottom   (high contrast, more aggressive)
             //  P3 — top → bottom   (inverted,      bright-on-dark UI)
@@ -3476,8 +3461,6 @@ function togglePetFilter(cat, val) {
             //  P5 — left  → right  (90° CW rotation — columns become rows)
             //  P6 — right → left   (90° CCW rotation — columns become rows, mirrored)
             //  P7 — bottom → top   (vertical flip — same as P4 but via flipY, no rotation)
-            //       This catches edge cases where 180° rotation and flipY diverge slightly
-            //       due to sub-pixel rounding at extreme screenshot aspect ratios.
 
             // Space is included so Tesseract preserves space-separated thousands like
             // "100 148 693" or "2 622 510 896" (seen in some game localisations).
@@ -3509,11 +3492,6 @@ function togglePetFilter(cat, val) {
 
             // ── Number extraction ──
             // The game uses different thousand separators depending on locale/device:
-            //   Dots:    3.815.702.420   (most common)
-            //   Spaces:  2 622 510 896   (some localisations)
-            //   Commas:  4,555,615,886   (EN locale fallback)
-            //   None:    100148693       (after OCR strips separators)
-            // We also handle 4-group numbers: 11.379.954.002 (10 digits, valid).
             function extractNums(text) {
                 const seen = new Set();
                 const out  = [];
@@ -3547,8 +3525,6 @@ function togglePetFilter(cat, val) {
                 }
 
                 // Plain digit runs — catches numbers after OCR strips separators
-                // (e.g. spaces collapsed: "100148693", "2622510896")
-                // Floor at 7 digits to avoid false positives from short UI numbers.
                 const rePlain = /(?<![.,\d ])\d{7,13}(?![.,\d])/g;
                 while ((m = rePlain.exec(text)) !== null) {
                     addVal(m[0]);
@@ -3558,7 +3534,6 @@ function togglePetFilter(cat, val) {
             }
 
             // ── Percentage extraction ──
-            // The game uses COMMAS as decimal separators: 39,45% or 3,33%
             function extractPcts(text) {
                 const out = [];
                 let m;
@@ -3578,13 +3553,6 @@ function togglePetFilter(cat, val) {
             }
 
             // ── Detect zero-damage rows AND their positions in the screenshot ──
-            // A slot showing 0 damage displays "0" alongside "0,00%" / "0.00%".
-            // We build a sequence of tokens (either a damage number or a zero marker)
-            // from each OCR pass so we can reconstruct the full 5-slot positional order
-            // including where zeros sit relative to non-zero values.
-            //
-            // Returns an array of length = total rows detected, each entry is either
-            // a numeric value (non-zero damage) or 0 (zero-damage slot), in top→bottom order.
             function extractPositionalSequence(text) {
                 // Tokenise the raw text line-by-line to find rows containing either
                 // a large damage number OR a zero-damage marker ("0" + "0,00%"/"0.00%").
@@ -3620,7 +3588,6 @@ function togglePetFilter(cat, val) {
             }
 
             // Run positional extraction on the three vertical passes (top→bottom canonical)
-            // and vote on the best sequence (most entries, plausible length 1–5).
             const positionalSeqs = [
                 extractPositionalSequence(r1.data.text),
                 extractPositionalSequence(r2.data.text),
@@ -3682,8 +3649,6 @@ function togglePetFilter(cat, val) {
                 .map(([v]) => v);
 
             // ── Pick top N candidates (capped to nonZeroSlots) ──
-            // If 1 slot has 0 damage we only take 4 candidates, not 5 — so the zero
-            // slot stays at 0 instead of being filled with a stray number.
             const topN = candidates.slice(0, nonZeroSlots);
 
             // Restore top→bottom display order using the best vertical pass as reference.
@@ -3712,17 +3677,9 @@ function togglePetFilter(cat, val) {
             }
 
             // ── Build 5 positional rows — zeros stay at their actual screenshot positions ──
-            //
-            // Strategy: if bestSeq gave us a reliable positional sequence (e.g. [A, 0, B, C, 0])
-            // we map confirmed non-zero topN values into those positions. Otherwise fall back
-            // to the original approach (zeros appended at the end).
-            //
-            // We match each non-zero entry in bestSeq against topN by value; any entry in
-            // bestSeq that is 0 becomes a zero slot at that position.
             let positionalValues; // length-5 array of damage values in screenshot top→bottom order
 
             // Validate bestSeq: it should contain at least the same non-zero values as topN
-            // (allowing for minor OCR misreads). Count how many topN values appear in bestSeq.
             const seqNonZero = bestSeq.filter(v => v > 0);
             const topNSet = new Set(topN);
             const seqMatchCount = seqNonZero.filter(v => topNSet.has(v)).length;
@@ -3753,8 +3710,6 @@ function togglePetFilter(cat, val) {
             const total = positionalValues.reduce((s, v) => s + v, 0);
 
             // Assign percentages in positional order
-            // allPcts comes from the best OCR pass in top→bottom order; align to same positions.
-            // We map pcts only to non-zero entries in positional order.
             const nonZeroPositions = positionalValues.map((v, i) => v > 0 ? i : -1).filter(i => i !== -1);
             const pctSum = allPcts.slice(0, nonZeroPositions.length).reduce((s, v) => s + v, 0);
             const usePcts = allPcts.length >= nonZeroPositions.length && Math.abs(pctSum - 100) < 5;
@@ -4067,7 +4022,6 @@ function togglePetFilter(cat, val) {
             return NON_RAID_FOLDERS.has(name) || NON_RAID_FOLDERS.has(name.toLowerCase());
         }
 
-        // Build the auto-generated filename:
         // Raid/unknown folders: SubfolderName_YYYY-MM-DD.json
         // Non-raid folders (Star, Brawl, Abyss, Stonehenge): sanitized-title.json
         function buildFilename(subfolderName) {
@@ -4267,7 +4221,7 @@ function togglePetFilter(cat, val) {
     </script>
 
     <script>
-    // ── Damage Timeline Graph ─────────────────────────────────────────────────
+    // ── Damage Timeline Graph ──────────────────────────────────────────────
     (function () {
         let _dtgSubfolderHandle = null; // the chosen subfolder handle
         let _dtgSubfolderName   = '';
@@ -4481,8 +4435,6 @@ function togglePetFilter(cat, val) {
             const tickStep  = niceMax / tickCount;
 
             // ── Coordinate helpers ──
-            // Column-based layout: each data point owns an equal slice of cW.
-            // Bars are centred in their column so they can never overflow the chart bounds.
             const colW  = cW / pts.length;
             const barW  = Math.min(Math.max(colW * 0.55, 8), 100);
             const xPos  = i => padL + colW * (i + 0.5);
@@ -4667,15 +4619,12 @@ function togglePetFilter(cat, val) {
             return nice * mag;
         }
 
-        // Re-render if window resizes (canvas is CSS-scaled, no re-render needed
-        // unless you want pixel-perfect — skip for now to keep it simple)
     })();
     </script>
 
     <script>
     // ── Export PNG via html2canvas ─────────────────────────────────────────────
     // Captures only the team grid + pets/formation/ult section (no header, no stats panel).
-    // No zoom transforms applied — html2canvas sees the raw 1:1 layout.
 
     async function exportCapturePNG() {
         const btn = document.getElementById('export-png-btn');
