@@ -4741,13 +4741,10 @@ function togglePetFilter(cat, val) {
 
     <script>
     // ── Export PNG via html2canvas ─────────────────────────────────────────────
-    // All game assets (characters, gear, icons) are same-origin on the server,
-    // so html2canvas can read them directly — no crossOrigin tricks needed.
-    //
-    // The one remaining issue: Font Awesome icons load their webfont from the
-    // cdnjs CDN (cross-origin). html2canvas can't read that font, so <i> tags
-    // render as blank squares. We swap them for Unicode equivalents just for
-    // the capture, then restore the real icons immediately after.
+    // All game assets are same-origin. The only cross-origin issue is the
+    // Font Awesome webfont (cdnjs CDN) — html2canvas can't read it, so FA <i>
+    // icons become blank squares. We simply hide them during capture since the
+    // buttons they're in also have text labels ("Off", "Def", etc.).
 
     async function exportCapturePNG() {
         const btn = document.getElementById('export-png-btn');
@@ -4768,8 +4765,8 @@ function togglePetFilter(cat, val) {
         const savedWidth      = zoomLock.style.width;
         const savedMinHeight  = zoomLock.style.minHeight;
 
-        // Track FA icon replacements so we can restore them after capture
-        const faRestoreList = [];
+        // Things to restore after capture
+        const restoreList = [];
 
         try {
             // 1. Remove zoom transform so html2canvas sees a 1:1 layout
@@ -4778,42 +4775,26 @@ function togglePetFilter(cat, val) {
             zoomLock.style.minHeight = 'auto';
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-            // 2. Swap Font Awesome <i> icons for Unicode equivalents.
-            //    FA webfont is cross-origin (cdnjs CDN) so html2canvas can't
-            //    render it — without this swap you get blank squares in the PNG.
-            const FA_FALLBACKS = {
-                'fa-fire': '🔥',          'fa-shield-halved': '🛡',
-                'fa-shirt': '👕',          'fa-user-plus': '👤',
-                'fa-chart-bar': '📊',      'fa-chart-area': '📈',
-                'fa-upload': '⬆',          'fa-clipboard': '📋',
-                'fa-arrow-rotate-right': '↻', 'fa-trash': '🗑',
-                'fa-redo': '↺',            'fa-spinner': '⏳',
-                'fa-arrow-up': '▲',        'fa-arrow-down': '▼',
-                'fa-check': '✓',           'fa-xmark': '✕',
-                'fa-image': '🖼',          'fa-floppy-disk': '💾',
-                'fa-folder-open': '📂',    'fa-folder': '📁',
-                'fa-chevron-down': '▾',    'fa-trash-can': '🗑',
-                'fa-dragon': '🐉',         'fa-arrows-rotate': '↻',
-                'fa-lock': '🔒',           'fa-layer-group': '⊞',
-                'fa-clone': '⧉',           'fa-file-code': '📄',
-                'fa-chevron-right': '›',   'fa-square-check': '☑',
-                'fa-check-square': '☑',
-            };
+            // 2. Hide all Font Awesome <i> icons inside the capture area.
+            //    FA webfont is cross-origin so html2canvas can't render it.
+            //    Hiding is cleaner than emoji replacement — no size-shift artifacts.
             captureEl.querySelectorAll('i[class*="fa-"]').forEach(icon => {
-                let glyph = '';
-                for (const [key, val] of Object.entries(FA_FALLBACKS)) {
-                    if (icon.className.includes(key)) { glyph = val; break; }
-                }
-                if (!glyph) return; // leave completely unknown icons alone
-                const span = document.createElement('span');
-                span.textContent = glyph;
-                span.style.cssText = 'font-style:normal;font-family:system-ui,sans-serif;';
-                icon.parentNode.insertBefore(span, icon);
+                const prev = icon.style.display;
                 icon.style.display = 'none';
-                faRestoreList.push({ icon, span });
+                restoreList.push(() => { icon.style.display = prev; });
             });
 
-            // 3. One frame for DOM to settle, then capture
+            // 3. Fix formation slot semi-transparent coloured backgrounds.
+            //    The tiny alpha backgrounds (#1a0a0a22 etc.) composite oddly in
+            //    html2canvas and produce a visible dark patch. Replace with
+            //    transparent for the capture only.
+            captureEl.querySelectorAll('.form-slot-forward, .form-slot-center, .form-slot-backward').forEach(el => {
+                const prev = el.style.background;
+                el.style.background = 'transparent';
+                restoreList.push(() => { el.style.background = prev; });
+            });
+
+            // 4. One frame for DOM to settle, then capture
             await new Promise(r => requestAnimationFrame(r));
 
             const canvas = await html2canvas(captureEl, {
@@ -4854,11 +4835,8 @@ function togglePetFilter(cat, val) {
             zoomLock.style.transform = savedTransform;
             zoomLock.style.width     = savedWidth;
             zoomLock.style.minHeight = savedMinHeight;
-            // Restore FA icons
-            faRestoreList.forEach(({ icon, span }) => {
-                icon.style.display = '';
-                if (span.parentNode) span.parentNode.removeChild(span);
-            });
+            // Restore everything we temporarily changed
+            restoreList.forEach(fn => fn());
         }
     }
     </script>
