@@ -4688,16 +4688,19 @@ function togglePetFilter(cat, val) {
                 'position:fixed',
                 'top:-99999px',
                 'left:0',
-                'width:' + (teamWrapper ? teamWrapper.offsetWidth : 1200) + 'px',
                 'background:#0f111a',
                 'padding:0px',
                 'box-sizing:border-box',
-                'z-index:-1'
+                'z-index:-1',
+                'display:flex',
+                'flex-direction:column'
             ].join(';');
 
             // Clone team-stats-wrapper (character slots + damage dealt panel)
             if (teamWrapper) {
                 const clone1 = teamWrapper.cloneNode(true);
+                clone1.style.margin = '0';
+                clone1.style.padding = '0';
                 // Keep the battle-stats panel — it's part of the export
                 tempWrap.appendChild(clone1);
             }
@@ -4705,7 +4708,8 @@ function togglePetFilter(cat, val) {
             // Clone the pets/formation/ult section
             if (petsSection && petsSection.tagName === 'SECTION') {
                 const clone2 = petsSection.cloneNode(true);
-                clone2.style.marginTop = '16px';
+                clone2.style.margin = '0';
+                clone2.style.padding = '0';
                 tempWrap.appendChild(clone2);
             }
 
@@ -4730,8 +4734,8 @@ function togglePetFilter(cat, val) {
                 scale:           2,
                 logging:         false,
                 imageTimeout:    0,
-                width:           tempWrap.offsetWidth,
-                height:          tempWrap.offsetHeight,
+                width:           tempWrap.scrollWidth,
+                height:          tempWrap.scrollHeight,
             });
 
             document.body.removeChild(tempWrap);
