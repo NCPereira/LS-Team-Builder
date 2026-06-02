@@ -4691,16 +4691,12 @@ function togglePetFilter(cat, val) {
                 'background:#0f111a',
                 'padding:0px',
                 'box-sizing:border-box',
-                'z-index:-1',
-                'display:flex',
-                'flex-direction:column'
+                'z-index:-1'
             ].join(';');
 
             // Clone team-stats-wrapper (character slots + damage dealt panel)
             if (teamWrapper) {
                 const clone1 = teamWrapper.cloneNode(true);
-                clone1.style.margin = '0';
-                clone1.style.padding = '0';
                 // Keep the battle-stats panel — it's part of the export
                 tempWrap.appendChild(clone1);
             }
@@ -4708,8 +4704,7 @@ function togglePetFilter(cat, val) {
             // Clone the pets/formation/ult section
             if (petsSection && petsSection.tagName === 'SECTION') {
                 const clone2 = petsSection.cloneNode(true);
-                clone2.style.margin = '0';
-                clone2.style.padding = '0';
+                clone2.style.marginTop = '16px';
                 tempWrap.appendChild(clone2);
             }
 
@@ -4727,6 +4722,21 @@ function togglePetFilter(cat, val) {
 
             await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
+            // Measure the actual content bounds to avoid extra blank space
+            const rect = tempWrap.getBoundingClientRect();
+            let maxWidth = 0;
+            let maxHeight = 0;
+            
+            tempWrap.querySelectorAll('*').forEach(el => {
+                const r = el.getBoundingClientRect();
+                if (r.right > maxWidth) maxWidth = r.right - rect.left;
+                if (r.bottom > maxHeight) maxHeight = r.bottom - rect.top;
+            });
+
+            // Add small buffer for rounding
+            maxWidth = Math.ceil(maxWidth) + 2;
+            maxHeight = Math.ceil(maxHeight) + 2;
+
             const canvas = await html2canvas(tempWrap, {
                 useCORS:         true,
                 allowTaint:      false,
@@ -4734,8 +4744,8 @@ function togglePetFilter(cat, val) {
                 scale:           2,
                 logging:         false,
                 imageTimeout:    0,
-                width:           tempWrap.scrollWidth,
-                height:          tempWrap.scrollHeight,
+                width:           maxWidth,
+                height:          maxHeight,
             });
 
             document.body.removeChild(tempWrap);
