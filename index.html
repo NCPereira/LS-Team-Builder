@@ -589,7 +589,7 @@
                                 <!-- Header row: position icon centred over pet (96px), stat badge centred over gem grid (96px) -->
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                        <img src="icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
                                     </div>
                                     <div id="gem-stat-badge-0" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_0_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -623,7 +623,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                        <img src="icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
                                     </div>
                                     <div id="gem-stat-badge-1" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_1_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -654,7 +654,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                        <img src="icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
                                     </div>
                                     <div id="gem-stat-badge-2" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_2_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -686,23 +686,21 @@
                     
                     <!-- RIGHT: Formation Section -->
                     <div class="flex-1 flex flex-col gap-4">
-                        <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Formation</h3>
-                        
-                        <!-- Formation rows — gap-2 (8px) everywhere -->
-                        <div class="flex flex-col gap-2">
+                        <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Formation</h3>                        
+                        <div class="flex flex-col gap-0.2">
                             <!-- TOP row with icons above each slot -->
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">TOP</span>
-                                <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="icons/position_backward.webp" class="w-5 h-5 object-contain opacity-80" title="Backward">
+                                <div class="flex-1 flex flex-col items-center gap-0.5">
+                                    <img src="icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
                                     <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
                                 </div>
-                                <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="icons/position_center.webp" class="w-5 h-5 object-contain opacity-80" title="Center">
+                                <div class="flex-1 flex flex-col items-center gap-0.5">
+                                    <img src="icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
                                     <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
                                 </div>
-                                <div class="flex-1 flex flex-col items-center gap-1">
-                                    <img src="icons/position_forward.webp" class="w-5 h-5 object-contain opacity-80" title="Forward">
+                                <div class="flex-1 flex flex-col items-center gap-0.5">
+                                    <img src="icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
                                     <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
                                 </div>
                             </div>
@@ -4901,11 +4899,11 @@ function togglePetFilter(cat, val) {
             <!-- Gem stat presets -->
             <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="filter-label" style="min-width:46px;">STAT<br>PRESETS</span>
-                <button id="gspbtn-gs-2atk2hp" onclick="setGemStatPreset('gs-2atk2hp')" class="filter-btn" style="width:auto;padding:3px 8px;" title="2× ATK / 2× HP">
-                    <span style="font-size:10px;font-weight:700;color:#fb923c;white-space:nowrap;">2×ATK/HP</span>
+                <button id="gspbtn-gs-4atk4hp" onclick="setGemStatPreset('gs-4atk4hp')" class="filter-btn" style="width:auto;padding:3px 8px;" title="4× ATK / 4× HP">
+                    <span style="font-size:10px;font-weight:700;color:#fb923c;white-space:nowrap;">4×ATK/HP</span>
                 </button>
-                <button id="gspbtn-gs-2cd2hp" onclick="setGemStatPreset('gs-2cd2hp')" class="filter-btn" style="width:auto;padding:3px 8px;" title="2× CD / 2× HP">
-                    <span style="font-size:10px;font-weight:700;color:#f472b6;white-space:nowrap;">2×CD/HP</span>
+                <button id="gspbtn-gs-4cd4hp" onclick="setGemStatPreset('gs-4cd4hp')" class="filter-btn" style="width:auto;padding:3px 8px;" title="4× CD / 4× HP">
+                    <span style="font-size:10px;font-weight:700;color:#f472b6;white-space:nowrap;">4×CD/HP</span>
                 </button>
                 <button onclick="clearGemStat()" style="font-size:10px;font-weight:700;color:#64748b;background:#111218;border:1px solid #2d3142;border-radius:5px;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:all 0.15s;" onmouseover="this.style.color='#f87171';this.style.borderColor='#7f1d1d'" onmouseout="this.style.color='#64748b';this.style.borderColor='#2d3142'">
                     <i class="fa-solid fa-xmark" style="font-size:9px;margin-right:3px;"></i>Clear
