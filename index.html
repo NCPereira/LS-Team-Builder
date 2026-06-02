@@ -61,7 +61,8 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #16161e; }
         ::-webkit-scrollbar-thumb { background: #4b6bfb; border-radius: 3px; }
-        [contenteditable]:focus { outline: 2px solid #4b6bfb; border-radius: 4px; padding: 0 4px; background: rgba(0,0,0,0.3); }
+        [contenteditable]:focus { outline: 2px solid #4b6bfb; border-radius: 12px; padding: 0 4px; background: rgba(0,0,0,0.5); }
+        h1[contenteditable] { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 12px; min-width: 200px; transition: all 0.2s ease; }
         .img-fallback { background-color: #1a1c26; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.75rem; text-align: center; }
         [draggable="true"] { cursor: grab; }
 
@@ -142,8 +143,8 @@
             padding-top: 4px;
         }
         .ult-char-icon {
-            width: 80px;
-            height: 80px;
+            width: 88px;
+            height: 88px;
             border-radius: 0.5rem;
             background: #20222f;
             border: 2px solid #2d3142;
@@ -166,9 +167,12 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
-            object-position: top center;
+            object-position: 50% 8%;
             image-rendering: -webkit-optimize-contrast;
             -ms-interpolation-mode: bicubic;
+            display: block;
+            transform: scale(1.25);
+            transform-origin: center 22%;
         }
         .ult-char-icon.empty {
             cursor: pointer;
@@ -268,8 +272,8 @@
             font-weight: 700;
             display: flex;
             align-items: center;
-            align-self: flex-start;
-            margin-top: 28px; /* vertically centers with 80px icon */
+            align-self: center;
+            margin-top: 0;
         }
 
         /* ── Multi-select toggle button ── */
@@ -515,7 +519,7 @@
 
     <div id="capture-area" class="bg-[#0f111a]">
         <header class="text-center mb-6">
-            <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-slate-100 transition-all inline-block" contenteditable="true" spellcheck="false">My Lost Sword Team</h1>
+            <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-slate-100 transition-all inline-block" contenteditable="true" spellcheck="false" style="min-width:200px;">My Lost Sword Team</h1>
         </header>
 
         <div id="team-stats-wrapper" class="max-w-7xl mx-auto w-full flex gap-4 items-stretch">
@@ -571,7 +575,7 @@
             </div>
         </div>
 
-        <section class="max-w-7xl mx-auto w-full mt-4 bg-cardBg border border-borderCool rounded-xl p-4 shadow-xl flex flex-col gap-6">
+        <section class="max-w-7xl mx-auto w-full mt-4 mb-4 bg-cardBg border border-borderCool rounded-xl p-4 shadow-xl flex flex-col gap-6">
             <!-- Pets and Gems Section -->
             <div class="flex flex-col gap-3">
                 <!-- Main container: Pets on TOP-LEFT, Formation on TOP-RIGHT -->
@@ -687,35 +691,35 @@
                     <!-- RIGHT: Formation Section -->
                     <div class="flex-1 flex flex-col gap-4">
                         <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Formation</h3>                        
-                        <div class="flex flex-col gap-0.2">
+                        <div class="flex flex-col gap-1">
                             <!-- TOP row with icons above each slot -->
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">TOP</span>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
                                     <img src="icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
-                                    <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
+                                    <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
                                     <img src="icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
-                                    <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
+                                    <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
                                     <img src="icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
-                                    <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
+                                    <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
                                 </div>
                             </div>
                             
                             <!-- BOT row — same gap-2, no icons (placeholder height keeps alignment) -->
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">BOT</span>
-                                <div class="flex-1 flex flex-col items-center" style="padding-top:21px;">
-                                    <div id="form-slot-3" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="3">-</div>
+                                <div class="flex-1 flex flex-col items-center">
+                                    <div id="form-slot-3" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="3">-</div>
                                 </div>
-                                <div class="flex-1 flex flex-col items-center" style="padding-top:21px;">
-                                    <div id="form-slot-4" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="4">-</div>
+                                <div class="flex-1 flex flex-col items-center">
+                                    <div id="form-slot-4" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="4">-</div>
                                 </div>
-                                <div class="flex-1 flex flex-col items-center" style="padding-top:21px;">
-                                    <div id="form-slot-5" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-10 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="5">-</div>
+                                <div class="flex-1 flex flex-col items-center">
+                                    <div id="form-slot-5" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="5">-</div>
                                 </div>
                             </div>
                         </div>
@@ -726,12 +730,15 @@
             <!-- Ultimate Rotation — full width -->
             <div class="border-t border-borderCool pt-4 flex flex-col gap-3">
                 <div class="flex items-center justify-between">
-                    <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Ultimate Rotation</h3>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Ultimate Rotation</h3>
+                        <div id="ultimate-rotation-controls" class="flex items-center gap-1"></div>
+                    </div>
                     <button onclick="resetUltimateRotation()" class="text-xs text-slate-400 hover:text-slate-200 transition px-2 py-1 rounded border border-slate-700 hover:border-slate-500" title="Reset all rotation slots">
                         <i class="fa-solid fa-redo mr-1"></i>Reset
                     </button>
                 </div>
-                <div id="ultimate-rotation-container" class="flex items-start gap-2 pb-2 overflow-x-auto" style="padding-top: 4px;">
+                <div id="ultimate-rotation-container" class="flex items-start gap-1 pb-2 overflow-x-auto" style="padding-top: 4px;">
                     <!-- Rotation slots will be generated here -->
                 </div>
             </div>
@@ -3285,17 +3292,41 @@ function togglePetFilter(cat, val) {
                 }
             });
             
-            // Add +/- controls after the last visible slot
+            // Add +/- controls beside the header
             // Hide controls when a repeat marker (x2/auto) is active — rotation is "locked"
-            const hasRepeatMarker = repeatIdx !== -1;
-            if (!hasRepeatMarker) {
-                const controlDiv = document.createElement('div');
-                controlDiv.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:8px;flex-shrink:0;';
-                controlDiv.innerHTML = `
-                    ${ultimateRotation.length < 11 ? `<button onclick="addUltimateSlot()" style="width:60px;height:32px;border-radius:0.5rem;background:#20222f;border:2px solid #2d3142;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:#475569;font-size:20px;font-weight:700;" title="Add slot" onmouseover="this.style.borderColor='#4b6bfb';this.style.background='#1e2240'" onmouseout="this.style.borderColor='#2d3142';this.style.background='#20222f'">+</button>` : ''}
-                    ${ultimateRotation.length > 2 ? `<button onclick="removeUltimateSlot()" style="width:60px;height:32px;border-radius:0.5rem;background:#20222f;border:2px solid #2d3142;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:#f87171;font-size:20px;font-weight:700;" title="Remove slot" onmouseover="this.style.borderColor='#f87171';this.style.background='#2a121d'" onmouseout="this.style.borderColor='#2d3142';this.style.background='#20222f'">-</button>` : ''}
-                `;
-                container.appendChild(controlDiv);
+            const controlsDiv = document.getElementById('ultimate-rotation-controls');
+            if (controlsDiv) {
+                controlsDiv.innerHTML = '';
+                const hasRepeatMarker = repeatIdx !== -1;
+                if (!hasRepeatMarker) {
+                    // Add button
+                    const addBtn = document.createElement('button');
+                    const canAdd = ultimateRotation.length < 11;
+                    addBtn.onclick = canAdd ? addUltimateSlot : null;
+                    addBtn.disabled = !canAdd;
+                    addBtn.style.cssText = `width:28px;height:24px;border-radius:0.375rem;background:#20222f;border:1px solid #2d3142;cursor:${canAdd ? 'pointer' : 'not-allowed'};transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:${canAdd ? '#22c55e' : '#475569'};font-size:14px;font-weight:700;box-shadow:0 0 0 1px #0f0f15;opacity:${canAdd ? '1' : '0.5'};`;
+                    if (canAdd) {
+                        addBtn.onmouseover = function() { this.style.borderColor='#4b6bfb'; this.style.background='#1e2240'; };
+                        addBtn.onmouseout = function() { this.style.borderColor='#2d3142'; this.style.background='#20222f'; };
+                    }
+                    addBtn.title = canAdd ? 'Add slot' : 'Cannot add more slots';
+                    addBtn.textContent = '+';
+                    controlsDiv.appendChild(addBtn);
+
+                    // Remove button
+                    const removeBtn = document.createElement('button');
+                    const canRemove = ultimateRotation.length > 2;
+                    removeBtn.onclick = canRemove ? removeUltimateSlot : null;
+                    removeBtn.disabled = !canRemove;
+                    removeBtn.style.cssText = `width:28px;height:24px;border-radius:0.375rem;background:#20222f;border:1px solid #2d3142;cursor:${canRemove ? 'pointer' : 'not-allowed'};transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:${canRemove ? '#f87171' : '#475569'};font-size:14px;font-weight:700;box-shadow:0 0 0 1px #0f0f15;opacity:${canRemove ? '1' : '0.5'};`;
+                    if (canRemove) {
+                        removeBtn.onmouseover = function() { this.style.borderColor='#f87171'; this.style.background='#2a121d'; };
+                        removeBtn.onmouseout = function() { this.style.borderColor='#2d3142'; this.style.background='#20222f'; };
+                    }
+                    removeBtn.title = canRemove ? 'Remove slot' : 'Cannot remove more slots';
+                    removeBtn.textContent = '-';
+                    controlsDiv.appendChild(removeBtn);
+                }
             }
         }
 
@@ -4696,11 +4727,11 @@ function togglePetFilter(cat, val) {
                 useCORS:         true,
                 allowTaint:      false,
                 backgroundColor: '#0f111a',
-                scale:           window.devicePixelRatio || 1,
+                scale:           2,
                 logging:         false,
                 imageTimeout:    0,
                 width:           tempWrap.offsetWidth,
-                height:          tempWrap.scrollHeight,
+                height:          tempWrap.offsetHeight,
             });
 
             document.body.removeChild(tempWrap);
