@@ -135,7 +135,7 @@ function getSlotCharImg(slotIndex) {
     if (skinIdx > 0) {
         const skins = _resolvedSkins[slot.character];
         if (Array.isArray(skins) && skins[skinIdx - 1]) {
-            return `assets/lostsword/skins/${skins[skinIdx - 1]}.webp`;
+            return `Assets/lostsword/skins/${skins[skinIdx - 1]}.webp`;
         }
     }
     const charData = db.characters.find(c => c.name === slot.character);
