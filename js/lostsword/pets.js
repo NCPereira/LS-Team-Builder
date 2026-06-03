@@ -7,7 +7,7 @@ const rawPets = [
     'Pet_Cheese_01', 'Pet_Momo_01',
     'Pet_Coco_01', 'Pet_Neo_01',
     'Pet_Nabi_01', 'Pet_Chick_01',
-    'Pet_Hen_01', 'Pet_CowQueen_01',
+    'Pet_Hen_01', 'Pet_Belsey_01',
     'Pet_Cristina_01', 'Pet_DianCecht_01',
     'Pet_Elizabeth_01', 'Pet_Erin_01',
     'Pet_Estheria_01', 'Pet_Eva_01',
