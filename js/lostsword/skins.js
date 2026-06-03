@@ -151,5 +151,6 @@ function cycleSkin(slotIndex, event) {
     if (!Array.isArray(skins) || skins.length === 0) return;
     const total = skins.length + 1; // +1 for base
     slotSkinIndex[slotIndex] = (slotSkinIndex[slotIndex] + 1) % total;
-    renderTeamGrid();
+    // Guard: renderTeamGrid is defined later in index.html, so check before calling.
+    if (typeof renderTeamGrid === 'function') renderTeamGrid();
 }
