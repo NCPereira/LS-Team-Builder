@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=1600, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=1600, initial-scale=1.0, maximum-scale=1.0, user-scalCardle=no">
     <title>My Lost Sword Team Builder</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -512,6 +512,12 @@
         .badge-Chaos    { background: #1a0a12; color: #f472b6; }
         .badge-Radiance { background: #1a1400; color: #fcd34d; }
     </style>
+    <script src="js/lostsword/characters.js"></script>
+    <script src="js/lostsword/equipment.js"></script>
+    <script src="js/lostsword/skins.js"></script>
+    <script src="js/lostsword/pets.js"></script>
+    <script src="js/lostsword/cards.js"></script>
+    <script src="js/lostsword/rotation.js"></script>
 </head>
 <body class="min-h-screen p-0 m-0" style="overflow-x:hidden;">
 <div class="flex flex-col p-4 gap-4" style="min-height:100vh;">
@@ -592,7 +598,7 @@
                                 <!-- Header row: position icon centred over pet (96px), stat badge centred over gem grid (96px) -->
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
+                                        <img src="assets/lostsword/icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
                                     </div>
                                     <div id="gem-stat-badge-0" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_0_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -626,7 +632,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
+                                        <img src="assets/lostsword/icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
                                     </div>
                                     <div id="gem-stat-badge-1" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_1_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -657,7 +663,7 @@
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
                                     <div class="w-24 flex justify-center flex-shrink-0">
-                                        <img src="icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
+                                        <img src="assets/lostsword/icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
                                     </div>
                                     <div id="gem-stat-badge-2" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_2_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
@@ -695,15 +701,15 @@
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] text-slate-500 font-bold w-8 flex-shrink-0">TOP</span>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
-                                    <img src="icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
+                                    <img src="assets/lostsword/icons/position_backward.webp" class="w-8 h-8 object-contain opacity-80" title="Backward">
                                     <div id="form-slot-0" class="form-slot-backward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="0">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
-                                    <img src="icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
+                                    <img src="assets/lostsword/icons/position_center.webp" class="w-8 h-8 object-contain opacity-80" title="Center">
                                     <div id="form-slot-1" class="form-slot-center w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="1">-</div>
                                 </div>
                                 <div class="flex-1 flex flex-col items-center gap-0.5">
-                                    <img src="icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
+                                    <img src="assets/lostsword/icons/position_forward.webp" class="w-8 h-8 object-contain opacity-80" title="Forward">
                                     <div id="form-slot-2" class="form-slot-forward w-full bg-[#1a1c26] border border-slate-700/50 rounded-lg h-11 flex items-center justify-center text-slate-300 text-xs transition cursor-grab hover:border-slate-500" draggable="true" data-form-idx="2">-</div>
                                 </div>
                             </div>
@@ -855,156 +861,8 @@
             return { character: null, gear: { Weapon: null, Armor: null, Helmet: null, Rune: null }, card: null, statPriority: { Weapon: [], Armor: [], Helmet: [], Rune: [] } };
         }
         let slotData = [_emptySlot(), _emptySlot(), _emptySlot(), _emptySlot(), _emptySlot()];
-        // ── Skin Database — runtime-detected ──────────────────────────────
-        // Maps character display name → candidate filenames to probe (up to _03).
-        // On first render for each character, we fire off image probes for each
-        // candidate. Only confirmed-existing files end up in _resolvedSkins.
-        // This means no button appears and no extra slots exist for missing files.
-
-        // Candidate filename stems per character (internal file name, no extension).
-        // These are the POSSIBLE names; actual existence is confirmed at runtime.
-        const _skinCandidates = {
-            'Agravaine':     ['Sk_Agravaine_01',   'Sk_Agravaine_02',   'Sk_Agravaine_03'],
-            'Anessa':        ['Sk_Anessa_01',       'Sk_Anessa_02',      'Sk_Anessa_03'],
-            'Asuka':         ['Sk_Asuka_01',        'Sk_Asuka_02',       'Sk_Asuka_03'],
-            'Balin':         ['Sk_Balin_01',        'Sk_Balin_02',       'Sk_Balin_03'],
-            'Bedivere':      ['Sk_Bedivere_01',     'Sk_Bedivere_02',    'Sk_Bedivere_03'],
-            'Neo Bedivere':   ['Sk_NeoBedivere_01',  'Sk_NeoBedivere_02', 'Sk_NeoBedivere_03'],
-            'Circe':         ['Sk_Circe_01',        'Sk_Circe_02',       'Sk_Circe_03'],
-            'Claire':        ['Sk_Claire_01',       'Sk_Claire_02',      'Sk_Claire_03'],
-            'Cowqueen':      ['Sk_CowQueen_01',     'Sk_CowQueen_02',    'Sk_CowQueen_03'],
-            'Cow Queen':     ['Sk_CowQueen_01',     'Sk_CowQueen_02',    'Sk_CowQueen_03'],
-            'Cristina':      ['Sk_Cristina_01',     'Sk_Cristina_02',    'Sk_Cristina_03'],
-            'Dian Cecht':     ['Sk_DianCecht_01',    'Sk_DianCecht_02',   'Sk_DianCecht_03'],
-            'Elaine':        ['Sk_Elaine_01',       'Sk_Elaine_02',      'Sk_Elaine_03'],
-            'Elin':          ['Sk_Elin_01',         'Sk_Elin_02',        'Sk_Elin_03'],
-            'Elizabeth':     ['Sk_Elizabeth_01',    'Sk_Elizabeth_02',   'Sk_Elizabeth_03'],
-            'Enya':          ['Sk_Enya_01',         'Sk_Enya_02',        'Sk_Enya_03'],
-            'Erin':          ['Sk_Erin_01',         'Sk_Erin_02',        'Sk_Erin_03'],
-            'Esmeralda':     ['Sk_Esmeralda_01',    'Sk_Esmeralda_02',   'Sk_Esmeralda_03'],
-            'Estheria':      ['Sk_Estheria_01',     'Sk_Estheria_02',    'Sk_Estheria_03'],
-            'Ethan':         ['Sk_Ethan_01',        'Sk_Ethan_02',       'Sk_Ethan_03'],
-            'Eva':           ['Sk_Eva_01',          'Sk_Eva_02',         'Sk_Eva_03'],
-            'Gaheris':       ['Sk_Gaheris_01',      'Sk_Gaheris_02',     'Sk_Gaheris_03'],
-            'Galahad':       ['Sk_Galahad_01',      'Sk_Galahad_02',     'Sk_Galahad_03'],
-            'Gawain':        ['Sk_Gawain_01',       'Sk_Gawain_02',      'Sk_Gawain_03'],
-            'Guinevere':     ['Sk_Guinevere_01',    'Sk_Guinevere_02',   'Sk_Guinevere_03'],
-            'Hikage':        ['Sk_Hikage_01',       'Sk_Hikage_02',      'Sk_Hikage_03'],
-            'Isabel':        ['Sk_Isabel_01',       'Sk_Isabel_02',      'Sk_Isabel_03'],
-            'Isis':          ['Sk_Isis_01',         'Sk_Isis_02',        'Sk_Isis_03'],
-            'Isolde':        ['Sk_Isolde_01',       'Sk_Isolde_02',      'Sk_Isolde_03'],
-            'Jessi':         ['Sk_Jessi_01',        'Sk_Jessi_02',       'Sk_Jessi_03'],
-            'Joan Of Arc':   ['Sk_Joanofarc_01',    'Sk_Joanofarc_02',   'Sk_Joanofarc_03'],
-            'Karishara':     ['Sk_Karishara_01',    'Sk_Karishara_02',   'Sk_Karishara_03'],
-            'Katrin':        ['Sk_Katrin_01',       'Sk_Katrin_02',      'Sk_Katrin_03'],
-            'Kay':           ['Sk_Kay_01',          'Sk_Kay_02',         'Sk_Kay_03'],
-            'Lancelot':      ['Sk_Lancelot_01',     'Sk_Lancelot_02',    'Sk_Lancelot_03'],
-            'Lilith':        ['Sk_Lilith_01',       'Sk_Lilith_02',      'Sk_Lilith_03'],
-            'Lisa':          ['Sk_Lisa_01',         'Sk_Lisa_02',        'Sk_Lisa_03'],
-            'Lohengrin':     ['Sk_Lohengrin_01',    'Sk_Lohengrin_02',   'Sk_Lohengrin_03'],
-            'Lua':           ['Sk_Lua_01',          'Sk_Lua_02',         'Sk_Lua_03'],
-            'Lucy':          ['Sk_Lucy_01',         'Sk_Lucy_02',        'Sk_Lucy_03'],
-            'Lueira':        ['Sk_Lueira_01',       'Sk_Lueira_02',      'Sk_Lueira_03'],
-            'Merlin':        ['Sk_Merlin_01',       'Sk_Merlin_02',      'Sk_Merlin_03'],
-            'Merry':         ['Sk_Merry_01',        'Sk_Merry_02',       'Sk_Merry_03'],
-            'S. Merry':      ['Sk_SMerry_01',       'Sk_SMerry_02',      'Sk_SMerry_03'],
-            'Mia':           ['Sk_Mia_01',          'Sk_Mia_02',         'Sk_Mia_03'],
-            'Morgan Le Fay': ['Sk_MorganleFay_01',  'Sk_MorganleFay_02', 'Sk_MorganleFay_03'],
-            'Morgana':       ['Sk_Morgana_01',      'Sk_Morgana_02',     'Sk_Morgana_03'],
-            'Morgause':      ['Sk_Morgause_01',     'Sk_Morgause_02',    'Sk_Morgause_03'],
-            'Nesha':         ['Sk_Nesha_01',        'Sk_Nesha_02',       'Sk_Nesha_03'],
-            'Nimue':         ['Sk_Nimue_01',        'Sk_Nimue_02',       'Sk_Nimue_03'],
-            'Palamedes':     ['Sk_Palamedes_01',    'Sk_Palamedes_02',   'Sk_Palamedes_03'],
-            'Percival':      ['Sk_Percival_01',     'Sk_Percival_02',    'Sk_Percival_03'],
-            'Rachel':        ['Sk_Rachel_01',       'Sk_Rachel_02',      'Sk_Rachel_03'],
-            'Ran':           ['Sk_Ran_01',          'Sk_Ran_02',         'Sk_Ran_03'],
-            'Ray':           ['Sk_Rey_01',          'Sk_Rey_02',         'Sk_Rey_03'],
-            'Ria':           ['Sk_Ria_01',          'Sk_Ria_02',         'Sk_Ria_03'],
-            'Rita':          ['Sk_Rita_01',         'Sk_Rita_02',        'Sk_Rita_03'],
-            'Rita Maid':     ['Sk_MaidRita_01',     'Sk_MaidRita_02',    'Sk_MaidRita_03'],
-            'Rowena':        ['Sk_Rowena_01',       'Sk_Rowena_02',      'Sk_Rowena_03'],
-            'Sarah':         ['Sk_Sarah_01',        'Sk_Sarah_02',       'Sk_Sarah_03'],
-            'Tiamat':        ['Sk_Tiamat_01',       'Sk_Tiamat_02',      'Sk_Tiamat_03'],
-            'Tristan':       ['Sk_Tristan_01',      'Sk_Tristan_02',     'Sk_Tristan_03'],
-            'Urien':         ['Sk_Urien_01',        'Sk_Urien_02',       'Sk_Urien_03'],
-            'Vivien':        ['Sk_Vivien_01',       'Sk_Vivien_02',      'Sk_Vivien_03'],
-            'Yumi':          ['Sk_Yumi_01',         'Sk_Yumi_02',        'Sk_Yumi_03'],
-        };
-
-        // Resolved cache: charName → string[] of confirmed-existing filenames.
-        // 'pending' while probe is in flight, [] if no skins found.
-        const _resolvedSkins = {};
-
-        // Probe a single image URL; resolve true if it loads, false if it 404s.
-        function _probeImage(url) {
-            return new Promise(resolve => {
-                const img = new Image();
-                img.onload  = () => resolve(true);
-                img.onerror = () => resolve(false);
-                img.src = url;
-            });
-        }
-
-        async function _probeSkins(charName) {
-            if (_resolvedSkins[charName] !== undefined) return; // already probing/done
-            _resolvedSkins[charName] = 'pending';
-            const candidates = _skinCandidates[charName] || [];
-            const confirmed = [];
-            for (const stem of candidates) {
-                const url = `skins/${stem}.webp`;
-                const ok = await _probeImage(url);
-                if (ok) confirmed.push(stem);
-                // Stop as soon as one is missing — skins are numbered sequentially,
-                // so a gap means no further skins exist.
-                else break;
-            }
-            _resolvedSkins[charName] = confirmed;
-            // Re-render so the button/dots update now that we know the real count.
-            renderTeamGrid();
-        }
-
-        // Return confirmed skins array for a character, or null if still unknown.
-        function getSkins(charName) {
-            if (!charName || !_skinCandidates[charName]) return [];
-            const cached = _resolvedSkins[charName];
-            if (cached === undefined) {
-                // Fire probe async; return empty for now (no button shown yet)
-                _probeSkins(charName);
-                return null; // null = "still loading"
-            }
-            if (cached === 'pending') return null;
-            return cached; // [] or ['Sk_...', ...]
-        }
-
-        // Per-slot active skin index: 0 = base character image, 1+ = skin index in confirmed array
-        let slotSkinIndex = [0, 0, 0, 0, 0];
-
-        // Get the image src for a slot: base char or active skin
-        function getSlotCharImg(slotIndex) {
-            const slot = slotData[slotIndex];
-            if (!slot || !slot.character) return null;
-            const skinIdx = slotSkinIndex[slotIndex];
-            if (skinIdx > 0) {
-                const skins = _resolvedSkins[slot.character];
-                if (Array.isArray(skins) && skins[skinIdx - 1]) {
-                    return `skins/${skins[skinIdx - 1]}.webp`;
-                }
-            }
-            const charData = db.characters.find(c => c.name === slot.character);
-            return charData ? charData.img : null;
-        }
-
-        // Cycle skin for a slot: base → skin1 → … → base
-        function cycleSkin(slotIndex, event) {
-            event.stopPropagation();
-            const slot = slotData[slotIndex];
-            if (!slot || !slot.character) return;
-            const skins = _resolvedSkins[slot.character];
-            if (!Array.isArray(skins) || skins.length === 0) return;
-            const total = skins.length + 1; // +1 for base
-            slotSkinIndex[slotIndex] = (slotSkinIndex[slotIndex] + 1) % total;
-            renderTeamGrid();
-        }
+        // _skinCandidates, _resolvedSkins, _probeImage, _probeSkins,
+        // getSkins, slotSkinIndex, getSlotCharImg, cycleSkin → skins.js
 
         // ── Face Detection & Smart Crop ────────────────────────────────────
         const _faceCache = {};
@@ -1103,50 +961,10 @@
             }
             return `${cached.x}% ${cached.y}%`;
         }
-
-        // Independent pets storage - not tied to character slots
-        let petsData = [
-            { name: null, gems: [null, null, null, null], gemStat: null },
-            { name: null, gems: [null, null, null, null], gemStat: null },
-            { name: null, gems: [null, null, null, null], gemStat: null }
-        ];
-
-        // Gem stat presets (same 2 options for all pets)
-        const GEM_STAT_PRESETS = [
-            { id: 'gs-4atk4hp', label: '4×ATK/4×HP', color: '#fb923c', stats: ['ATK','ATK','ATK','ATK','HP','HP','HP','HP'] },
-            { id: 'gs-4cd4hp',  label: '4×CD/4×HP',  color: '#f472b6', stats: ['CD','CD','CD','CD','HP','HP','HP','HP'] },
-        ];
         // Formation mapping: form-slot-idx -> team slot index (or -1 for empty)
         // Default: Slot 2->Top1, Slot 4->Top2, Slot 5->Top3, Slot 1->Bot1, Slot 3->Bot2, empty->Bot3
         let formationSlots = [1, 3, 4, 0, 2, -1];
         const categories = ['Weapon', 'Armor', 'Helmet', 'Rune'];
-        
-        // Gem database with element restrictions
-        const rawGems = [
-            'amethyst-hexagon', 'amethyst-octagon', 
-            'amethyst-round', 'amethyst-square', 
-            'emerald-hexagon', 'emerald-octagon', 
-            'emerald-round', 'emerald-square', 
-            'opal-hexagon', 'opal-octagon', 
-            'opal-round', 'opal-square', 
-            'ruby-hexagon', 'ruby-octagon', 
-            'ruby-round', 'ruby-square', 
-            'sapphire-hexagon', 'sapphire-octagon', 
-            'sapphire-round', 'sapphire-square', 
-            'topaz-hexagon', 'topaz-octagon', 
-            'topaz-round', 'topaz-square', 
-            'turquoise-hexagon', 'turquoise-octagon', 
-            'turquoise-round', 'turquoise-square'];
-        
-        const gemElements = {
-            'amethyst-hexagon': 'Chaos', 'amethyst-octagon': 'Chaos', 'amethyst-round': 'Chaos', 'amethyst-square': 'Chaos',
-            'emerald-hexagon': 'Nature', 'emerald-octagon': 'Nature', 'emerald-round': 'Nature', 'emerald-square': 'Nature',
-            'opal-hexagon': 'Holy', 'opal-octagon': 'Holy', 'opal-round': 'Holy', 'opal-square': 'Holy',
-            'ruby-hexagon': 'Fire', 'ruby-octagon': 'Fire', 'ruby-round': 'Fire', 'ruby-square': 'Fire',
-            'sapphire-hexagon': 'Frost', 'sapphire-octagon': 'Frost', 'sapphire-round': 'Frost', 'sapphire-square': 'Frost',
-            'topaz-hexagon': 'Radiance', 'topaz-octagon': 'Radiance', 'topaz-round': 'Radiance', 'topaz-square': 'Radiance',
-            'turquoise-hexagon': 'Shock', 'turquoise-octagon': 'Shock', 'turquoise-round': 'Shock', 'turquoise-square': 'Shock'
-        };
         
         
         function validateSlotGear(slotIndex) {
@@ -1168,77 +986,6 @@
             }
         }
 
-        function validatePetGems(petIdx) {
-            const pet = petsData[petIdx];
-            if (!pet || !pet.name) return;
-
-            const petInfo = getCharInfo(pet.name);
-            const petElement = petInfo.element;
-
-            for (let gemIdx = 0; gemIdx < 4; gemIdx++) {
-                const gemName = pet.gems[gemIdx];
-                if (!gemName) continue;
-
-                // Look up gem element using the full gem name
-                const gemElement = gemElements[gemName];
-
-                // Clear gem if it doesn't match pet's element
-                if (gemElement && gemElement !== petElement) {
-                    pet.gems[gemIdx] = null;
-                }
-            }
-        }
-
-        function renderPets() {
-    // Validate that all gems are still compatible with their pets
-    for (let i = 0; i < 3; i++) {
-        validatePetGems(i);
-    }
-
-    const petDisplays = [
-        document.getElementById('pet-display-p1'),
-        document.getElementById('pet-display-p2'),
-        document.getElementById('pet-display-p3')
-    ];
-
-    // Render pet images
-    petDisplays.forEach((el, i) => {
-        if (!el) return;
-
-        const petName = petsData[i].name;
-
-        if (!petName) {
-            el.innerHTML = `<span class="text-xs text-slate-400">+</span>`;
-            return;
-        }
-
-        const pet = db.pets.find(p => p.name === petName);
-        el.innerHTML = `<img src="${pet?.img || ''}" class="w-full h-full object-cover rounded-lg">`;
-    });
-
-    // Render gem slots
-    for (let petIdx = 0; petIdx < 3; petIdx++) {
-        for (let gemIdx = 0; gemIdx < 4; gemIdx++) {
-            const gemName = petsData[petIdx].gems[gemIdx];
-            const gemEl = document.getElementById(`gem-p${petIdx + 1}-${gemIdx}`);
-            if (gemEl) {
-                if (gemName) {
-                    gemEl.innerHTML = `<img src="gems/${gemName}.webp" class="w-7 h-7 object-contain" alt="${gemName}">`;
-                } else {
-                    gemEl.innerHTML = `<span class="text-xs font-bold text-slate-500 leading-none">+</span>`;
-                }
-            }
-        }
-    }
-    
-    // Reset opacity on all pet slot containers
-    document.querySelectorAll('[data-pet-idx]').forEach(slot => {
-        slot.style.opacity = '1';
-    });
-    
-    setupPetDragDrop();
-    renderAllGemStatBadges();
-}
         function renderTeamGrid() {
             // Validate that all gear is still compatible with their characters
             for (let i = 0; i < slotData.length; i++) {
@@ -1320,7 +1067,7 @@
                     <div class="grid grid-cols-2 gap-2.5">
                         ${categories.map(cat => {
                             const sp = slot.statPriority?.[cat] || [];
-                            const spLabel = sp.length > 0 ? (() => {
+                            const spLCardel = sp.length > 0 ? (() => {
                                 const counts = {};
                                 sp.forEach(x => { counts[x] = (counts[x]||0)+1; });
                                 return Object.entries(counts).map(([s,n]) => n>1?`${n}×${s}`:s).join('/');
@@ -1338,7 +1085,7 @@
                                         })() : `<span class="text-[10px] text-slate-400 font-mono">${cat}</span>`}
                                     </div>
                                 </div>
-                                <div style="background:#0f111a;border:1px solid ${spLabel ? badgeColor+'55' : '#2d314255'};border-radius:5px;padding:0 4px;text-align:center;font-size:8px;font-weight:800;color:${spLabel ? badgeColor : '#475569'};letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;height:24px;display:flex;align-items:center;justify-content:center;" onclick="openModal('${index}', 'gear', '${cat}')" title="${spLabel ? 'Stat priority: '+spLabel : 'Set stat priority'}">${spLabel || '—'}</div>
+                                <div style="background:#0f111a;border:1px solid ${spLCardel ? badgeColor+'55' : '#2d314255'};border-radius:5px;padding:0 4px;text-align:center;font-size:8px;font-weight:800;color:${spLCardel ? badgeColor : '#475569'};letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;height:24px;display:flex;align-items:center;justify-content:center;" onclick="openModal('${index}', 'gear', '${cat}')" title="${spLCardel ? 'Stat priority: '+spLCardel : 'Set stat priority'}">${spLCardel || '—'}</div>
                             </div>`;
                         }).join('')}
                     </div>
@@ -1416,16 +1163,6 @@
             });
         }
 
-        // ── Display name overrides applied inside parseName (raw namePart → display name) ──
-        // Needed for filenames whose camelCase doesn't auto-split correctly,
-        // e.g. "Joanofarc" → "Joan Of Arc",  "Morganlefay" → "Morgan Le Fay"
-        const _parseNameOverrides = {
-            'Joanofarc':   'Joan Of Arc',
-            'MorganleFay': 'Morgan Le Fay',
-            'Morganlefay': 'Morgan Le Fay',
-            'SMerry':      'S. Merry',
-        };
-
         function parseName(filename) {
             let parts = filename.split('_');
             let namePart = parts[1] || parts[0];
@@ -1438,538 +1175,15 @@
             return namePart + numStr;
         }
 
-        // ── Explicit name overrides: display name → characterDatabase key ──
-        const charNameOverrides = {
-            'Rey':           'Ray',
-            'Rita 2':        'Rita Maid',
-            'Cow Queen':     'Cowqueen',
-            'Morgan Le Fay': 'Morgan Le Fay',
-            'Joan Of Arc':   'Joanofarc',
-            'S. Merry':      'SMerry',
-        };
-
-        // ── Search aliases: typed shorthand → substring to match against display names (lowercase) ──
-        const searchAliases = {
-            'mlf':    'morgan le fay',
-            'smerry': 's merry',
-        };
-
-        // Resolve a raw search term against aliases (exact match only).
-        // Falls through to normal substring search if no alias matches.
-        function resolveSearch(raw) {
-            if (!raw) return raw;
-            return searchAliases[raw] || raw;
-        }
-
-        // Pre-built normalised (no-space, lowercase) index — populated after characterDatabase
-        const _dbIndex = {};
-
-        function getCharInfo(displayName) {
-            if (!displayName) return {}; // Return empty object if no character selected
-            // 1. Explicit overrides (check both raw name and stripped-number form)
-            const stripped = displayName.replace(/\s+\d+$/, '').trim();
-            for (const candidate of [displayName, stripped]) {
-                if (candidate in charNameOverrides) {
-                    const k = charNameOverrides[candidate];
-                    return k ? (characterDatabase[k] || {}) : {};
-                }
-            }
-            // 2. Direct lookup
-            if (characterDatabase[displayName]) return characterDatabase[displayName];
-            // 3. Strip trailing variant number ("Bedivere 2" → "Bedivere")
-            if (characterDatabase[stripped]) return characterDatabase[stripped];
-            // 4. Case-insensitive no-space match ("Cow Queen" → "Cowqueen")
-            const norm = stripped.replace(/\s+/g, '').toLowerCase();
-            const key = _dbIndex[norm];
-            if (key) return characterDatabase[key];
-            return {};
-        }
-
-        const rawCharacters = [
-            'Pc_Agravaine_01', 'Pc_Anessa_01', 
-            'Pc_Asuka_01', 'Pc_Balin_01', 
-            'Pc_Bedivere_01', 'Pc_NeoBedivere_01', 
-            'Pc_Claire_01', 'Pc_CowQueen_01', 
-            'Pc_Cristina_01', 'Pc_DianCecht_01', 
-            'Pc_Elaine_01', 'Pc_Elin_01', 
-            'Pc_Elizabeth_01', 'Pc_Enya_01', 
-            'Pc_Erin_01', 'Pc_Esmeralda_01', 
-            'Pc_Estheria_01', 'Pc_Ethan_01', 
-            'Pc_Eva_01', 'Pc_Gaheris_01', 
-            'Pc_Galahad_01', 'Pc_Gawain_01', 
-            'Pc_Guinevere_01', 'Pc_Hikage_01', 
-            'Pc_Isabel_01', 'Pc_Isis_01', 
-            'Pc_Isolde_01', 'Pc_Joanofarc_01', 
-            'Pc_Jessi_01', 'Pc_Karishara_01', 
-            'Pc_Katrin_01', 'Pc_Kay_01', 
-            'Pc_Circe_01', 'Pc_Lancelot_01', 
-            'Pc_Lilith_01', 'Pc_Lisa_01', 
-            'Pc_Lohengrin_01', 'Pc_Lua_01', 
-            'Pc_Lucy_01', 'Pc_Lueira_01', 
-            'Pc_Rowena_01', 'Pc_Merlin_01', 
-            'Pc_Merry_01', 'Pc_SMerry_01', 
-            'Pc_Mia_01', 'Pc_Morgana_01', 
-            'Pc_MorganleFay_01', 'Pc_Morgause_01', 
-            'Pc_Nesha_01', 'Pc_Nimue_01', 
-            'Pc_Palamedes_01', 'Pc_Percival_01', 
-            'Pc_Rachel_01', 'Pc_Ran_01', 
-            'Pc_Rey_01', 'Pc_Ria_01', 
-            'Pc_Rita_01', 'Pc_MaidRita_01', 
-            'Pc_Sarah_01', 'Pc_Tiamat_01', 
-            'Pc_Tristan_01', 'Pc_Urien_01', 
-            'Pc_Vivien_01', 'Pc_Yumi_01'];
-        
-        // Character database with class, element, position, and rarity
-        const characterDatabase = {
-          'Agravaine': { class: 'Archer', element: 'Chaos', position: 'Middle', rarity: '5' },
-          'Anessa': { class: 'Knight', element: 'Frost', position: 'Front', rarity: '5' },
-          'Asuka': { class: 'Knight', element: 'Nature', position: 'Front', rarity: '5' },
-          'Balin': { class: 'Knight', element: 'Nature', position: 'Front', rarity: '4' },
-          'Bedivere': { class: 'Archer', element: 'Nature', position: 'Back', rarity: '4' },
-          'NeoBedivere': { class: 'Archer', element: 'Holy', position: 'Middle', rarity: '5' },
-          'Circe': { class: 'Wizard', element: 'Chaos', position: 'Back', rarity: '5' },
-          'Claire': { class: 'Knight', element: 'Radiance', position: 'Middle', rarity: '5' },
-          'Cowqueen': { class: 'Knight', element: 'Fire', position: 'Front', rarity: '5' },
-          'Cristina': { class: 'Wizard', element: 'Fire', position: 'Middle', rarity: '5' },
-          'DianCecht': { class: 'Healer', element: 'Radiance', position: 'Middle', rarity: '5' },
-          'Elaine': { class: 'Wizard', element: 'Frost', position: 'Middle', rarity: '3' },
-          'Elin': { class: 'Archer', element: 'Nature', position: 'Middle', rarity: '4' },
-          'Elizabeth': { class: 'Knight', element: 'Fire', position: 'Front', rarity: '5' },
-          'Enya': { class: 'Archer', element: 'Fire', position: 'Back', rarity: '5' },
-          'Erin': { class: 'Wizard', element: 'Radiance', position: 'Back', rarity: '5' },
-          'Esmeralda': { class: 'Healer', element: 'Radiance', position: 'Back', rarity: '4' },
-          'Estheria': { class: 'Wizard', element: 'Chaos', position: 'Back', rarity: '5' },
-          'Ethan': { class: 'Knight', element: 'Frost', position: 'Front', rarity: '4' },
-          'Eva': { class: 'Wizard', element: 'Shock', position: 'Back', rarity: '5' },
-          'Gaheris': { class: 'Knight', element: 'Fire', position: 'Front', rarity: '4' },
-          'Galahad': { class: 'Knight', element: 'Radiance', position: 'Front', rarity: '5' },
-          'Gawain': { class: 'Knight', element: 'Nature', position: 'Front', rarity: '5' },
-          'Guinevere': { class: 'Healer', element: 'Frost', position: 'Back', rarity: '5' },
-          'Hikage': { class: 'Archer', element: 'Nature', position: 'Middle', rarity: '5' },
-          'Isabel': { class: 'Archer', element: 'Frost', position: 'Front', rarity: '5' },
-          'Isis': { class: 'Knight', element: 'Radiance', position: 'Front', rarity: '3' },
-          'Isolde': { class: 'Healer', element: 'Nature', position: 'Back', rarity: '5' },
-          'Jessi': { class: 'Archer', element: 'Chaos', position: 'Back', rarity: '3' },
-          'Joanofarc': { class: 'Archer', element: 'Shock', position: 'Back', rarity: '5' },
-          'Karishara': { class: 'Wizard', element: 'Fire', position: 'Back', rarity: '5' },
-          'Katrin': { class: 'Wizard', element: 'Frost', position: 'Back', rarity: '5' },
-          'Kay': { class: 'Knight', element: 'Fire', position: 'Front', rarity: '5' },
-          'Circe': { class: 'Wizard', element: 'Nature', position: 'Back', rarity: '5' },
-          'Lancelot': { class: 'Knight', element: 'Radiance', position: 'Front', rarity: '5' },
-          'Lilith': { class: 'Knight', element: 'Chaos', position: 'Middle', rarity: '5' },
-          'Lisa': { class: 'Archer', element: 'Chaos', position: 'Middle', rarity: '5' },
-          'Lohengrin': { class: 'Knight', element: 'Chaos', position: 'Back', rarity: '5' },
-          'Lua': { class: 'Knight', element: 'Shock', position: 'Front', rarity: '5' },
-          'Lucy': { class: 'Knight', element: 'Chaos', position: 'Front', rarity: '5' },
-          'Lueira': { class: 'Healer', element: 'Frost', position: 'Back', rarity: '5' },
-          'Merlin': { class: 'Wizard', element: 'Holy', position: 'Middle', rarity: '5' },
-          'Merry': { class: 'Wizard', element: 'Nature', position: 'Back', rarity: '4' },
-          'SMerry': { class: 'Wizard', element: 'Frost', position: 'Back', rarity: '5' },
-          'Mia': { class: 'Knight', element: 'Shock', position: 'Front', rarity: '5' },
-          'Morgan Le Fay': { class: 'Wizard', element: 'Holy', position: 'Middle', rarity: '5' },
-          'Morgana': { class: 'Wizard', element: 'Chaos', position: 'Back', rarity: '5' },
-          'Morgause': { class: 'Wizard', element: 'Fire', position: 'Back', rarity: '5' },
-          'Nesha': { class: 'Archer', element: 'Radiance', position: 'Back', rarity: '5' },
-          'Nimue': { class: 'Wizard', element: 'Frost', position: 'Middle', rarity: '4' },
-          'Palamedes': { class: 'Knight', element: 'Nature', position: 'Front', rarity: '5' },
-          'Percival': { class: 'Knight', element: 'Frost', position: 'Front', rarity: '5' },
-          'Rachel': { class: 'Healer', element: 'Nature', position: 'Middle', rarity: '3' },
-          'Ran': { class: 'Knight', element: 'Holy', position: 'Front', rarity: '5' },
-          'Ray': { class: 'Knight', element: 'Chaos', position: 'Front', rarity: '4' },
-          'Ria': { class: 'Healer', element: 'Fire', position: 'Back', rarity: '5' },
-          'Rita': { class: 'Knight', element: 'Fire', position: 'Front', rarity: '3' },
-          'MaidRita': { class: 'Healer', element: 'Fire', position: 'Middle', rarity: '5' },
-          'Rowena': { class: 'Wizard', element: 'Chaos', position: 'Back', rarity: '4' },
-          'Sarah': { class: 'Archer', element: 'Fire', position: 'Middle', rarity: '4' },
-          'Tiamat': { class: 'Wizard', element: 'Holy', position: 'Back', rarity: '5' },
-          'Tristan': { class: 'Archer', element: 'Nature', position: 'Back', rarity: '5' },
-          'Urien': { class: 'Knight', element: 'Radiance', position: 'Front', rarity: '4' },
-          'Vivien': { class: 'Wizard', element: 'Nature', position: 'Middle', rarity: '5' },
-          'Yumi': { class: 'Wizard', element: 'Frost', position: 'Back', rarity: '5' },
-          
-          // ── Pet-only entries ───────────────────────────────────────────────
-          'Whitey':    { element: 'Radiance', rarity: '4' },
-          'Gold':      { element: 'Fire',     rarity: '3' },
-          'Neo':       { element: 'Frost',    rarity: '4' },
-          'Nightsong': { element: 'Chaos',    rarity: '4' },
-          'Shiba':     { element: 'Fire',     rarity: '4' },
-          'Belle':     { element: 'Nature',   rarity: '4' },
-          'Slime':     { element: 'Nature',   rarity: '3' },
-          'Retriever': { element: 'Radiance', rarity: '3' },
-          'Raccoon':   { element: 'Shock',    rarity: '3' },
-          'Hen':       { element: 'Shock',    rarity: '3' },
-          'Chick':     { element: 'Fire',     rarity: '3' },
-          'Momo':      { element: 'Nature',   rarity: '3' },
-          'Nabi':      { element: 'Chaos',    rarity: '3' },
-          'Cheese':    { element: 'Holy',     rarity: '3' },
-          'Phoenix':   { element: 'Fire',     rarity: '5' },
-          'Coco':      { element: 'Frost',    rarity: '3' },
-          'Midnight':  { element: 'Shock',    rarity: '4' },
-          'Fenrir':    { element: 'Shock',    rarity: '5' },
-          'Griffon':   { element: 'Nature',   rarity: '5' },
-          'Athena':    { element: 'Radiance', rarity: '5' },
-          'UnleashedEva': { element: 'Shock', rarity: '5' }
-        };
-
-        // Populate normalised lookup index now that characterDatabase is defined
-        Object.keys(characterDatabase).forEach(k => {
-            _dbIndex[k.replace(/\s+/g, '').toLowerCase()] = k;
-        });
-        const rawCards = [
-            'Ab_Agravaine_01', 'Ab_Anessa_01', 
-            'Ab_Asuka_01', 'Ab_Balin_01', 
-            'Ab_Bedivere_01', 'Ab_NeoBedivere_01', 
-            'Ab_Cain_01', 'Ab_Claire_01', 
-            'Ab_Cowqueen_01', 'Ab_Cristina_01', 
-            'Ab_DianCecht_01', 'Ab_Elaine_01', 
-            'Ab_Elin_01', 'Ab_Elizabeth_01', 
-            'Ab_Enya_01', 'Ab_Erin_01', 
-            'Ab_Esmeralda_01', 'Ab_Estheria_01', 
-            'Ab_Ethan_01', 'Ab_Abyss30_01', 
-            'Ab_Eva_01', 'Ab_Gaheris_01', 
-            'Ab_Galahad_01', 'Ab_Gawain_01', 
-            'Ab_Guinevere_01', 'Ab_Hikage_01', 
-            'Ab_Isabel_01', 'Ab_Isolde_01', 
-            'Ab_Joanofarc_01', 'Ab_Jessi_01', 
-            'Ab_Kanna_01', 'Ab_Karishara_01', 
-            'Ab_Katrin_01', 'Ab_Kay_01', 
-            'Ab_Circe_01', 'Ab_Lancelot_01', 
-            'Ab_Lilith_01', 'Ab_Lisa_01', 
-            'Ab_Lohengrin_01', 'Ab_Lua_01', 
-            'Ab_Lucius_01', 'Ab_Lucy_01', 
-            'Ab_Lueira_01', 'Ab_Rowena_01', 
-            'Ab_Abyss60_01', 'Ab_Merlin_01', 
-            'Ab_SMerry_01', 'Ab_Mia_01', 
-            'Ab_Mordred_01', 'Ab_Morgana_01', 
-            'Ab_MorganleFay_01', 'Ab_Morgause_01', 
-            'Ab_Nesha_01', 'Ab_Nimue_01', 
-            'Ab_Palamedes_01', 'Ab_Percival_01', 
-            'Ab_Rachel_01', 'Ab_Ria_01', 
-            'Ab_Rita_01', 'Ab_MaidRita_01', 
-            'Ab_Sarah_01', 'Ab_Tiamat_01', 
-            'Ab_Tristan_01', 'Ab_Urien_01', 
-            'Ab_Vivien_01', 'Ab_Vortigern_01', 
-            'Ab_Yumi_01'];
-        const rawPets = [
-            'Pet_Agravaine_01', 'Pet_Anessa_01', 
-            'Pet_Asuka_01', 'Pet_Athena_01', 
-            'Pet_Bedivere_01', 'Pet_NeoBedivere_01', 
-            'Pet_Cheese_01', 'Pet_Momo_01', 
-            'Pet_Coco_01', 'Pet_Neo_01', 
-            'Pet_Nabi_01', 'Pet_Chick_01', 
-            'Pet_Hen_01', 'Pet_CowQueen_01', 
-            'Pet_Cristina_01', 'Pet_DianCecht_01', 
-            'Pet_Elizabeth_01', 'Pet_Erin_01', 
-            'Pet_Estheria_01', 'Pet_Eva_01', 
-            'Pet_UnleashedEva_01', 'Pet_Fenrir_01', 
-            'Pet_Galahad_01', 'Pet_Griffon_01', 
-            'Pet_Guinevere_01', 'Pet_Hikage_01', 
-            'Pet_Isabel_01', 'Pet_Joanofarc_01', 
-            'Pet_Karishara_01', 'Pet_Katrin_01', 
-            'Pet_Kay_01', 'Pet_Circe_01', 
-            'Pet_Lancelot_01', 'Pet_Lilith_01', 
-            'Pet_Lisa_01', 'Pet_Lohengrin_01', 
-            'Pet_Lua_01', 'Pet_Lueira_01', 
-            'Pet_Merlin_01', 'Pet_SMerry_01', 
-            'Pet_Morgana_01', 'Pet_Morganlefay_01', 
-            'Pet_Nesha_01', 'Pet_Nightsong_01', 
-            'Pet_Midnight_01', 'Pet_Palamedes_01', 
-            'Pet_Phoenix_01', 'Pet_Belle_01', 
-            'Pet_Raccoon_01', 'Pet_Ran_01', 
-            'Pet_Retriever_01', 'Pet_Gold_01', 
-            'Pet_MaidRita_01', 'Pet_Shiba_01', 
-            'Pet_Slime_01', 'Pet_Tiamat_01', 
-            'Pet_Tristan_01', 'Pet_Vivien_01', 
-            'Pet_Whitey_01', 'Pet_Yumi_01'];
-
-        // Weapon filename mapping - display name -> actual filename
-        const weaponFilenames = {
-            'Abyssal Bow': 'abyssal-bow',
-            'Abyssal Greatsword': 'abyssal-greatsword',
-            'Abyssal Staff': 'abyssal-staff',
-            'Aquarius': 'aquarius',
-            'Arbalest': 'arbalest',
-            'Arguros Toxos': 'arguros-toxos',
-            'Arondight': 'arondight',
-            'Balisada': 'balisada',
-            'Claiomh Solais Chaotic': 'claiomh-solais-chaotic',
-            'Cosmic Axe': 'cosmic-axe',
-            'Death Scythe': 'death-scythe',
-            'Demon Blade Hellhad': 'demon-blade-hellhad',
-            'Dragon Buster': 'dragon-buster',
-            'Dragon Killer': 'dragon-killer',
-            'Dragon Slayer': 'dragon-slayer',
-            'DualBlade': 'dual-blade',
-            'Durendal': 'durendal',
-            'Failnaught': 'failnaught',
-            'Fire Dragon\'s Banner': 'fire-dragons-banner',
-            'Fire Dragon\'s Curved Sword': 'fire-dragons-curved-sword',
-            'Fire Dragon\'s Great Bow': 'fire-dragons-great-bow',
-            'Fragarach': 'fragarach',
-            'Gambanteinn': 'gambanteinn',
-            'Goblin Slasher': 'goblin-slasher',
-            'Goddess Bow': 'goddess-bow',
-            'Goddess Greatsword': 'goddess-greatsword',
-            'Goddess Staff': 'goddess-staff',
-            'Heavy Bow': 'heavy-bow',
-            'Holy Fire Bow': 'holy-fire-bow',
-            'Holy Fire Staff': 'holy-fire-staff',
-            'Holy Fire Sword': 'holy-fire-sword',
-            'Infinity Staff': 'infinity-staff',
-            'Iokheira': 'iokheira',
-            'Rampage Bow': 'rampage-bow',
-            'Red Dragon Tooth': 'red-dragon-tooth',
-            'Red Ribboned Bow': 'red-ribboned-bow',
-            'Red Ribboned Staff': 'red-ribboned-staff',
-            'Red Ribboned Sword': 'red-ribboned-sword',
-            'Royal Cow Axe': 'royal-cow-axe',
-            'Royal Cow Bowgun': 'royal-cow-bowgun',
-            'Royal Cow Staff': 'royal-cow-staff',
-            'Sagittarius': 'sagittarius',
-            'Sumarbrander': 'sumarbrander',
-            'Tempest Bow': 'tempest-bow',
-            'Tempest Staff': 'tempest-staff',
-            'Tempest Sword': 'tempest-sword',
-            'Thunderclap': 'thunderclap',
-            'Trident': 'trident',
-            'Tyrfingr': 'tyrfingr',
-            'Void Staff': 'void-staff',
-            'White Feather Fan': 'white-feather-fan'
-        };
-
-        // Weapon Database with class restrictions
-        const rawWeapons = [
-            'Abyssal Bow', 'Abyssal Greatsword', 
-            'Abyssal Staff', 'Aquarius', 
-            'Arbalest', 'Arguros Toxos', 
-            'Arondight', 'Balisada', 
-            'Claiomh Solais Chaotic', 'Cosmic Axe', 
-            'Death Scythe', 'Demon Blade Hellhad', 
-            'Dragon Buster', 'Dragon Killer', 
-            'Dragon Slayer', 'DualBlade', 
-            'Durendal', 'Failnaught', 
-            'Fire Dragon\'s Banner', 'Fire Dragon\'s Curved Sword', 
-            'Fire Dragon\'s Great Bow', 'Fragarach', 
-            'Gambanteinn', 'Goblin Slasher', 
-            'Goddess Bow', 'Goddess Greatsword', 
-            'Goddess Staff', 'Heavy Bow', 
-            'Holy Fire Bow', 'Holy Fire Staff', 
-            'Holy Fire Sword', 'Infinity Staff', 
-            'Iokheira', 'Rampage Bow', 
-            'Red Dragon Tooth', 'Red Ribboned Bow', 
-            'Red Ribboned Staff', 'Red Ribboned Sword', 
-            'Royal Cow Axe', 'Royal Cow Bowgun', 
-            'Royal Cow Staff', 'Sagittarius', 
-            'Sumarbrander', 'Tempest Bow', 
-            'Tempest Staff', 'Tempest Sword', 
-            'Thunderclap', 'Trident', 
-            'Tyrfingr', 'Void Staff', 
-            'White Feather Fan'];
-
-        const weaponClasses = {
-            // Add unique: true to any entry to prevent that item from being equipped on multiple characters.
-            // Example: 'Arondight': { class: 'Knight', unique: true },
-            'Abyssal Bow': { class: 'Archer' },
-            'Abyssal Greatsword': { class: 'Knight' },
-            'Abyssal Staff': { class: 'Wizard'},
-            'Aquarius': { class: 'Wizard', class: 'Healer' },
-            'Arbalest': { class: 'Archer' },
-            'Arguros Toxos': { class: 'Archer' },
-            'Arondight': { class: 'Knight' },
-            'Balisada': { class: 'Knight', unique: true },
-            'Claiomh Solais Chaotic': { class: 'Wizard', unique: true },
-            'Cosmic Axe': { class: 'Knight' },
-            'Death Scythe': { class: 'Wizard' },
-            'Demon Blade Hellhad': { class: 'Knight' },
-            'Dragon Buster': { class: 'Wizard' },
-            'Dragon Killer': { class: 'Archer' },
-            'Dragon Slayer': { class: 'Knight' },
-            'DualBlade': { class: 'Knight', unique: true },
-            'Durendal': { class: 'Knight' },
-            'Failnaught': { class: 'Archer', unique: true },
-            'Fire Dragon\'s Banner': { class: 'Wizard', class: 'Healer' },
-            'Fire Dragon\'s Curved Sword': { class: 'Knight' },
-            'Fire Dragon\'s Great Bow': { class: 'Archer' },
-            'Fragarach': { class: 'Knight' },
-            'Gambanteinn': { class: 'Wizard' },
-            'Goblin Slasher': { class: 'Knight' },
-            'Goddess Bow': { class: 'Archer' },
-            'Goddess Greatsword': { class: 'Knight' },
-            'Goddess Staff': { class: 'Wizard' },
-            'Heavy Bow': { class: 'Archer' },
-            'Holy Fire Bow': { class: 'Archer' },
-            'Holy Fire Staff': { class: 'Wizard' },
-            'Holy Fire Sword': { class: 'Knight' },
-            'Infinity Staff': { class: 'Wizard', class: 'Healer', unique: true },
-            'Iokheira': { class: 'Archer' },
-            'Rampage Bow': { class: 'Archer' },
-            'Red Dragon Tooth': { class: 'Knight' },
-            'Red Ribboned Bow': { class: 'Archer' },
-            'Red Ribboned Staff': { class: 'Wizard' },
-            'Red Ribboned Sword': { class: 'Knight' },
-            'Royal Cow Axe': { class: 'Knight' },
-            'Royal Cow Bowgun': { class: 'Archer' },
-            'Royal Cow Staff': { class: 'Wizard' },
-            'Sagittarius': { class: 'Archer' },
-            'Sumarbrander': { class: 'Knight' },
-            'Tempest Bow': { class: 'Archer' },
-            'Tempest Staff': { class: 'Wizard', class: 'Healer' },
-            'Tempest Sword': { class: 'Knight' },
-            'Thunderclap': { class: 'Wizard' },
-            'Trident': { class: 'Knight', unique: true },
-            'Tyrfingr': { class: 'Knight' },
-            'Void Staff': { class: 'Wizard', class: 'Healer' },
-            'White Feather Fan': { class: 'Wizard' }
-        };
-
-        // ─── Armor Database ───────────────────────────────────────────
-        // ADD ARMOR: push the display name to rawArmor, add the filename to
-        // armorFilenames (kebab-case, no extension), and optionally restrict
-        // it to a class in armorClasses.  The image must live at:
-        //   armor/<filename>.webp
-        const rawArmor = [
-            // 'Example Armor',   // ← add names here
-            'Royal Cow Armor', 'Silver Armor', 
-            'Gold Armor', 'Abyssal Armor', 
-            'Dragon Armor', 'Red Ribboned Robe', 
-            'Tempest Armor', 'Gorgon Armor', 
-            'Holy Fire Armor', 'Mirror armor', 
-            'Mithril armor', 'Merlin\'s Robe', 
-            'Armor of the dead', 'Fire Dragon\'s Armor', 
-            'Wild Combat Suit', 'Wrath of Agnes', 
-            'Goddess Armor', 'Absolute Armor'];
-
-        const armorFilenames = {
-            // 'Example Armor': 'example-armor',   // ← display name → filename
-            'Royal Cow Armor': 'royal-cow-armor',
-            'Silver Armor': 'silver-armor',
-            'Gold Armor': 'gold-armor',
-            'Abyssal Armor': 'abyssal-armor',
-            'Dragon Armor': 'dragon-armor',
-            'Red Ribboned Robe': 'red-ribboned-robe',
-            'Tempest Armor': 'tempest-armor',
-            'Gorgon Armor': 'gorgon-armor',
-            'Holy Fire Armor': 'holy-fire-armor',
-            'Mirror armor': 'mirror-armor',
-            'Mithril armor': 'mithril-armor',
-            'Merlin\'s Robe': 'merlins-robe',
-            'Armor of the dead': 'armor-of-the-dead',
-            'Fire Dragon\'s Armor': 'fire-dragons-armor',
-            'Wild Combat Suit': 'wild-combat-suit',
-            'Wrath of Agnes': 'wrath-of-agnes',
-            'Goddess Armor': 'goddess-armor',
-            'Absolute Armor': 'absolute-armor',
-        };
-
-        const armorClasses = {
-            // Add unique: true to any entry to make that armor a one-slot-only item.
-            // 'Example Armor': { class: 'Knight', unique: true },
-            'Wrath of Agnes': { unique: true },
-            'Mirror armor': { unique: true },   
-            'Absolute Armor': { unique: true }
-        };
-
-        // ─── Helmet Database ──────────────────────────────────────────
-        // ADD HELMETS: same pattern as armor above.
-        // Image path: helmets/<filename>.webp
-        const rawHelmets = [
-            // 'Example Helmet',
-            'Abyssal Ring', 'Achilles Helmet', 
-            'Aegis', 'Claiomh Solais Ring', 
-            'Crown Of The Dead', 'Fire Dragon\'s Helmet', 
-            'Goddess Ring', 'Healing Goddess Statue', 
-            'Holy Fire Helmet', 'jade Seal', 'Red Hare', 
-            'Red Ribboned Ring', 'Royal Cow Crown', 
-            'Stiletto Of Jealousy', 'Tempest Helmet', 
-            'Tiamat\'s Signature', 'Transformation Scroll', 
-            'Wild Hair Band', 'Destrutions Favor'];
-
-        const helmetFilenames = {
-            // 'Example Helmet': 'example-helmet',
-                'Abyssal Ring': 'abyssal-ring',
-                'Achilles Helmet': 'achilles-helmet',
-                'Aegis': 'aegis',
-                'Claiomh Solais Ring': 'claiomh-solais-ring',
-                'Crown Of The Dead': 'crown-of-the-dead',
-                'Fire Dragon\'s Helmet': 'fire-dragons-helmet',
-                'Goddess Ring': 'goddess-ring', 
-                'Healing Goddess Statue': 'healing-goddess-statue',
-                'Holy Fire Helmet': 'holy-fire-helmet',
-                'jade Seal': 'jade-seal',
-                'Red Hare': 'red-hare',
-                'Red Ribboned Ring': 'red-ribboned-ring',
-                'Royal Cow Crown': 'royal-cow-crown',
-                'Stiletto Of Jealousy': 'stiletto-of-jealousy',
-                'Tempest Helmet': 'tempest-helmet',
-                'Tiamat\'s Signature': 'tiamat-signature',
-                'Transformation Scroll': 'transformation-scroll',
-                'Wild Hair Band': 'wild-hair-band',
-                'Destrutions Favor': 'destructions-favor', 
-        };
-        
-        const helmetClasses = {
-            // Add unique: true to any entry to make that helmet a one-slot-only item.
-            // 'Example Helmet': { class: 'Archer', unique: true },
-            'Stiletto Of Jealousy': { unique: true },
-            'Transformation Scroll': { unique: true },
-            'Tiamat\'s Signature': { unique: true },
-            'Red Hare': { unique: true },
-            'Destrutions Favor': { unique: true }
-        };
-
-        // ─── Rune Database ────────────────────────────────────────────
-        // ADD RUNES: same pattern as armor above.
-        // Image path: runes/<filename>.webp
-        const rawRunes = [
-            // 'Example Rune',
-            'Abyssal Rune', 'Celestial Rune', 
-            'Claiomh Solais Rune', 'Extreme Rune', 
-            'Goddess Rune', 'Holy Fire Rune', 
-            'Memories Of Flame', 'Red Ribboned Rune', 
-            'Royal Cow Rune', 'Rune Of Healing', 
-            'Rune Of Focus', 'Rune Of The Deep Sea', 
-            'Swordbringer Rune', 'Tempest Rune', 
-            'ThunderHeart'];
-        
-            const runeFilenames = {
-            // 'Example Rune': 'example-rune',
-                'Abyssal Rune': 'abyssal-rune',
-                'Celestial Rune': 'celestial-rune',
-                'Claiomh Solais Rune': 'claiomh-solais-rune',
-                'Extreme Rune': 'extreme-rune',
-                'Goddess Rune': 'goddess-rune',
-                'Holy Fire Rune': 'holy-fire-rune',
-                'Memories Of Flame': 'memories-of-flame',
-                'Red Ribboned Rune': 'red-ribboned-rune',
-                'Royal Cow Rune': 'royal-cow-rune',
-                'Rune Of Healing': 'rune-of-healing',
-                'Rune Of Focus': 'rune-of-focus',
-                'Rune Of The Deep Sea': 'rune-of-the-deep-sea',
-                'Swordbringer Rune': 'swordbringer-rune',
-                'Tempest Rune': 'tempest-rune',
-                'ThunderHeart': 'thunderheart'    
-        };
-        const runeClasses = {
-            // Add unique: true to any entry to make that rune a one-slot-only item.
-            // 'Example Rune': { class: 'Wizard', unique: true },
-            // Add excludeClass: 'ClassName' to hide an item from a specific class.
-            // 'Example Rune': { excludeClass: 'Healer' },
-            'Rune Of Healing': { class: 'Healer' },
-            'Rune Of Focus': { excludeClass: 'Healer' },
-            'Memories Of Flame': { unique: true },
-            'extreme Rune': { unique: true },
-            'Celestial Rune': { unique: true },
-        };
-
         const db = {
-            characters: rawCharacters.map(f => ({ name: parseName(f), img: `rawCharacters/${f}.webp` })),
-            cards: rawCards.map(f => ({ name: parseName(f), img: `rawCards/${f}.webp` })),
-            pets: rawPets.map(f => ({ name: parseName(f), img: `rawPets/${f}.webp` })),
-            gems: rawGems.map(name => ({ name, img: `gems/${name}.webp`, element: gemElements[name] })),
-            Weapon: rawWeapons.map(name => ({ name, img: `weapons/${weaponFilenames[name]}.webp`, class: weaponClasses[name]?.class, excludeClass: weaponClasses[name]?.excludeClass, unique: weaponClasses[name]?.unique || false })),
-            Armor:  rawArmor.map(name => ({ name, img: `armor/${armorFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: armorClasses[name]?.class, excludeClass: armorClasses[name]?.excludeClass, unique: armorClasses[name]?.unique || false })),
-            Helmet: rawHelmets.map(name => ({ name, img: `helmets/${helmetFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: helmetClasses[name]?.class, excludeClass: helmetClasses[name]?.excludeClass, unique: helmetClasses[name]?.unique || false })),
-            Rune:   rawRunes.map(name => ({ name, img: `runes/${runeFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: runeClasses[name]?.class, excludeClass: runeClasses[name]?.excludeClass, unique: runeClasses[name]?.unique || false }))
+            characters: rawCharacters.map(f => ({ name: parseName(f), img: `assets/lostsword/rawCharacters/${f}.webp` })),
+            cards: rawCards.map(f => ({ name: parseName(f), img: `assets/lostsword/rawCards/${f}.webp` })),
+            pets: rawPets.map(f => ({ name: parseName(f), img: `assets/lostsword/rawPets/${f}.webp` })),
+            gems: rawGems.map(name => ({ name, img: `assets/lostsword/gems/${name}.webp`, element: gemElements[name] })),
+            Weapon: rawWeapons.map(name => ({ name, img: `assets/lostsword/weapons/${weaponFilenames[name]}.webp`, class: weaponClasses[name]?.class, excludeClass: weaponClasses[name]?.excludeClass, unique: weaponClasses[name]?.unique || false })),
+            Armor:  rawArmor.map(name => ({ name, img: `assets/lostsword/armor/${armorFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: armorClasses[name]?.class, excludeClass: armorClasses[name]?.excludeClass, unique: armorClasses[name]?.unique || false })),
+            Helmet: rawHelmets.map(name => ({ name, img: `assets/lostsword/helmets/${helmetFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: helmetClasses[name]?.class, excludeClass: helmetClasses[name]?.excludeClass, unique: helmetClasses[name]?.unique || false })),
+            Rune:   rawRunes.map(name => ({ name, img: `assets/lostsword/runes/${runeFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g, '').replace(/\s+/g, '-')}.webp`, class: runeClasses[name]?.class, excludeClass: runeClasses[name]?.excludeClass, unique: runeClasses[name]?.unique || false }))
         };
 
         let currentActiveSection = null, currentActiveCategory = null, currentGearCategory = null;
@@ -2046,9 +1260,6 @@
             const countEl = document.getElementById('char-showing-count');
             if (countEl) countEl.textContent = `Showing ${filtered.length} of ${chars.length} Characters`;
         }
-
-        // ── Gem batch-select state ────────────────────────────
-        let gemBatchMode = false;
         let gearBatchMode = false;
         // ── Multi-select state ────────────────────────────────
         let multiSelectMode = false;
@@ -2189,90 +1400,6 @@
             defBtn.className = 'auto-gear-btn' + (autoGearMode === 'defensive' ? ' defensive' : '');
         }
 
-        function toggleGemBatch() {
-            gemBatchMode = !gemBatchMode;
-            const btn  = document.getElementById('gem-batch-btn');
-            const hint = document.getElementById('gem-batch-hint');
-            if (gemBatchMode) {
-                btn.classList.add('active');
-                btn.querySelector('i').style.color = '#4b6bfb';
-                btn.querySelector('span').style.color = '#e2e8f0';
-                hint.classList.remove('hidden');
-            } else {
-                btn.classList.remove('active');
-                btn.querySelector('i').style.color = '';
-                btn.querySelector('span').style.color = '';
-                hint.classList.add('hidden');
-            }
-        }
-
-        // ── Gem stat preset helpers ──────────────────────────
-        let _currentGemPetIdx = null; // which pet (0/1/2) the gem modal is open for
-
-        function setGemStatPreset(id) {
-            if (_currentGemPetIdx === null) return;
-            const preset = GEM_STAT_PRESETS.find(p => p.id === id);
-            if (!preset) return;
-            const current = petsData[_currentGemPetIdx].gemStat;
-            // Toggle off if same preset clicked again
-            if (current && JSON.stringify([...current].sort()) === JSON.stringify([...preset.stats].sort())) {
-                petsData[_currentGemPetIdx].gemStat = null;
-            } else {
-                petsData[_currentGemPetIdx].gemStat = [...preset.stats];
-            }
-            updateGemStatUI(_currentGemPetIdx);
-            renderGemStatBadge(_currentGemPetIdx);
-        }
-
-        function updateGemStatUI(petIdx) {
-            const current = petIdx !== null ? petsData[petIdx].gemStat : null;
-            GEM_STAT_PRESETS.forEach(p => {
-                const btn = document.getElementById(`gspbtn-${p.id}`);
-                if (!btn) return;
-                const isActive = current &&
-                    JSON.stringify([...current].sort()) === JSON.stringify([...p.stats].sort());
-                btn.classList.toggle('active', isActive);
-            });
-        }
-
-        function renderGemStatBadge(petIdx) {
-            const badgeEl = document.getElementById(`gem-stat-badge-${petIdx}`);
-            if (!badgeEl) return;
-            const stat = petsData[petIdx].gemStat;
-            if (!stat || stat.length === 0) {
-                badgeEl.style.background = '#0f111a';
-                badgeEl.style.borderColor = '#2d314255';
-                badgeEl.style.color = '#475569';
-                badgeEl.textContent = '—';
-                return;
-            }
-            // Build label e.g. 2×ATK/HP
-            const counts = {};
-            stat.forEach(s => { counts[s] = (counts[s] || 0) + 1; });
-            const label = Object.entries(counts).map(([s, n]) => n > 1 ? `${n}×${s}` : s).join('/');
-            // Pick a color from the active preset
-            const match = GEM_STAT_PRESETS.find(p =>
-                JSON.stringify([...p.stats].sort()) === JSON.stringify([...stat].sort())
-            );
-            const color = match ? match.color : '#4b6bfb';
-            badgeEl.style.background = '#0f111a';
-            badgeEl.style.borderColor = color + '55';
-            badgeEl.style.color = color;
-            badgeEl.textContent = label;
-        }
-
-        function clearGemStat() {
-            if (_currentGemPetIdx === null) return;
-            petsData[_currentGemPetIdx].gemStat = null;
-            updateGemStatUI(_currentGemPetIdx);
-            renderGemStatBadge(_currentGemPetIdx);
-        }
-
-        // Re-render all 3 gem stat badges (called from renderPets)
-        function renderAllGemStatBadges() {
-            for (let i = 0; i < 3; i++) renderGemStatBadge(i);
-        }
-
         // ── Multi-select helpers ──────────────────────────────
         function toggleMultiSelect() {
             multiSelectMode = !multiSelectMode;
@@ -2391,7 +1518,7 @@
         // Active filter: null = no filter, { stats: [...] } = custom filter
         let activeStatFilter = null; // { stats: string[] } — the currently active filter
 
-        function statFilterLabel(stats) {
+        function statFilterLCardel(stats) {
             if (!stats || stats.length === 0) return '';
             // Group and count: ['ATK','ATK','CD'] → '2×ATK / CD'
             const counts = {};
@@ -2507,91 +1634,6 @@
                 if (hint) hint.classList.add('hidden');
             }
         }
-        // ─────────────────────────────────────────────────────
-        
-        // 1. Initialize the state
-const activePetFilters = { rarity: new Set(), element: new Set() };
-
-// 2. Toggle "All" for a category
-function toggleAllPetFilter(cat) {
-    // Clear all specific selections for this category
-    const allValues = { 
-        rarity: ['3','4','5'], 
-        element: ['Fire','Frost','Nature','Holy','Shock','Chaos','Radiance'] 
-    };
-    
-    allValues[cat].forEach(val => {
-        activePetFilters[cat].delete(val);
-        const btn = document.getElementById(`pfbtn-${cat}-${val}`);
-        btn && btn.classList.remove('active');
-    });
-    
-    // Set "all" button active
-    const allBtn = document.getElementById(`pfbtn-${cat}-all`);
-    allBtn && allBtn.classList.add('active');
-    
-    applyPetFilters();
-}
-
-// 3. Toggle individual filter
-function togglePetFilter(cat, val) {
-    const btn = document.getElementById(`pfbtn-${cat}-${val}`);
-    const allBtn = document.getElementById(`pfbtn-${cat}-all`);
-    
-    if (activePetFilters[cat].has(val)) {
-        activePetFilters[cat].delete(val);
-        btn && btn.classList.remove('active');
-        // If nothing selected, re-activate "all"
-        if (activePetFilters[cat].size === 0) {
-            allBtn && allBtn.classList.add('active');
-        }
-    } else {
-        activePetFilters[cat].add(val);
-        btn && btn.classList.add('active');
-        // Deactivate "all" when a specific is chosen
-        allBtn && allBtn.classList.remove('active');
-    }
-    applyPetFilters();
-}
-        // ─────────────────────────────────────────────────────
-        // 4. Reset function (Optional but recommended for consistency)
-        function resetPetFilters() {
-            ['rarity', 'element'].forEach(cat => {
-                activePetFilters[cat].forEach(val => {
-                    const btn = document.getElementById(`pfbtn-${cat}-${val}`);
-                    btn && btn.classList.remove('active');
-                });
-             activePetFilters[cat].clear();
-                const allBtn = document.getElementById(`pfbtn-${cat}-all`);
-                allBtn && allBtn.classList.add('active');
-            });
-            document.getElementById('modal-search').value = '';
-            applyPetFilters();
-        }
-
-        // 5. Apply filters (Ensure this matches your data structure)
-        function applyPetFilters() {
-            const rawSearch = (document.getElementById('modal-search').value || '').toLowerCase();
-            const search = resolveSearch(rawSearch); // Ensure this function exists
-            const pets = db.pets;
-    
-            const filtered = pets.filter(item => {
-                const info = getCharInfo(item.name); // Assuming this works for pets too
-        
-                if (search && !item.name.toLowerCase().includes(search)) return false;
-        
-                // Filter Checks
-                if (activePetFilters.rarity.size && !activePetFilters.rarity.has(String(info.rarity || ''))) return false;
-                if (activePetFilters.element.size && !activePetFilters.element.has(info.element || '')) return false;
-        
-                return true;
-            });
-    
-            renderModalGrid(filtered, false); // 'false' indicates this is not a character grid
-    
-            const countEl = document.getElementById('pet-showing-count');
-            if (countEl) countEl.textContent = `Showing ${filtered.length} of ${pets.length} Pets`;
-        }
 
         // ─────────────────────────────────────────────────────
 
@@ -2600,8 +1642,8 @@ function togglePetFilter(cat, val) {
             document.getElementById('modal-title').innerText = `Select ${gearCat || type}`;
             const searchEl = document.getElementById('modal-search');
             searchEl.value = '';
-            const sectionLabel = gearCat || (type === 'character' ? 'characters' : type === 'card' ? 'cards' : type === 'pet' ? 'pets' : type === 'gem' ? 'gems' : type);
-            searchEl.placeholder = `Search ${sectionLabel} by name...`;
+            const sectionLCardel = gearCat || (type === 'character' ? 'characters' : type === 'card' ? 'cards' : type === 'pet' ? 'pets' : type === 'gem' ? 'gems' : type);
+            searchEl.placeholder = `Search ${sectionLCardel} by name...`;
             const isChar = type === 'character';
             const isPet  = type === 'pet';
             const isGem  = type === 'gem';
@@ -2977,22 +2019,6 @@ function togglePetFilter(cat, val) {
             closeModal();
         }
 
-        function selectUltimateX2() {
-            if (typeof currentActiveSection !== 'number') return;
-            ultimateRotation[currentActiveSection].character = 'x2';
-            ultimateRotation[currentActiveSection].time = '';
-            renderUltimateRotation();
-            closeModal();
-        }
-
-        function selectUltimateAuto() {
-            if (typeof currentActiveSection !== 'number') return;
-            ultimateRotation[currentActiveSection].character = 'auto';
-            ultimateRotation[currentActiveSection].time = '';
-            renderUltimateRotation();
-            closeModal();
-        }
-
         function clearSlot() {
             if (currentActiveCategory === 'character') {
                 const removed = slotData[currentActiveSection].character;
@@ -3046,42 +2072,6 @@ function togglePetFilter(cat, val) {
             multiSelectedItems.clear();
         }
         
-        function setupPetDragDrop() {
-            document.querySelectorAll('[data-pet-idx]').forEach(slot => {
-                slot.ondragstart = (e) => {
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('dragType', 'pet');
-                    e.dataTransfer.setData('dragIndex', slot.dataset.petIdx);
-                    slot.style.opacity = '0.5';
-                };
-                slot.ondragend = (e) => {
-                    slot.style.opacity = '1';
-                    // Reset all pet slots to be safe
-                    document.querySelectorAll('[data-pet-idx]').forEach(s => {
-                        s.style.opacity = '1';
-                    });
-                };
-                slot.ondragover = (e) => {
-                    e.preventDefault();
-                    e.dataTransfer.dropEffect = 'move';
-                };
-                slot.ondrop = (e) => {
-                    e.preventDefault();
-                    const dragType = e.dataTransfer.getData('dragType');
-                    const dragIndex = parseInt(e.dataTransfer.getData('dragIndex'));
-                    if (dragType === 'pet') {
-                        const toIdx = parseInt(slot.dataset.petIdx);
-                        [petsData[dragIndex], petsData[toIdx]] = [petsData[toIdx], petsData[dragIndex]];
-                        // Reset all opacities immediately
-                        document.querySelectorAll('[data-pet-idx]').forEach(s => {
-                            s.style.opacity = '1';
-                        });
-                        renderPets();
-                    }
-                };
-            });
-        }
-        
         function setupFormationDragDrop() {
             document.querySelectorAll('[data-form-idx]').forEach(slot => {
                 slot.ondragstart = (e) => {
@@ -3133,223 +2123,8 @@ function togglePetFilter(cat, val) {
         renderTeamGrid();
         setupFormationDragDrop();
 
-        // Initialize Ultimate Rotation
-        let ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
+        // Initialize Ultimate Rotation (state + functions live in rotation.js)
         renderUltimateRotation();
-
-        let _ultDragFromIdx = null;
-
-        function renderUltimateRotation() {
-            const container = document.getElementById('ultimate-rotation-container');
-            if (!container) return;
-            
-            // Find the x2 or auto marker (whichever comes first)
-            const x2Idx   = ultimateRotation.findIndex(slot => slot.character === 'x2');
-            const autoIdx = ultimateRotation.findIndex(slot => slot.character === 'auto');
-            const repeatIdx = x2Idx === -1 && autoIdx === -1 ? -1
-                            : x2Idx === -1 ? autoIdx
-                            : autoIdx === -1 ? x2Idx
-                            : Math.min(x2Idx, autoIdx);
-            
-            container.innerHTML = '';
-            ultimateRotation.forEach((slot, idx) => {
-                // Hide slots after the repeat marker
-                if (repeatIdx !== -1 && idx > repeatIdx) return;
-                
-                const slotDiv = document.createElement('div');
-                slotDiv.className = 'ult-rotation-slot';
-                slotDiv.dataset.ultIdx = idx;
-                
-                // Character icon
-                const iconDiv = document.createElement('div');
-                iconDiv.className = 'ult-char-icon' + (slot.character ? '' : ' empty');
-                iconDiv.style.cursor = 'grab';
-                iconDiv.draggable = true;
-                iconDiv.dataset.ultIdx = idx;
-
-                // Drag source events — use module-level _ultDragFromIdx because
-                // dataTransfer.getData() returns '' during dragover (browser security)
-                iconDiv.addEventListener('dragstart', (e) => {
-                    _ultDragFromIdx = idx;
-                    e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', String(idx));
-                    setTimeout(() => { iconDiv.style.opacity = '0.45'; }, 0);
-                });
-                iconDiv.addEventListener('dragend', () => {
-                    _ultDragFromIdx = null;
-                    iconDiv.style.opacity = '';
-                    document.querySelectorAll('.ult-rotation-slot').forEach(s => { s.style.outline = ''; });
-                });
-
-                // Drop target events
-                slotDiv.addEventListener('dragover', (e) => {
-                    if (_ultDragFromIdx !== null && _ultDragFromIdx !== idx) {
-                        e.preventDefault();
-                        slotDiv.style.outline = '2px solid #4b6bfb';
-                        slotDiv.style.borderRadius = '0.5rem';
-                    }
-                });
-                slotDiv.addEventListener('dragleave', (e) => {
-                    if (!slotDiv.contains(e.relatedTarget)) slotDiv.style.outline = '';
-                });
-                slotDiv.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    slotDiv.style.outline = '';
-                    const from = _ultDragFromIdx;
-                    const to   = idx;
-                    _ultDragFromIdx = null;
-                    if (from !== null && from !== to) {
-                        [ultimateRotation[from], ultimateRotation[to]] = [ultimateRotation[to], ultimateRotation[from]];
-                        renderUltimateRotation();
-                    }
-                });
-
-                iconDiv.onclick = () => selectUltimateCharacter(idx);
-                
-                if (slot.character === 'x2') {
-                    iconDiv.innerHTML = '<span style="font-size:14px;font-weight:700;color:#64748b;">x2</span>';
-                } else if (slot.character === 'auto') {
-                    iconDiv.innerHTML = '<span style="font-size:12px;font-weight:700;color:#4ade80;">Auto</span>';
-                } else if (slot.character) {
-                    const charEntry = db.characters ? db.characters.find(c => c.name === slot.character) : null;
-                    if (charEntry && charEntry.img) {
-                        const img = document.createElement('img');
-                        img.src = charEntry.img;
-                        img.alt = slot.character;
-                        img.style.objectPosition = getFacePosition(charEntry.img);
-                        iconDiv.innerHTML = '';
-                        iconDiv.appendChild(img);
-                    } else {
-                        iconDiv.innerHTML = '<span style="font-size:10px;font-weight:700;color:#475569;">' + (slot.character.substring(0, 2).toUpperCase()) + '</span>';
-                    }
-                } else {
-                    iconDiv.innerHTML = '<span class="text-xs text-slate-400">+</span>';
-                }
-                
-                // Time input wrapper — always in DOM, hidden by default
-                const timeWrapper = document.createElement('div');
-                if (slot.character !== 'x2' && slot.character !== 'auto') {
-                    const hasTime = slot.time && slot.time.trim() !== '';
-                    timeWrapper.className = 'ult-time-wrapper' + (hasTime ? ' visible' : '');
-                    if (hasTime) slotDiv.classList.add('has-time');
-
-                    const timeInput = document.createElement('input');
-                    timeInput.type = 'text';
-                    timeInput.className = 'ult-time-input';
-                    timeInput.placeholder = 'Time';
-                    timeInput.value = slot.time;
-                    timeInput.addEventListener('change', (e) => {
-                        ultimateRotation[idx].time = e.target.value;
-                    });
-                    timeWrapper.appendChild(timeInput);
-                }
-
-                slotDiv.appendChild(iconDiv);
-
-                // Add-time toggle button — top-right of slotDiv, hover-only
-                if (slot.character !== 'x2' && slot.character !== 'auto') {
-                    const hasTime = slot.time && slot.time.trim() !== '';
-                    const addTimeBtn = document.createElement('button');
-                    addTimeBtn.className = 'ult-add-time-btn';
-                    addTimeBtn.title = hasTime ? 'Hide time slot' : 'Add time slot';
-                    addTimeBtn.innerHTML = hasTime
-                        ? '<span style="font-size:13px;font-weight:700;line-height:1;display:block;margin-top:-1px;">×</span>'
-                        : '<span style="font-size:14px;font-weight:700;line-height:1;display:block;margin-top:-1px;">+</span>';
-                    addTimeBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        const showing = timeWrapper.classList.contains('visible');
-                        if (showing) {
-                            timeWrapper.classList.remove('visible');
-                            slotDiv.classList.remove('has-time');
-                            addTimeBtn.innerHTML = '<span style="font-size:14px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;">+</span>';
-                            addTimeBtn.title = 'Add time slot';
-                            // Clear saved time so it doesn't reappear when a new character fills this slot
-                            ultimateRotation[idx].time = '';
-                            if (timeWrapper.querySelector('input')) timeWrapper.querySelector('input').value = '';
-                        } else {
-                            timeWrapper.classList.add('visible');
-                            slotDiv.classList.add('has-time');
-                            addTimeBtn.innerHTML = '<span style="font-size:12px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;">×</span>';
-                            addTimeBtn.title = 'Hide time slot';
-                            timeWrapper.querySelector('input').focus();
-                        }
-                    });
-                    slotDiv.appendChild(addTimeBtn);
-                }
-
-                slotDiv.appendChild(timeWrapper);
-                
-                container.appendChild(slotDiv);
-                
-                // Add arrow between slots (except after the last visible one)
-                if (idx < ultimateRotation.length - 1 && (repeatIdx === -1 || idx < repeatIdx)) {
-                    const arrowDiv = document.createElement('div');
-                    arrowDiv.className = 'ult-arrow';
-                    arrowDiv.innerHTML = '&gt;';
-                    container.appendChild(arrowDiv);
-                }
-            });
-            
-            // Add +/- controls beside the header
-            // Hide controls when a repeat marker (x2/auto) is active — rotation is "locked"
-            const controlsDiv = document.getElementById('ultimate-rotation-controls');
-            if (controlsDiv) {
-                controlsDiv.innerHTML = '';
-                const hasRepeatMarker = repeatIdx !== -1;
-                if (!hasRepeatMarker) {
-                    // Add button
-                    const addBtn = document.createElement('button');
-                    const canAdd = ultimateRotation.length < 11;
-                    addBtn.onclick = canAdd ? addUltimateSlot : null;
-                    addBtn.disabled = !canAdd;
-                    addBtn.style.cssText = `width:28px;height:24px;border-radius:0.375rem;background:#20222f;border:1px solid #2d3142;cursor:${canAdd ? 'pointer' : 'not-allowed'};transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:${canAdd ? '#22c55e' : '#475569'};font-size:14px;font-weight:700;box-shadow:0 0 0 1px #0f0f15;opacity:${canAdd ? '1' : '0.5'};`;
-                    if (canAdd) {
-                        addBtn.onmouseover = function() { this.style.borderColor='#4b6bfb'; this.style.background='#1e2240'; };
-                        addBtn.onmouseout = function() { this.style.borderColor='#2d3142'; this.style.background='#20222f'; };
-                    }
-                    addBtn.title = canAdd ? 'Add slot' : 'Cannot add more slots';
-                    addBtn.textContent = '+';
-                    controlsDiv.appendChild(addBtn);
-
-                    // Remove button
-                    const removeBtn = document.createElement('button');
-                    const canRemove = ultimateRotation.length > 2;
-                    removeBtn.onclick = canRemove ? removeUltimateSlot : null;
-                    removeBtn.disabled = !canRemove;
-                    removeBtn.style.cssText = `width:28px;height:24px;border-radius:0.375rem;background:#20222f;border:1px solid #2d3142;cursor:${canRemove ? 'pointer' : 'not-allowed'};transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;color:${canRemove ? '#f87171' : '#475569'};font-size:14px;font-weight:700;box-shadow:0 0 0 1px #0f0f15;opacity:${canRemove ? '1' : '0.5'};`;
-                    if (canRemove) {
-                        removeBtn.onmouseover = function() { this.style.borderColor='#f87171'; this.style.background='#2a121d'; };
-                        removeBtn.onmouseout = function() { this.style.borderColor='#2d3142'; this.style.background='#20222f'; };
-                    }
-                    removeBtn.title = canRemove ? 'Remove slot' : 'Cannot remove more slots';
-                    removeBtn.textContent = '-';
-                    controlsDiv.appendChild(removeBtn);
-                }
-            }
-        }
-
-        function removeUltimateSlot() {
-            if (ultimateRotation.length <= 2) return;
-            ultimateRotation.pop();
-            renderUltimateRotation();
-        }
-        function selectUltimateCharacter(slotIdx) {
-            currentActiveSection = slotIdx;
-            currentActiveCategory = 'ultimate';
-            openModal(slotIdx, 'ultimate');
-        }
-
-        function addUltimateSlot() {
-            if (ultimateRotation.length >= 12) return;
-            ultimateRotation.push({ character: null, time: '' });
-            renderUltimateRotation();
-        }
-
-        function resetUltimateRotation() {
-            ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
-            renderUltimateRotation();
-        }
     </script>
 
     <script>
@@ -3703,7 +2478,7 @@ function togglePetFilter(cat, val) {
             console.log('[BStats] topN:', topN, '| pcts:', allPcts, '| votes:', Object.fromEntries(numVotes));
 
             if (topN.length === 0) {
-                setStatus('Could not read numbers — ensure "Damage Dealt" tab is visible');
+                setStatus('Could not read numbers — ensure "Damage Dealt" tCard is visible');
                 return;
             }
 
@@ -3714,9 +2489,9 @@ function togglePetFilter(cat, val) {
             const seqNonZero = bestSeq.filter(v => v > 0);
             const topNSet = new Set(topN);
             const seqMatchCount = seqNonZero.filter(v => topNSet.has(v)).length;
-            const seqIsReliable = bestSeq.length >= 2 && seqMatchCount >= Math.min(seqNonZero.length, topN.length);
+            const seqIsReliCardle = bestSeq.length >= 2 && seqMatchCount >= Math.min(seqNonZero.length, topN.length);
 
-            if (seqIsReliable && bestSeq.length <= 5) {
+            if (seqIsReliCardle && bestSeq.length <= 5) {
                 // Use positional sequence from OCR — zeros preserved at their detected positions.
                 // Replace non-zero entries in bestSeq with the voted topN values in order
                 // (topN is already sorted top→bottom) to correct any OCR misreads.
@@ -3733,7 +2508,7 @@ function togglePetFilter(cat, val) {
                 }
                 positionalValues = mapped.slice(0, 5);
             } else {
-                // Fallback: no reliable positional info — put non-zero values at top,
+                // Fallback: no reliCardle positional info — put non-zero values at top,
                 // zeros at the bottom (original behaviour).
                 positionalValues = Array.from({ length: 5 }, (_, i) => topN[i] ?? 0);
             }
@@ -3809,7 +2584,7 @@ function togglePetFilter(cat, val) {
             Fire:     ['#f97316', '#fb923c'],
             Frost:    ['#3b82f6', '#60a5fa'],
             Nature:   ['#22c55e', '#4ade80'],
-            Holy:     ['#eab308', '#fde68a'],
+            Holy:     ['#eCard308', '#fde68a'],
             Shock:    ['#a855f7', '#c084fc'],
             Chaos:    ['#ec4899', '#f472b6'],
             Radiance: ['#ca8a04', '#fcd34d'],
@@ -3946,310 +2721,7 @@ function togglePetFilter(cat, val) {
     }
     </script>
 
-    <script>
-        // ── Preset System ────────────────────────────────────────────────────
-        let _presetsDir = null;
-        let _pendingSaveTitle = '';
-
-        async function initPresetsFolder() {
-            if (!window.showDirectoryPicker) {
-                alert('Your browser does not support the File System Access API.\nPlease use Chrome or Edge.');
-                return;
-            }
-            try {
-                const root = await window.showDirectoryPicker({ mode: 'readwrite' });
-                _presetsDir = await root.getDirectoryHandle('presets', { create: true });
-                await scanPresets();
-            } catch (e) {
-                if (e.name !== 'AbortError') console.warn('Folder access error:', e);
-            }
-        }
-
-        // Scan presets dir + all subfolders for .json files, grouped by folder
-        async function scanPresets() {
-            const list = document.getElementById('preset-list');
-            if (!list) return;
-            if (!_presetsDir) {
-                list.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500 text-center italic">Click Load Preset to grant folder access</div>';
-                return;
-            }
-
-            // Collect root files + subfolder files
-            const rootFiles = [];
-            const subfolders = {}; // { folderName: [filenames] }
-
-            for await (const [name, handle] of _presetsDir.entries()) {
-                if (handle.kind === 'file' && name.endsWith('.json')) {
-                    rootFiles.push(name);
-                } else if (handle.kind === 'directory') {
-                    subfolders[name] = [];
-                    for await (const [fname, fhandle] of handle.entries()) {
-                        if (fhandle.kind === 'file' && fname.endsWith('.json')) {
-                            subfolders[name].push(fname);
-                        }
-                    }
-                    subfolders[name].sort((a, b) => a.localeCompare(b));
-                }
-            }
-            rootFiles.sort((a, b) => a.localeCompare(b));
-
-            const totalCount = rootFiles.length + Object.values(subfolders).reduce((s, a) => s + a.length, 0);
-            if (totalCount === 0) {
-                list.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500 text-center italic">No presets found</div>';
-                return;
-            }
-
-            list.innerHTML = '';
-
-            // Helper to make a file row
-            function makeRow(displayName, onClick) {
-                const row = document.createElement('button');
-                row.className = 'w-full text-left px-3 py-2 text-xs text-slate-300 hover:bg-[#21243a] hover:text-white transition-all flex items-center gap-2 group';
-                row.innerHTML = '<i class="fa-solid fa-file-code text-slate-500 group-hover:text-blue-400 flex-shrink-0 transition-colors"></i><span class="truncate">' + displayName + '</span>';
-                row.onclick = onClick;
-                return row;
-            }
-
-            // Root files
-            if (rootFiles.length > 0) {
-                rootFiles.forEach(name => {
-                    const label = name.replace(/\.json$/, '').replace(/_/g, ' ');
-                    list.appendChild(makeRow(label, () => loadPresetByName(name, null)));
-                });
-            }
-
-            // Subfolders
-            const folderNames = Object.keys(subfolders).sort();
-            folderNames.forEach(folder => {
-                const files = subfolders[folder];
-                // Folder header
-                const header = document.createElement('div');
-                header.className = 'px-3 pt-3 pb-1 text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1.5 border-t border-[#2d3142] mt-1';
-                header.innerHTML = '<i class="fa-solid fa-folder text-slate-600"></i>' + folder;
-                list.appendChild(header);
-
-                if (files.length === 0) {
-                    const empty = document.createElement('div');
-                    empty.className = 'px-4 py-1.5 text-[11px] text-slate-600 italic';
-                    empty.textContent = 'Empty folder';
-                    list.appendChild(empty);
-                } else {
-                    files.forEach(name => {
-                        const label = name.replace(/\.json$/, '').replace(/_/g, ' ');
-                        list.appendChild(makeRow(label, () => loadPresetByName(name, folder)));
-                    });
-                }
-            });
-        }
-
-        // Non-raid folders that get title-based filenames instead of date-based
-        const NON_RAID_FOLDERS = new Set([
-            'star', 'brawl', 'abyss', 'stonehenge', 'snowcap' , 'avalon',
-            'Star', 'Brawl', 'Abyss', 'Stonehenge', 'Snowcap' , 'Avalon',
-        ]);
-
-        function isNonRaidFolder(name) {
-            if (!name) return false;
-            return NON_RAID_FOLDERS.has(name) || NON_RAID_FOLDERS.has(name.toLowerCase());
-        }
-
-        // Raid/unknown folders: SubfolderName_YYYY-MM-DD.json
-        // Non-raid folders (Star, Brawl, Abyss, Stonehenge): sanitized-title.json
-        function buildFilename(subfolderName) {
-            const date = new Date();
-            const dateStr = date.getFullYear() + '-'
-                + String(date.getMonth() + 1).padStart(2, '0') + '-'
-                + String(date.getDate()).padStart(2, '0');
-            if (subfolderName && isNonRaidFolder(subfolderName)) {
-                // Use the team title as filename for non-raid folders
-                const title = (_pendingSaveTitle || 'preset')
-                    .replace(/[^a-zA-Z0-9\s_-]/g, '')
-                    .trim()
-                    .replace(/\s+/g, '_')
-                    .substring(0, 40);
-                return (title || 'preset') + '.json';
-            }
-            if (subfolderName) {
-                return subfolderName + '_' + dateStr + '.json';
-            }
-            return dateStr + '.json';
-        }
-
-        async function savePreset() {
-            if (!_presetsDir) {
-                await initPresetsFolder();
-                if (!_presetsDir) return; // user cancelled
-            }
-            _pendingSaveTitle = document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'My Lost Sword Team';
-
-            // Scan subfolders
-            const subfolderList = document.getElementById('subfolder-list');
-            subfolderList.innerHTML = '<div class="px-3 py-3 text-xs text-slate-500 text-center italic">Scanning folders...</div>';
-
-            const folders = [];
-            for await (const [name, handle] of _presetsDir.entries()) {
-                if (handle.kind === 'directory') folders.push(name);
-            }
-            folders.sort((a, b) => a.localeCompare(b));
-
-            subfolderList.innerHTML = '';
-
-            if (folders.length === 0) {
-                subfolderList.innerHTML = '<div class="px-3 py-3 text-[11px] text-slate-500 text-center italic">No subfolders found in /presets.<br>Create subfolders in your file system to organise saves.</div>';
-            } else {
-                folders.forEach(name => {
-                    const btn = document.createElement('button');
-                    btn.className = 'w-full text-left px-4 py-3 text-sm text-slate-200 hover:bg-[#21243a] hover:text-white transition-all flex items-center gap-3 group rounded-lg mx-0';
-                    btn.innerHTML = `<i class="fa-solid fa-folder text-yellow-500/70 group-hover:text-yellow-400 text-base flex-shrink-0 transition-colors"></i>
-                        <span class="flex-1 truncate font-medium">${name}</span>
-                        <i class="fa-solid fa-chevron-right text-slate-600 group-hover:text-slate-400 text-xs transition-colors"></i>`;
-                    btn.onclick = () => confirmSaveToFolder(name);
-                    subfolderList.appendChild(btn);
-                });
-            }
-
-            // Update preview with no folder selected yet
-            updateSavePreview(folders.length > 0 ? folders[0] : null);
-
-            // Show modal
-            document.getElementById('subfolder-modal').classList.remove('hidden');
-        }
-
-        function updateSavePreview(subfolderName) {
-            const filename = buildFilename(subfolderName);
-            const path = subfolderName ? `presets/${subfolderName}/${filename}` : `presets/${filename}`;
-            document.getElementById('subfolder-preview').textContent = path;
-        }
-
-        function closeSubfolderModal() {
-            document.getElementById('subfolder-modal').classList.add('hidden');
-        }
-
-        async function confirmSaveToFolder(subfolderName) {
-            closeSubfolderModal();
-            if (!_presetsDir) return;
-
-            const filename = buildFilename(subfolderName);
-            let targetDir = _presetsDir;
-
-            if (subfolderName) {
-                targetDir = await _presetsDir.getDirectoryHandle(subfolderName, { create: true });
-            }
-
-            // Check if file exists
-            let exists = false;
-            try { await targetDir.getFileHandle(filename); exists = true; } catch (_) {}
-            if (exists && !confirm(`"${filename}" already exists.\nOverwrite it?`)) return;
-
-            const fh = await targetDir.getFileHandle(filename, { create: true });
-            const writable = await fh.createWritable();
-            await writable.write(JSON.stringify({
-                version: 1,
-                title: _pendingSaveTitle,
-                slotData, petsData, formationSlots, ultimateRotation,
-                slotSkinIndex: (typeof slotSkinIndex !== 'undefined' ? slotSkinIndex : [0,0,0,0,0]),
-                bstatDealt: (typeof bstatDealt !== 'undefined' ? bstatDealt : null),
-                bstatPrev:  (typeof bstatPrev  !== 'undefined' ? bstatPrev  : null)
-            }, null, 2));
-            await writable.close();
-            await scanPresets();
-
-            // Flash the save button green
-            const btn = document.querySelector('[onclick="savePreset()"]');
-            if (btn) {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="fa-solid fa-check mr-2"></i>Saved!';
-                btn.classList.replace('text-blue-400', 'text-green-400');
-                btn.classList.replace('border-blue-700', 'border-green-700');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.replace('text-green-400', 'text-blue-400');
-                    btn.classList.replace('border-green-700', 'border-blue-700');
-                }, 1800);
-            }
-        }
-
-        // Load accepts optional subfolder name; null = root presets dir
-        async function loadPresetByName(filename, subfolderName) {
-            if (!_presetsDir) return;
-            try {
-                let targetDir = _presetsDir;
-                if (subfolderName) {
-                    targetDir = await _presetsDir.getDirectoryHandle(subfolderName);
-                }
-                const fh = await targetDir.getFileHandle(filename);
-                const text = await (await fh.getFile()).text();
-                const preset = JSON.parse(text);
-                if (!preset.slotData || !preset.petsData || !preset.formationSlots) {
-                    alert('Invalid preset file.'); return;
-                }
-                slotData = preset.slotData;
-                // Backfill statPriority for presets saved before this field existed
-                slotData.forEach(s => { if (!s.statPriority) s.statPriority = { Weapon: [], Armor: [], Helmet: [], Rune: [] }; });
-                petsData = preset.petsData;
-                // Backfill gemStat for presets saved before this field existed
-                petsData.forEach(p => { if (!('gemStat' in p)) p.gemStat = null; });
-                formationSlots = preset.formationSlots;
-                ultimateRotation = preset.ultimateRotation || Array(11).fill().map(() => ({ character: null, time: '' }));
-                slotSkinIndex = preset.slotSkinIndex || [0, 0, 0, 0, 0];
-                const titleEl = document.querySelector('h1[contenteditable]');
-                if (titleEl && preset.title) titleEl.innerText = preset.title;
-
-                if (typeof bstatDealt !== 'undefined') {
-                    bstatDealt = preset.bstatDealt || null;
-                    bstatPrev  = preset.bstatPrev  || null;
-                }
-                renderTeamGrid();
-                setupFormationDragDrop();
-                renderUltimateRotation();
-                if (typeof renderBStatBars === 'function') {
-                    renderBStatBars();
-                    const clearBtn  = document.getElementById('battle-stats-clear');
-                    const updateBtn = document.getElementById('battle-stats-update');
-                    if (bstatDealt && bstatDealt.length) {
-                        if (clearBtn)  clearBtn.classList.remove('hidden');
-                        if (updateBtn) updateBtn.classList.remove('hidden');
-                    } else {
-                        if (clearBtn)  clearBtn.classList.add('hidden');
-                        if (updateBtn) updateBtn.classList.add('hidden');
-                    }
-                }
-                document.getElementById('preset-dropdown').classList.add('hidden');
-            } catch (e) {
-                alert('Failed to load preset: ' + e.message);
-            }
-        }
-
-        function togglePresetDropdown(e) {
-            e.stopPropagation();
-            if (!_presetsDir) {
-                initPresetsFolder().then(() => {
-                    if (_presetsDir) document.getElementById('preset-dropdown').classList.remove('hidden');
-                });
-                return;
-            }
-            document.getElementById('preset-dropdown').classList.toggle('hidden');
-        }
-
-        // Close subfolder modal on backdrop click
-        document.getElementById('subfolder-modal').addEventListener('click', function(e) {
-            if (e.target === this) closeSubfolderModal();
-        });
-
-        // Update filename preview when hovering folder buttons
-        document.getElementById('subfolder-list').addEventListener('mouseover', function(e) {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            const folderName = btn.querySelector('span')?.textContent?.trim();
-            if (folderName) updateSavePreview(folderName);
-        });
-
-        document.addEventListener('click', (e) => {
-            const dd = document.getElementById('preset-dropdown');
-            if (!dd || dd.classList.contains('hidden')) return;
-            if (!dd.contains(e.target)) dd.classList.add('hidden');
-        });
-    </script>
+    <script src="js/lostsword/presets.js"></script>
 
     <script>
     // ── Damage Timeline Graph ──────────────────────────────────────────────
@@ -4323,8 +2795,8 @@ function togglePetFilter(cat, val) {
         window.dtgLoad = async function () {
             if (!_dtgSubfolderHandle) return;
 
-            const countLabel = document.getElementById('dtg-count-label');
-            countLabel.textContent = 'Loading…';
+            const countLCardel = document.getElementById('dtg-count-label');
+            countLCardel.textContent = 'Loading…';
 
             const entries = [];
             try {
@@ -4334,7 +2806,7 @@ function togglePetFilter(cat, val) {
                     }
                 }
             } catch (e) {
-                countLabel.textContent = 'Error reading folder';
+                countLCardel.textContent = 'Error reading folder';
                 return;
             }
 
@@ -4357,7 +2829,7 @@ function togglePetFilter(cat, val) {
             }
 
             const n = dataPoints.length;
-            countLabel.textContent = n > 0
+            countLCardel.textContent = n > 0
                 ? `${n} preset${n !== 1 ? 's' : ''} loaded`
                 : 'No damage data found';
 
@@ -4383,8 +2855,8 @@ function togglePetFilter(cat, val) {
                 return;
             }
 
-            const countLabel = document.getElementById('dtg-count-label');
-            countLabel.textContent = 'Loading all raids…';
+            const countLCardel = document.getElementById('dtg-count-label');
+            countLCardel.textContent = 'Loading all raids…';
             document.getElementById('dtg-folder-label').textContent = '/ All Raids';
 
             const dataPoints = [];
@@ -4416,15 +2888,15 @@ function togglePetFilter(cat, val) {
                     } catch (_) {}
                 }
             } catch (e) {
-                countLabel.textContent = 'Error reading folders';
+                countLCardel.textContent = 'Error reading folders';
                 return;
             }
 
-            // Sort by total descending for better readability
+            // Sort by total descending for better readCardility
             dataPoints.sort((a, b) => b.total - a.total);
 
             const n = dataPoints.length;
-            countLabel.textContent = n > 0
+            countLCardel.textContent = n > 0
                 ? `${n} raid${n !== 1 ? 's' : ''} loaded`
                 : 'No raid data found';
 
@@ -4791,16 +3263,16 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('class','Knight')" id="fbtn-class-Knight" class="filter-btn" title="Knight">
-                    <img src="icons/class_knight.webp" class="filter-icon-img" alt="Knight">
+                    <img src="assets/lostsword/icons/class_knight.webp" class="filter-icon-img" alt="Knight">
                 </button>
                 <button onclick="toggleFilter('class','Archer')" id="fbtn-class-Archer" class="filter-btn" title="Archer">
-                    <img src="icons/class_archer.webp" class="filter-icon-img" alt="Archer">
+                    <img src="assets/lostsword/icons/class_archer.webp" class="filter-icon-img" alt="Archer">
                 </button>
                 <button onclick="toggleFilter('class','Wizard')" id="fbtn-class-Wizard" class="filter-btn" title="Wizard">
-                    <img src="icons/class_wizard.webp" class="filter-icon-img" alt="Wizard">
+                    <img src="assets/lostsword/icons/class_wizard.webp" class="filter-icon-img" alt="Wizard">
                 </button>
                 <button onclick="toggleFilter('class','Healer')" id="fbtn-class-Healer" class="filter-btn" title="Healer">
-                    <img src="icons/class_healer.webp" class="filter-icon-img" alt="Healer">
+                    <img src="assets/lostsword/icons/class_healer.webp" class="filter-icon-img" alt="Healer">
                 </button>
                 <!-- Divider -->
                 <div class="w-px h-6 bg-slate-700 mx-1 flex-shrink-0"></div>
@@ -4825,13 +3297,13 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('position','Forward')" id="fbtn-position-Forward" class="filter-btn" title="Forward">
-                    <img src="icons/position_forward.webp" class="filter-icon-img" alt="Forward">
+                    <img src="assets/lostsword/icons/position_forward.webp" class="filter-icon-img" alt="Forward">
                 </button>
                 <button onclick="toggleFilter('position','Center')" id="fbtn-position-Center" class="filter-btn" title="Center">
-                    <img src="icons/position_center.webp" class="filter-icon-img" alt="Center">
+                    <img src="assets/lostsword/icons/position_center.webp" class="filter-icon-img" alt="Center">
                 </button>
                 <button onclick="toggleFilter('position','Backward')" id="fbtn-position-Backward" class="filter-btn" title="Backward">
-                    <img src="icons/position_backward.webp" class="filter-icon-img" alt="Backward">
+                    <img src="assets/lostsword/icons/position_backward.webp" class="filter-icon-img" alt="Backward">
                 </button>
                 <!-- Divider -->
                 <div class="w-px h-6 bg-slate-700 mx-1 flex-shrink-0"></div>
@@ -4840,25 +3312,25 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="toggleFilter('element','Fire')" id="fbtn-element-Fire" class="filter-btn" title="Fire">
-                    <img src="icons/element_fire.webp" class="filter-icon-img" alt="Fire">
+                    <img src="assets/lostsword/icons/element_fire.webp" class="filter-icon-img" alt="Fire">
                 </button>
                 <button onclick="toggleFilter('element','Frost')" id="fbtn-element-Frost" class="filter-btn" title="Frost">
-                    <img src="icons/element_frost.webp" class="filter-icon-img" alt="Frost">
+                    <img src="assets/lostsword/icons/element_frost.webp" class="filter-icon-img" alt="Frost">
                 </button>
                 <button onclick="toggleFilter('element','Nature')" id="fbtn-element-Nature" class="filter-btn" title="Nature">
-                    <img src="icons/element_nature.webp" class="filter-icon-img" alt="Nature">
+                    <img src="assets/lostsword/icons/element_nature.webp" class="filter-icon-img" alt="Nature">
                 </button>
                 <button onclick="toggleFilter('element','Holy')" id="fbtn-element-Holy" class="filter-btn" title="Holy">
-                    <img src="icons/element_holy.webp" class="filter-icon-img" alt="Holy">
+                    <img src="assets/lostsword/icons/element_holy.webp" class="filter-icon-img" alt="Holy">
                 </button>
                 <button onclick="toggleFilter('element','Shock')" id="fbtn-element-Shock" class="filter-btn" title="Shock">
-                    <img src="icons/element_shock.webp" class="filter-icon-img" alt="Shock">
+                    <img src="assets/lostsword/icons/element_shock.webp" class="filter-icon-img" alt="Shock">
                 </button>
                 <button onclick="toggleFilter('element','Chaos')" id="fbtn-element-Chaos" class="filter-btn" title="Chaos">
-                    <img src="icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
+                    <img src="assets/lostsword/icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
                 </button>
                 <button onclick="toggleFilter('element','Radiance')" id="fbtn-element-Radiance" class="filter-btn" title="Radiance">
-                    <img src="icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
+                    <img src="assets/lostsword/icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
                 </button>
                 <!-- Count + Reset pushed to end -->
                 <div class="flex items-center gap-2 ml-auto">
@@ -4891,25 +3363,25 @@ function togglePetFilter(cat, val) {
                     <span class="filter-all-btn">★</span>
                 </button>
                 <button onclick="togglePetFilter('element','Fire')" id="pfbtn-element-Fire" class="filter-btn" title="Fire">
-                    <img src="icons/element_fire.webp" class="filter-icon-img" alt="Fire">
+                    <img src="assets/lostsword/icons/element_fire.webp" class="filter-icon-img" alt="Fire">
                 </button>
                 <button onclick="togglePetFilter('element','Frost')" id="pfbtn-element-Frost" class="filter-btn" title="Frost">
-                    <img src="icons/element_frost.webp" class="filter-icon-img" alt="Frost">
+                    <img src="assets/lostsword/icons/element_frost.webp" class="filter-icon-img" alt="Frost">
                 </button>
                 <button onclick="togglePetFilter('element','Nature')" id="pfbtn-element-Nature" class="filter-btn" title="Nature">
-                    <img src="icons/element_nature.webp" class="filter-icon-img" alt="Nature">
+                    <img src="assets/lostsword/icons/element_nature.webp" class="filter-icon-img" alt="Nature">
                 </button>
                 <button onclick="togglePetFilter('element','Holy')" id="pfbtn-element-Holy" class="filter-btn" title="Holy">
-                    <img src="icons/element_holy.webp" class="filter-icon-img" alt="Holy">
+                    <img src="assets/lostsword/icons/element_holy.webp" class="filter-icon-img" alt="Holy">
                 </button>
                 <button onclick="togglePetFilter('element','Shock')" id="pfbtn-element-Shock" class="filter-btn" title="Shock">
-                    <img src="icons/element_shock.webp" class="filter-icon-img" alt="Shock">
+                    <img src="assets/lostsword/icons/element_shock.webp" class="filter-icon-img" alt="Shock">
                 </button>
                 <button onclick="togglePetFilter('element','Chaos')" id="pfbtn-element-Chaos" class="filter-btn" title="Chaos">
-                    <img src="icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
+                    <img src="assets/lostsword/icons/element_chaos.webp" class="filter-icon-img" alt="Chaos">
                 </button>
                 <button onclick="togglePetFilter('element','Radiance')" id="pfbtn-element-Radiance" class="filter-btn" title="Radiance">
-                    <img src="icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
+                    <img src="assets/lostsword/icons/element_radiance.webp" class="filter-icon-img" alt="Radiance">
                 </button>
                 <!-- Count + Reset pushed to end -->
                 <div class="flex items-center gap-2 ml-auto">
