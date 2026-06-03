@@ -62,9 +62,9 @@ const rawCharacters = [
     'Pc_Circe_01', 'Pc_Lancelot_01','Pc_Lilith_01', 'Pc_Lisa_01',
     'Pc_Lohengrin_01', 'Pc_Lua_01','Pc_Lucy_01', 'Pc_Lueira_01',
     'Pc_Rowena_01', 'Pc_Merlin_01','Pc_Merry_01', 'Pc_SMerry_01',
-    'Pc_Mia_01', 'Pc_Morgana_01','Pc_MorganLeFay_01', 'Pc_Morgause_01',
+    'Pc_Mia_01', 'Pc_Morgana_01','Pc_Morganlefay_01', 'Pc_Morgause_01',
     'Pc_Nesha_01', 'Pc_Nimue_01','Pc_Palamedes_01', 'Pc_Percival_01',
-    'Pc_Rachel_01', 'Pc_Ran_01','Pc_Rey_01', 'Pc_Ria_01',
+    'Pc_Rachel_01', 'Pc_Ran_01','Pc_Ray_01', 'Pc_Ria_01',
     'Pc_Rita_01', 'Pc_MaidRita_01','Pc_Sarah_01', 'Pc_Tiamat_01',
     'Pc_Tristan_01', 'Pc_Urien_01','Pc_Vivien_01', 'Pc_Yumi_01',
 ];
