@@ -267,7 +267,7 @@ function renderPets() {
             const gemEl   = document.getElementById(`gem-p${petIdx + 1}-${gemIdx}`);
             if (gemEl) {
                 gemEl.innerHTML = gemName
-                    ? `<img src="assets/lostsword/gems/${gemName}.webp" class="w-7 h-7 object-contain" alt="${gemName}">`
+                    ? `<img src="Assets/lostsword/gems/${gemName}.webp" class="w-7 h-7 object-contain" alt="${gemName}">`
                     : `<span class="text-xs font-bold text-slate-500 leading-none">+</span>`;
             }
         }
