@@ -55,7 +55,7 @@ const _skinCandidates = {
     'Merry':         ['Sk_Merry_01',        'Sk_Merry_02',       'Sk_Merry_03'],
     'S. Merry':      ['Sk_SMerry_01',       'Sk_SMerry_02',      'Sk_SMerry_03'],
     'Mia':           ['Sk_Mia_01',          'Sk_Mia_02',         'Sk_Mia_03'],
-    'MorganLeFay':   ['Sk_MorganLeFay_01',  'Sk_MorganLeFay_02', 'Sk_MorganLeFay_03'],
+    'Morgan Le Fay': ['Sk_MorganLeFay_01',  'Sk_MorganLeFay_02', 'Sk_MorganLeFay_03'],
     'Morgana':       ['Sk_Morgana_01',      'Sk_Morgana_02',     'Sk_Morgana_03'],
     'Morgause':      ['Sk_Morgause_01',     'Sk_Morgause_02',    'Sk_Morgause_03'],
     'Nesha':         ['Sk_Nesha_01',        'Sk_Nesha_02',       'Sk_Nesha_03'],

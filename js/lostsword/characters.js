@@ -12,16 +12,6 @@ const _parseNameOverrides = {
     'SMerry':      'S. Merry',
 };
 
-// ── Explicit name overrides: display name → characterDatabase key ──
-const charNameOverrides = {
-    'Rey':           'Ray',
-    'Rita 2':        'Rita Maid',
-    'Cow Queen':     'Cowqueen',
-    'Morgan Le Fay': 'Morgan Le Fay',
-    'Joan Of Arc':   'Joanofarc',
-    'S. Merry':      'SMerry',
-};
-
 // ── Search aliases: typed shorthand → substring to match against display names (lowercase) ──
 const searchAliases = {
     'mlf':    'morgan le fay',
@@ -72,7 +62,7 @@ const rawCharacters = [
     'Pc_Circe_01', 'Pc_Lancelot_01','Pc_Lilith_01', 'Pc_Lisa_01',
     'Pc_Lohengrin_01', 'Pc_Lua_01','Pc_Lucy_01', 'Pc_Lueira_01',
     'Pc_Rowena_01', 'Pc_Merlin_01','Pc_Merry_01', 'Pc_SMerry_01',
-    'Pc_Mia_01', 'Pc_Morgana_01','Pc_MorganleFay_01', 'Pc_Morgause_01',
+    'Pc_Mia_01', 'Pc_Morgana_01','Pc_MorganLeFay_01', 'Pc_Morgause_01',
     'Pc_Nesha_01', 'Pc_Nimue_01','Pc_Palamedes_01', 'Pc_Percival_01',
     'Pc_Rachel_01', 'Pc_Ran_01','Pc_Rey_01', 'Pc_Ria_01',
     'Pc_Rita_01', 'Pc_MaidRita_01','Pc_Sarah_01', 'Pc_Tiamat_01',
@@ -125,7 +115,7 @@ const characterDatabase = {
     'Merry':         { class: 'Wizard',  element: 'Nature',   position: 'Back',   rarity: '4' },
     'SMerry':        { class: 'Wizard',  element: 'Frost',    position: 'Back',   rarity: '5' },
     'Mia':           { class: 'Knight',  element: 'Shock',    position: 'Front',  rarity: '5' },
-    'Morgan Le Fay': { class: 'Wizard',  element: 'Holy',     position: 'Middle', rarity: '5' },
+    'MorganLeFay':   { class: 'Wizard',  element: 'Holy',     position: 'Middle', rarity: '5' },
     'Morgana':       { class: 'Wizard',  element: 'Chaos',    position: 'Back',   rarity: '5' },
     'Morgause':      { class: 'Wizard',  element: 'Fire',     position: 'Back',   rarity: '5' },
     'Nesha':         { class: 'Archer',  element: 'Radiance', position: 'Back',   rarity: '5' },
