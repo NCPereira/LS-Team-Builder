@@ -98,7 +98,7 @@ async function _probeSkins(charName) {
     const candidates = _skinCandidates[charName] || [];
     const confirmed = [];
     for (const stem of candidates) {
-        const url = `assets/lostsword/skins/${stem}.webp`;
+        const url = `Assets/lostsword/skins/${stem}.webp`;
         const ok = await _probeImage(url);
         if (ok) confirmed.push(stem);
         // Stop as soon as one is missing — skins are numbered sequentially,
