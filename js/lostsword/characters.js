@@ -25,6 +25,16 @@ function resolveSearch(raw) {
     return searchAliases[raw] || raw;
 }
 
+// ── Explicit name overrides: display name → characterDatabase key ──
+const charNameOverrides = {
+    'Rey':           'Ray',
+    'Rita 2':        'Rita Maid',
+    'Cow Queen':     'Cowqueen',
+    'Morgan Le Fay': 'Morgan Le Fay',
+    'Joan Of Arc':   'Joanofarc',
+    'S. Merry':      'SMerry',
+};
+
 // Pre-built normalised (no-space, lowercase) index — populated after characterDatabase
 const _dbIndex = {};
 
