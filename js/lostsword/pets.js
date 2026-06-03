@@ -21,7 +21,7 @@ const rawPets = [
     'Pet_Lisa_01', 'Pet_Lohengrin_01',
     'Pet_Lua_01', 'Pet_Lueira_01',
     'Pet_Merlin_01', 'Pet_SMerry_01',
-    'Pet_Morgana_01', 'Pet_Morganlefay_01',
+    'Pet_Morgana_01', 'Pet_MorganLeFay_01',
     'Pet_Nesha_01', 'Pet_Nightsong_01',
     'Pet_Midnight_01', 'Pet_Palamedes_01',
     'Pet_Phoenix_01', 'Pet_Belle_01',
