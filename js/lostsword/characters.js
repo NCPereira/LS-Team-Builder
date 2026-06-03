@@ -25,34 +25,17 @@ function resolveSearch(raw) {
     return searchAliases[raw] || raw;
 }
 
-// ── Explicit name overrides: display name → characterDatabase key ──
-const charNameOverrides = {
-    'Rey':           'Ray',
-    'Rita 2':        'Rita Maid',
-    'Cow Queen':     'Cowqueen',
-    'Morgan Le Fay': 'Morgan Le Fay',
-    'Joan Of Arc':   'Joanofarc',
-    'S. Merry':      'SMerry',
-};
-
 // Pre-built normalised (no-space, lowercase) index — populated after characterDatabase
 const _dbIndex = {};
 
 function getCharInfo(displayName) {
-    if (!displayName) return {}; // Return empty object if no character selected
-    // 1. Explicit overrides (check both raw name and stripped-number form)
-    const stripped = displayName.replace(/\s+\d+$/, '').trim();
-    for (const candidate of [displayName, stripped]) {
-        if (candidate in charNameOverrides) {
-            const k = charNameOverrides[candidate];
-            return k ? (characterDatabase[k] || {}) : {};
-        }
-    }
-    // 2. Direct lookup
+    if (!displayName) return {};
+    // 1. Direct lookup
     if (characterDatabase[displayName]) return characterDatabase[displayName];
-    // 3. Strip trailing variant number ("Bedivere 2" → "Bedivere")
+    // 2. Strip trailing variant number ("Bedivere 2" → "Bedivere")
+    const stripped = displayName.replace(/\s+\d+$/, '').trim();
     if (characterDatabase[stripped]) return characterDatabase[stripped];
-    // 4. Case-insensitive no-space match ("Cow Queen" → "Cowqueen")
+    // 3. Case-insensitive no-space match ("Morgan Le Fay" → "MorganLeFay")
     const norm = stripped.replace(/\s+/g, '').toLowerCase();
     const key = _dbIndex[norm];
     if (key) return characterDatabase[key];
