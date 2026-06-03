@@ -11,7 +11,7 @@ const rawPets = [
     'Pet_Karishara_01', 'Pet_Katrin_01','Pet_Kay_01', 'Pet_Circe_01',
     'Pet_Lancelot_01', 'Pet_Lilith_01','Pet_Lisa_01', 'Pet_Lohengrin_01',
     'Pet_Lua_01', 'Pet_Lueira_01','Pet_Merlin_01', 'Pet_SMerry_01',
-    'Pet_Morgana_01', 'Pet_MorganLeFay_01','Pet_Nesha_01', 'Pet_Nightsong_01',
+    'Pet_Morgana_01', 'Pet_Morganlefay_01','Pet_Nesha_01', 'Pet_Nightsong_01',
     'Pet_Midnight_01', 'Pet_Palamedes_01','Pet_Phoenix_01', 'Pet_Belle_01',
     'Pet_Raccoon_01', 'Pet_Ran_01','Pet_Retriever_01', 'Pet_Gold_01',
     'Pet_MaidRita_01', 'Pet_Shiba_01','Pet_Slime_01', 'Pet_Tiamat_01',
