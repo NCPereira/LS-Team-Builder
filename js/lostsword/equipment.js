@@ -123,7 +123,7 @@ const weaponClasses = {
     'Holy Fire Bow':              { class: 'Archer' },
     'Holy Fire Staff':            { class: 'Wizard' },
     'Holy Fire Sword':            { class: 'Knight' },
-    'Infinity Staff':             { class: 'Wizard', class: 'Healer', unique: true },
+    'Infinity Staff':             { classes: ['Wizard', 'Healer'], unique: true },
     'Iokheira':                   { class: 'Archer' },
     'Rampage Bow':                { class: 'Archer' },
     'Red Dragon Tooth':           { class: 'Knight' },

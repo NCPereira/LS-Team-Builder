@@ -36,7 +36,7 @@ const db = {
     cards:      rawCards.map(f => ({ name: parseName(f), img: `Assets/lostsword/rawCards/${f}.webp` })),
     pets:       rawPets.map(f => ({ name: parseName(f), img: `Assets/lostsword/rawPets/${f}.webp` })),
     gems:       rawGems.map(name => ({ name, img: `Assets/lostsword/gems/${name}.webp`, element: gemElements[name] })),
-    Weapon: rawWeapons.map(name => ({ name, img: `Assets/lostsword/weapons/${weaponFilenames[name]}.webp`, class: weaponClasses[name]?.class, excludeClass: weaponClasses[name]?.excludeClass, unique: weaponClasses[name]?.unique || false })),
+    Weapon: rawWeapons.map(name => ({ name, img: `Assets/lostsword/weapons/${weaponFilenames[name]}.webp`, class: weaponClasses[name]?.class, classes: weaponClasses[name]?.classes, excludeClass: weaponClasses[name]?.excludeClass, unique: weaponClasses[name]?.unique || false })),
     Armor:  rawArmor.map(name =>   ({ name, img: `Assets/lostsword/armor/${armorFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,'-')}.webp`,   class: armorClasses[name]?.class,   excludeClass: armorClasses[name]?.excludeClass,   unique: armorClasses[name]?.unique   || false })),
     Helmet: rawHelmets.map(name =>  ({ name, img: `Assets/lostsword/helmets/${helmetFilenames[name] || name.toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,'-')}.webp`, class: helmetClasses[name]?.class,  excludeClass: helmetClasses[name]?.excludeClass,  unique: helmetClasses[name]?.unique  || false })),
     Rune:   rawRunes.map(name =>    ({ name, img: `Assets/lostsword/runes/${runeFilenames[name]   || name.toLowerCase().replace(/[^\w\s]/g,'').replace(/\s+/g,'-')}.webp`,   class: runeClasses[name]?.class,    excludeClass: runeClasses[name]?.excludeClass,    unique: runeClasses[name]?.unique    || false })),
@@ -253,6 +253,7 @@ function applyAutoGear(mode) {
             const gearEntry = (db[cat] || []).find(g => g.name === gearName);
             if (!gearEntry) return;
             if (gearEntry.class && gearEntry.class !== cls) return;
+            if (gearEntry.classes && !gearEntry.classes.includes(cls)) return;
             if (gearEntry.excludeClass && gearEntry.excludeClass === cls) return;
             if (gearEntry.unique) {
                 const alreadyUsed = slotData.some((s, i) => i < idx && s.gear[cat] === gearName);
@@ -332,6 +333,7 @@ function applySlotAutoGear(slotIndex, mode) {
         const gearEntry = (db[cat] || []).find(g => g.name === gearName);
         if (!gearEntry) return;
         if (gearEntry.class && gearEntry.class !== cls) return;
+        if (gearEntry.classes && !gearEntry.classes.includes(cls)) return;
         if (gearEntry.excludeClass && gearEntry.excludeClass === cls) return;
         if (gearEntry.unique) {
             const alreadyUsed = slotData.some((s, i) => i !== slotIndex && s.gear[cat] === gearName);
@@ -458,8 +460,19 @@ function applyGearStatFilter() {
     const charClass = charInfo.class || '';
     const gearItems = db[currentGearCategory] || [];
     let items = charClass
-        ? gearItems.filter(item => (!item.class || item.class === charClass) && item.excludeClass !== charClass)
-        : gearItems;
+    ? gearItems.filter(item => {
+        // 1. If it has a strict single class limit that doesn't match, hide it
+        if (item.class && item.class !== charClass) return false;
+        
+        // 2. If it has a multi-class array limit, character class MUST be in it
+        if (item.classes && !item.classes.includes(charClass)) return false;
+        
+        // 3. If it has an explicit exclusion rule, hide it
+        if (item.excludeClass && item.excludeClass === charClass) return false;
+        
+        return true;
+      })
+    : gearItems;
     const rawSearch = (document.getElementById('modal-search')?.value || '').toLowerCase();
     if (rawSearch) items = items.filter(i => i.name.toLowerCase().includes(rawSearch));
     renderModalGrid(items, false);
@@ -484,7 +497,10 @@ function validateSlotGear(slotIndex) {
         const gearName = slot.gear[gearCat];
         if (!gearName) continue;
         const gear = db[gearCat].find(g => g.name === gearName);
-        if (!gear || (gear.class && gear.class !== charClass) || (gear.excludeClass && gear.excludeClass === charClass)) {
+        if (!gear || 
+            (gear.class && gear.class !== charClass) || 
+            (gear.classes && !gear.classes.includes(charClass)) || 
+            (gear.excludeClass && gear.excludeClass === charClass)) {
             slot.gear[gearCat] = null;
         }
     }
@@ -689,7 +705,7 @@ function openModal(slotIndex, type, gearCat = null) {
         const charClass  = charInfo.class || '';
         const gearItems  = db[gearCat] || [];
         const filteredItems = charClass
-            ? gearItems.filter(item => (!item.class || item.class === charClass) && item.excludeClass !== charClass)
+            ? gearItems.filter(item => (!item.class || item.class === charClass) && (!item.classes || item.classes.includes(charClass)) && item.excludeClass !== charClass)
             : gearItems;
         renderModalGrid(filteredItems, false);
         const equippedName  = slotData[slotIndex]?.gear?.[gearCat];
@@ -870,11 +886,12 @@ function applyGenericSearch() {
         const charClass = charInfo.class || '';
         const gearItems = db[currentGearCategory] || [];
         items = charClass
-            ? gearItems.filter(item => (!item.class || item.class === charClass) && item.excludeClass !== charClass)
+            ? gearItems.filter(item => (!item.class || item.class === charClass) && (!item.classes || item.classes.includes(charClass)) && item.excludeClass !== charClass)
             : gearItems;
     }
 
-    let filtered = search ? items.filter(i => i.name.toLowerCase().includes(search)) : items;
+    let filtered = [...items];
+    if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
 
     // Keep equipped item pinned to top even while searching
     if (currentActiveCategory === 'gear') {
