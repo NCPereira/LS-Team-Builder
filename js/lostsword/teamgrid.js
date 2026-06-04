@@ -525,8 +525,8 @@ function renderTeamGrid() {
                 <button id="slot-off-btn-${index}" onclick="applySlotAutoGear(${index},'offensive')" title="Auto-equip offensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#ef4444';this.style.color='#f87171'" onmouseout="resetSlotOffBtn(${index})"` : ''}>Off</button>
                 <button id="slot-def-btn-${index}" onclick="applySlotAutoGear(${index},'defensive')" title="Auto-equip defensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#3b82f6';this.style.color='#60a5fa'" onmouseout="resetSlotDefBtn(${index})"` : ''}>Def</button>
             </div>
-            <div class="relative bg-slotBg border-2 border-dashed border-slate-700 rounded-lg overflow-hidden cursor-pointer p-0 h-48 group transition-all hover:border-accentBlue" onclick="openModal('${index}', 'character')" style="display:block;">
-                <div id="char-display-${index}" style="position:absolute;inset:0;">
+            <div class="relative bg-slotBg border-2 border-dashed border-slate-700 rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all hover:border-accentBlue" onclick="openModal('${index}', 'character')">
+                <div id="char-display-${index}" class="w-full h-full">
                     ${slot.character ? (() => {
                         const charInfo = getCharInfo(slot.character);
                         const pos = charInfo.position || '';
@@ -541,8 +541,8 @@ function renderTeamGrid() {
                                 `<div class="skin-dot${i === skinIdx ? ' active' : ''}"></div>`).join('')}</div>`
                             : '';
                         return `
-                            <div style="position:absolute;inset:0;border-left:4px solid ${posColor};">
-                                <img src="${imgSrc || ''}" alt="${slot.character}" style="width:100%;height:100%;object-fit:cover;object-position:${getFacePosition(imgSrc)};display:block;" onerror="this.style.display='none'">
+                            <div class="relative w-full h-full" style="border-left: 4px solid ${posColor};">
+                                <img src="${imgSrc || ''}" alt="${slot.character}" class="w-full h-full object-cover" style="object-position:${getFacePosition(imgSrc)};" onerror="this.style.display='none'">
                                 ${hasSkins ? `<button class="skin-swap-btn${skinIdx > 0 ? ' skin-active' : ''}" onclick="cycleSkin(${index}, event)" title="Swap skin"><i class="fa-solid fa-shirt" style="font-size:10px;"></i></button>` : ''}
                                 ${dotsHtml}
                                 <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/80 to-transparent"></div>
@@ -551,8 +551,8 @@ function renderTeamGrid() {
                                 </div>
                             </div>`;
                     })() : `
-                        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;padding:0.5rem;">
-                            <i class="fa-solid fa-user-plus text-2xl text-slate-500"></i>
+                        <div class="text-center flex flex-col items-center justify-center w-full h-full p-2">
+                            <i class="fa-solid fa-user-plus text-2xl text-slate-500 mb-2"></i>
                             <span class="text-xs text-slate-400 font-medium">Add Character</span>
                         </div>`}
                 </div>
@@ -584,19 +584,19 @@ function renderTeamGrid() {
                     </div>`;
                 }).join('')}
             </div>
-            <div class="relative bg-slotBg border border-slate-700 rounded-lg h-40 cursor-pointer overflow-hidden" onclick="openModal('${index}', 'card')" style="display:block;">
-                <div id="card-display-${index}" style="position:absolute;inset:0;">
+            <div class="relative bg-slotBg border border-slate-700 rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="openModal('${index}', 'card')">
+                <div id="card-display-${index}" class="card-display w-full h-full">
                     ${slot.card ? (() => {
                         const cardData = db.cards.find(c => c.name === slot.card);
                         return `
-                            <div style="position:absolute;inset:0;">
-                                <img src="${cardData?.img || ''}" alt="${slot.card}" style="width:100%;height:100%;object-fit:cover;display:block;">
+                            <div class="relative w-full h-full">
+                                <img src="${cardData?.img || ''}" alt="${slot.card}" class="w-full h-full object-cover">
                                 <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/80 to-transparent"></div>
                                 <div class="absolute bottom-1 left-1 right-1 text-center">
                                     <span class="text-[10px] text-white font-bold drop-shadow-lg">${slot.card}</span>
                                 </div>
                             </div>`;
-                    })() : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><span class="text-xs text-slate-400">Add Card</span></div>`}
+                    })() : `<span class="text-xs text-slate-400">Add Card</span>`}
                 </div>
             </div>`;
 

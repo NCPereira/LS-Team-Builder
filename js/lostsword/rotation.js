@@ -174,30 +174,24 @@ function renderUltimateRotation() {
 
     // ── Brawl kill counter widget — appended after all rotation slots ──────────
     if (brawlKillCount !== null) {
-        // "=" separator between last slot and kill counter
-        const eqArrow = document.createElement('div');
-        eqArrow.className = 'ult-arrow';
-        eqArrow.textContent = '=';
-        container.appendChild(eqArrow);
-
-        // Kill counter — stacked label + input, vertically aligned to icon row
+        // Kill counter — inline label + typeable input, centred with the rotation row
         const killCard = document.createElement('div');
-        killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding-top:4px;';
+        killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;align-items:center;gap:6px;';
 
         const label = document.createElement('span');
         label.textContent = 'Kills:';
-        label.style.cssText = 'font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:0.04em;white-space:nowrap;text-align:center;';
+        label.style.cssText = 'font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:0.04em;white-space:nowrap;';
 
         const input = document.createElement('input');
         input.type = 'text';
         input.id   = 'brawl-kill-input';
         input.value = String(brawlKillCount);
         input.style.cssText = `
-            width:80px;height:36px;
-            background:#0f111a;border:1px solid #7c3aed55;border-radius:6px;
-            color:#c4b5fd;font-size:16px;font-weight:800;text-align:center;
+            width:52px;height:26px;
+            background:#0f111a;border:1px solid #7c3aed55;border-radius:5px;
+            color:#c4b5fd;font-size:13px;font-weight:800;text-align:center;
             font-variant-numeric:tabular-nums;outline:none;
-            transition:border-color 0.15s;padding:0 6px;
+            transition:border-color 0.15s;padding:0 4px;
         `;
         input.addEventListener('focus', () => { input.style.borderColor='#a78bfa'; input.select(); });
         input.addEventListener('blur',  () => { input.style.borderColor='#7c3aed55'; });
