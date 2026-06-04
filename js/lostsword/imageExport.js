@@ -186,8 +186,12 @@ async function exportCapturePNG() {
         clone.style.backgroundColor = 'transparent';
 
         // ── Step 5b: Replace <img> elements with background-image divs ──────────
-        //    html2canvas fails to render object-fit:cover and transform:scale on imgs.
-        //    We replace every qualifying img with a background-image div instead.
+        //    html2canvas has two key failures with <img> tags:
+        //      1. It ignores CSS transform:scale() — so face-zoom is lost.
+        //      2. It ignores object-fit:cover/contain — images stretch to fill
+        //         their container, warping pet icons, card art, gear icons, etc.
+        //    Converting ALL content images to background-image divs fixes both,
+        //    since html2canvas renders background-size/position correctly.
         liveAll.forEach((liveEl, i) => {
             if (liveEl.tagName !== 'IMG') return;
             const cloneEl = cloneAll[i];
@@ -196,20 +200,21 @@ async function exportCapturePNG() {
             const cs        = window.getComputedStyle(liveEl);
             const transform = cs.transform || cs.webkitTransform || '';
             const objFit    = cs.objectFit || '';
-            // Grab object-position from inline style first, then computed
             const objPos    = liveEl.style.objectPosition || cs.objectPosition || '';
 
-            const isScaled  = transform && transform !== 'none' && transform !== 'matrix(1, 0, 0, 1, 0, 0)';
-            const hasObjFit = objFit === 'cover' || objFit === 'contain';
+            // Process imgs that have transform:scale OR object-fit:cover/contain.
+            // Plain decorative imgs with no special sizing can stay as-is.
+            const isScaled   = transform && transform !== 'none' && transform !== 'matrix(1, 0, 0, 1, 0, 0)';
+            const hasObjFit  = objFit === 'cover' || objFit === 'contain';
             if (!isScaled && !hasObjFit) return;
 
             const src = liveEl.src || liveEl.getAttribute('src') || '';
             if (!src) return;
 
-            // ── background-size ────────────────────────────────────────────────
-            // For scaled imgs bake the scale factor in; otherwise mirror object-fit.
+            // ── Determine background-size ──────────────────────────────────────
             let bgSize;
-            if (isScaled && !hasObjFit) {
+            if (isScaled) {
+                // Face-zoom images: scale factor baked into background-size
                 let scale = 1;
                 const matMatch = transform.match(/matrix\(([^,]+)/);
                 if (matMatch) scale = parseFloat(matMatch[1]) || 1;
@@ -217,15 +222,17 @@ async function exportCapturePNG() {
             } else if (objFit === 'cover') {
                 bgSize = 'cover';
             } else {
+                // contain
                 bgSize = 'contain';
             }
 
-            // ── background-position ────────────────────────────────────────────
-            // Prefer object-position (face-crop coords); fall back to transform-origin.
+            // ── Determine background-position ──────────────────────────────────
+            // For scaled imgs fall back to transform-origin; for others use object-position.
             let bgPosX = '50%';
-            let bgPosY = '10%';   // sensible default for portrait character art
+            let bgPosY = '50%';
 
             if (isScaled) {
+                // Use transform-origin as the crop anchor
                 const originRaw   = cs.transformOrigin || '50% 50%';
                 const originParts = originRaw.split(' ');
                 bgPosX = originParts[0] || '50%';
@@ -234,53 +241,36 @@ async function exportCapturePNG() {
                 if (bgPosY === 'center') bgPosY = '50%';
             }
 
-            if (objPos && objPos !== 'auto' && objPos !== '50% 50%') {
+            // object-position overrides transform-origin when present
+            if (objPos && objPos !== 'auto') {
                 const pp = objPos.trim().split(/\s+/);
                 if (pp[0]) bgPosX = pp[0];
                 if (pp[1]) bgPosY = pp[1];
             }
 
             // ── Build replacement div ──────────────────────────────────────────
-            // Detect if this image is an absolute-fill child (position:absolute, inset:0)
-            // — character portraits and card images now use this pattern after the
-            // teamgrid fix. For these we must replicate position:absolute;inset:0
-            // exactly so the div fills its parent without any gaps.
-            const liveParent   = liveEl.parentElement;
-            const parentCs     = liveParent ? window.getComputedStyle(liveParent) : null;
-            const imgIsAbsFill = cs.position === 'absolute' ||
-                                 (cs.width === (parentCs && parentCs.width) &&
-                                  cs.height === (parentCs && parentCs.height) &&
-                                  parseFloat(cs.width) > 0);
-
             const div = document.createElement('div');
+            div.style.cssText = cloneEl.style.cssText;   // inherit all computed styles already applied
             div.style.backgroundImage    = `url("${src}")`;
             div.style.backgroundSize     = bgSize;
             div.style.backgroundPosition = `${bgPosX} ${bgPosY}`;
             div.style.backgroundRepeat   = 'no-repeat';
-            div.style.overflow           = 'hidden';
-            div.style.transform          = 'none';
-            div.style.borderRadius       = cs.borderRadius;
-
-            if (imgIsAbsFill) {
-                // Fill parent completely — no gaps, no lines
-                div.style.position = 'absolute';
-                div.style.inset    = '0';
-                div.style.width    = '100%';
-                div.style.height   = '100%';
-                div.style.display  = 'block';
-            } else {
-                // Non-fill image (icons, gear, pets) — keep exact dimensions
-                div.style.display    = cs.display === 'inline' ? 'inline-block' : (cs.display || 'block');
-                div.style.width      = cs.width;
-                div.style.height     = cs.height;
-                div.style.minWidth   = cs.minWidth;
-                div.style.minHeight  = cs.minHeight;
-                div.style.flexShrink = cs.flexShrink;
-                div.style.flexGrow   = cs.flexGrow;
-                div.style.flexBasis  = cs.flexBasis;
-            }
+            // Ensure div fills its parent exactly as the img did
+            div.style.display    = cs.display === 'inline' ? 'inline-block' : (cs.display || 'block');
+            div.style.width      = cs.width;
+            div.style.height     = cs.height;
+            div.style.minWidth   = cs.minWidth;
+            div.style.minHeight  = cs.minHeight;
+            div.style.flexShrink = cs.flexShrink;
+            div.style.flexGrow   = cs.flexGrow;
+            div.style.flexBasis  = cs.flexBasis;
+            div.style.borderRadius = cs.borderRadius;
+            div.style.overflow   = 'hidden';
+            // Remove transform — baked into background-size for scaled imgs
+            div.style.transform  = 'none';
 
             cloneEl.parentNode.replaceChild(div, cloneEl);
+            // Keep cloneAll in sync so subsequent index lookups still work
             cloneAll[i] = div;
         });
 
