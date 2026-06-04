@@ -319,6 +319,65 @@
         .auto-gear-btn.offensive { border-color: #ef4444; background: #1a0a0a; color: #f87171; }
         .auto-gear-btn.defensive { border-color: #3b82f6; background: #0a1020; color: #60a5fa; }
 
+        /* ── Panel toggle buttons (Damage / Comments) ── */
+        .panel-toggle-btn {
+            background: #1a1c28;
+            border: 1px solid #2d3142;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 7px;
+            height: 24px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #64748b;
+            white-space: nowrap;
+        }
+        .panel-toggle-btn:hover { background: #21243a; border-color: #4b6bfb; color: #e2e8f0; }
+        .panel-toggle-btn.active-dmg  { border-color: #4b6bfb; background: #1e2240; color: #7c9dff; }
+        .panel-toggle-btn.active-notes { border-color: #a78bfa; background: #1a1030; color: #c4b5fd; }
+
+        /* ── Comments Panel ── */
+        #comments-panel {
+            background: #181a24;
+            border: 1px solid #2d3142;
+            border-radius: 0.75rem;
+            padding: 1.2rem;
+            display: none;
+            flex-direction: column;
+            gap: 0.75rem;
+            min-width: 340px;
+            max-width: 420px;
+            flex: 1;
+        }
+        #comments-panel.visible { display: flex; }
+        #comments-textarea {
+            flex: 1;
+            background-color: #20222f !important;
+            border: 1px solid #2d3142;
+            border-radius: 0.5rem;
+            color: #e2e8f0 !important;
+            font-size: 12px;
+            line-height: 1.6;
+            padding: 10px 12px;
+            resize: vertical;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+            min-height: 200px;
+            font-family: system-ui, sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+            color-scheme: dark;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+        #comments-textarea:focus { outline: none; border-color: #a78bfa; background-color: #1e1a2e !important; }
+        #comments-textarea::placeholder { color: #475569 !important; }
+        .comments-char-count { font-size: 10px; color: #475569; text-align: right; }
+
         /* ── Color coding for formation slots ── */
         .form-slot-backward { border-color: #60a5fa55 !important; background: #0c162622 !important; }
         .form-slot-center   { border-color: #fbbf2455 !important; background: #1a150522 !important; }
@@ -536,9 +595,19 @@
 
                 <!-- Battle Stats Panel -->
                 <div id="battle-stats-panel" style="flex:1;display:flex;flex-direction:column;">
-                    <div class="text-[12px] text-slate-400 font-semibold tracking-widest uppercase flex items-center gap-2 mb-2">
-                        <i class="fa-solid fa-chart-bar text-[#4b6bfb]"></i>
-                        Damage Dealt
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-chart-bar text-[#4b6bfb]"></i>
+                            Damage Dealt
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button id="panel-toggle-dmg" class="panel-toggle-btn active-dmg" onclick="switchPanel('dmg')" title="Damage Dealt">
+                                <i class="fa-solid fa-chart-bar" style="font-size:8px;"></i> Damage
+                            </button>
+                            <button id="panel-toggle-notes" class="panel-toggle-btn" onclick="switchPanel('notes')" title="Notes & Comments">
+                                <i class="fa-solid fa-note-sticky" style="font-size:8px;"></i> Comments
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Upload + Paste buttons (hidden when image is loaded) -->
@@ -575,6 +644,29 @@
                         <button id="battle-stats-clear" class="hidden text-[10px] text-slate-400 hover:text-red-400 border border-slate-700 hover:border-red-800 rounded px-2 py-0.5 transition" onclick="clearBattleStats()">
                             <i class="fa-solid fa-trash mr-1"></i>Clear
                         </button>
+                    </div>
+                </div>
+
+                <!-- Comments Panel -->
+                <div id="comments-panel">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="text-[10px] text-slate-400 font-semibold tracking-widest uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-note-sticky" style="color:#a78bfa;"></i>
+                            Notes &amp; Comments
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button id="panel-toggle-dmg2" class="panel-toggle-btn" onclick="switchPanel('dmg')" title="Damage Dealt">
+                                <i class="fa-solid fa-chart-bar" style="font-size:8px;"></i> Damage
+                            </button>
+                            <button id="panel-toggle-notes2" class="panel-toggle-btn active-notes" onclick="switchPanel('notes')" title="Notes & Comments">
+                                <i class="fa-solid fa-note-sticky" style="font-size:8px;"></i> Comments
+                            </button>
+                        </div>
+                    </div>
+                    <textarea id="comments-textarea" placeholder="Add notes, strategy tips, reminders, or any comments about your team build..." maxlength="2000" oninput="updateCommentsCount()"></textarea>
+                    <div class="flex items-center justify-between mt-1">
+                        <span class="text-[10px] text-slate-600 italic">Saved with preset</span>
+                        <span id="comments-char-count" class="comments-char-count">0 / 2000</span>
                     </div>
                 </div>
 
@@ -946,6 +1038,36 @@
         renderTeamGrid();
         setupFormationDragDrop();
         renderUltimateRotation();
+
+        // ── Panel toggle (Damage / Comments) ────────────────────────────
+        function switchPanel(which) {
+            const dmgPanel   = document.getElementById('battle-stats-panel');
+            const notesPanel = document.getElementById('comments-panel');
+
+            // All 4 buttons (2 in each panel)
+            const allDmgBtns   = [document.getElementById('panel-toggle-dmg'),  document.getElementById('panel-toggle-dmg2')];
+            const allNotesBtns = [document.getElementById('panel-toggle-notes'), document.getElementById('panel-toggle-notes2')];
+
+            if (which === 'dmg') {
+                dmgPanel.style.display = 'flex';
+                notesPanel.classList.remove('visible');
+                allDmgBtns.forEach(b   => b && b.classList.add('active-dmg'));
+                allNotesBtns.forEach(b => b && b.classList.remove('active-notes'));
+            } else {
+                dmgPanel.style.display = 'none';
+                notesPanel.classList.add('visible');
+                allNotesBtns.forEach(b => b && b.classList.add('active-notes'));
+                allDmgBtns.forEach(b   => b && b.classList.remove('active-dmg'));
+            }
+        }
+
+        function updateCommentsCount() {
+            const ta  = document.getElementById('comments-textarea');
+            const cnt = document.getElementById('comments-char-count');
+            if (!ta || !cnt) return;
+            cnt.textContent = `${ta.value.length} / 2000`;
+            cnt.style.color = ta.value.length > 1800 ? '#f87171' : '#475569';
+        }
     </script>
 
     <script src="js/lostsword/battlestats.js"></script>
