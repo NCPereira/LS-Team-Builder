@@ -680,7 +680,10 @@ function openModal(slotIndex, type, gearCat = null) {
     if (isChar) {
         resetFilters();
     } else if (isGear) {
-        activeStatFilter = null;
+        // Restore stat priority from the slot if one was previously saved
+        const savedStats = slotData[slotIndex]?.statPriority?.[gearCat];
+        activeStatFilter = (savedStats && savedStats.length > 0) ? { stats: [...savedStats] } : null;
+
         const charName   = slotData[slotIndex]?.character;
         const charInfo   = getCharInfo(charName);
         const charClass  = charInfo.class || '';
@@ -727,6 +730,19 @@ function renderModalGrid(items, isChar) {
     const grid = document.getElementById('modal-grid');
     grid.innerHTML = '';
 
+    // Determine currently equipped gear item (if a gear modal is open)
+    const equippedGearName = (currentActiveCategory === 'gear' && currentActiveSection !== null)
+        ? slotData[currentActiveSection]?.gear?.[currentGearCategory] || null
+        : null;
+
+    // Pin equipped item to front of list
+    if (equippedGearName) {
+        const equippedIdx = items.findIndex(i => i.name === equippedGearName);
+        if (equippedIdx > 0) {
+            items = [items[equippedIdx], ...items.slice(0, equippedIdx), ...items.slice(equippedIdx + 1)];
+        }
+    }
+
     // None tile
     const noneBox = document.createElement('div');
     noneBox.className = "item-card bg-[#1a1c28] border border-dashed border-slate-600 rounded-lg p-1.5 flex flex-col items-center justify-center cursor-pointer hover:border-red-500 hover:bg-[#1f1014] transition-all";
@@ -762,6 +778,7 @@ function renderModalGrid(items, isChar) {
         const el          = info.element || '';
         const rar         = info.rarity  || '';
         const rarColor    = rar === '5' ? '#fbbf24' : rar === '4' ? '#a78bfa' : '#64748b';
+        const isEquipped  = equippedGearName && item.name === equippedGearName;
         const isSelected  = multiSelectMode && multiSelectedItems.has(item.name);
         const maxSlots    = currentActiveCategory === 'pet' ? 3 : 5;
         const atCap       = multiSelectMode && multiSelectedItems.size >= maxSlots && !isSelected;
@@ -770,8 +787,13 @@ function renderModalGrid(items, isChar) {
         const itemBox     = document.createElement('div');
         itemBox.className = "item-card bg-[#1a1c28] border border-[#2d3142] rounded-lg p-1.5 flex flex-col items-center justify-between transition-all"
             + (isSelected ? ' multi-selected' : '')
+            + (isEquipped ? ' equipped-item' : '')
             + (atCap ? '' : ' cursor-pointer hover:border-[#4b6bfb] hover:bg-[#1e2240]');
-        itemBox.style.cssText = atCap ? 'aspect-ratio:3/4;opacity:0.35;cursor:not-allowed;' : 'aspect-ratio:3/4;';
+        itemBox.style.cssText = atCap
+            ? 'aspect-ratio:3/4;opacity:0.35;cursor:not-allowed;'
+            : isEquipped
+                ? 'aspect-ratio:3/4;border-color:#4b6bfb;background:#1a1e36;box-shadow:0 0 0 2px #4b6bfb44 inset;'
+                : 'aspect-ratio:3/4;';
         itemBox.onclick = () => selectItem(item);
 
         const selOverlay = isSelected
@@ -788,12 +810,15 @@ function renderModalGrid(items, isChar) {
                 <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${item.name}</span>
                 ${el ? `<span class="char-el-badge badge-${el} mt-0.5">${el}</span>` : ''}`;
         } else {
+            const equippedBadge = isEquipped
+                ? `<div style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);background:#4b6bfb;color:#fff;font-size:7px;font-weight:800;padding:1px 5px;border-radius:3px;letter-spacing:0.05em;white-space:nowrap;">EQUIPPED</div>`
+                : '';
             itemBox.innerHTML = `
                 <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
                     <img src="${item.img}" alt="${item.name}" class="w-full h-full object-contain" loading="lazy" onerror="this.style.display='none'">
-                    ${selOverlay}
+                    ${selOverlay}${equippedBadge}
                 </div>
-                <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${item.name}</span>`;
+                <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${isEquipped ? `<span style="color:#7c9dff">${item.name}</span>` : item.name}</span>`;
         }
 
         grid.appendChild(itemBox);
@@ -849,7 +874,19 @@ function applyGenericSearch() {
             : gearItems;
     }
 
-    const filtered = search ? items.filter(i => i.name.toLowerCase().includes(search)) : items;
+    let filtered = search ? items.filter(i => i.name.toLowerCase().includes(search)) : items;
+
+    // Keep equipped item pinned to top even while searching
+    if (currentActiveCategory === 'gear') {
+        const equippedName = slotData[currentActiveSection]?.gear?.[currentGearCategory];
+        if (equippedName) {
+            const eIdx = filtered.findIndex(i => i.name === equippedName);
+            if (eIdx > 0) {
+                filtered = [filtered[eIdx], ...filtered.slice(0, eIdx), ...filtered.slice(eIdx + 1)];
+            }
+        }
+    }
+
     renderModalGrid(filtered, false);
 }
 
