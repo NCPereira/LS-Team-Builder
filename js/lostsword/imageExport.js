@@ -1,7 +1,8 @@
 // ── imageExport.js ────────────────────────────────────────────────────────────
 // PNG export via html2canvas.
-// Captures #capture-area directly (not document.body with crop offsets —
-// that approach breaks complex flex layouts).
+// Strategy: manually clone #capture-area into a fixed off-screen container
+// at exact pixel dimensions, render THAT, then clean up. This avoids all
+// html2canvas internal clone/reflow issues with complex flex layouts.
 
 async function exportCapturePNG() {
     const btn    = document.getElementById('export-png-btn');
@@ -16,126 +17,156 @@ async function exportCapturePNG() {
     btn.innerHTML  = 'Rendering…';
     btn.disabled   = true;
 
-    // ── Fix: text-shift caused by Tailwind preflight img{display:block} ──────
-    // html2canvas appends a hidden div to body to measure text metrics.
-    // Without this, that div inherits Tailwind's img reset and shifts baselines.
-    const h2cStyleFix = document.createElement('style');
-    h2cStyleFix.textContent = [
-        'body > div:last-child img { display: inline-block !important; }',
-        'body > div:last-child * { line-height: normal !important; }',
-    ].join('\n');
-    document.head.appendChild(h2cStyleFix);
+    // Temporary container that we'll render from
+    let offscreen = null;
 
     try {
-        const canvas = await html2canvas(target, {
+        const rect = target.getBoundingClientRect();
+        const W    = Math.round(rect.width);
+        const H    = Math.round(rect.height);
+
+        // ── Step 1: Deep-clone the capture area ──────────────────────────────
+        const clone = target.cloneNode(true);
+
+        // ── Step 2: Fix panels — hide whichever panel is inactive ────────────
+        const dmgPanel   = document.getElementById('battle-stats-panel');
+        const notesPanel = document.getElementById('comments-panel');
+        const cloneDmg   = clone.querySelector('#battle-stats-panel');
+        const cloneNotes = clone.querySelector('#comments-panel');
+
+        if (cloneDmg && dmgPanel) {
+            cloneDmg.style.display = window.getComputedStyle(dmgPanel).display;
+        }
+        if (cloneNotes) {
+            const notesVisible = notesPanel && notesPanel.classList.contains('visible');
+            cloneNotes.style.display = notesVisible ? 'flex' : 'none';
+        }
+
+        // ── Step 3: Replace textareas with divs (html2canvas can't read .value)
+        const liveTAs = target.querySelectorAll('textarea');
+        clone.querySelectorAll('textarea').forEach((cloneTa, idx) => {
+            const liveTa = liveTAs[idx];
+            const value  = liveTa ? liveTa.value : '';
+            const cs     = liveTa ? window.getComputedStyle(liveTa) : null;
+
+            const div = document.createElement('div');
+            if (cs) {
+                [
+                    'width','height','minHeight','maxHeight','boxSizing',
+                    'padding','paddingTop','paddingBottom','paddingLeft','paddingRight',
+                    'fontSize','fontWeight','fontFamily','lineHeight','letterSpacing',
+                    'color','backgroundColor','background',
+                    'border','borderColor','borderWidth','borderStyle','borderRadius',
+                    'whiteSpace','wordBreak','overflowWrap','textAlign',
+                ].forEach(p => { try { div.style[p] = cs[p]; } catch(_){} });
+            }
+            div.style.display    = 'block';
+            div.style.overflow   = 'hidden';
+            div.style.whiteSpace = 'pre-wrap';
+
+            if (value.trim() === '') {
+                div.textContent     = cloneTa.getAttribute('placeholder') || '';
+                div.style.color     = '#475569';
+                div.style.fontStyle = 'italic';
+            } else {
+                div.textContent = value;
+            }
+            cloneTa.parentNode.replaceChild(div, cloneTa);
+        });
+
+        // ── Step 4: Hide FontAwesome icons ───────────────────────────────────
+        clone.querySelectorAll('i[class*="fa-"]').forEach(i => {
+            i.style.display = 'none';
+        });
+
+        // ── Step 5: Copy ALL computed styles from every live element to clone ─
+        //    Walk both trees in parallel (cloneNode preserves DOM order).
+        const liveAll  = Array.from(target.querySelectorAll('*'));
+        const cloneAll = Array.from(clone.querySelectorAll('*'));
+
+        const PROPS = [
+            'display','visibility',
+            'flexDirection','alignItems','justifyContent','alignSelf','justifySelf',
+            'flexWrap','flexGrow','flexShrink','flexBasis',
+            'gap','rowGap','columnGap',
+            'padding','paddingTop','paddingBottom','paddingLeft','paddingRight',
+            'margin','marginTop','marginBottom','marginLeft','marginRight',
+            'width','height','minWidth','minHeight','maxWidth','maxHeight',
+            'boxSizing','position','top','left','right','bottom','zIndex',
+            'fontSize','fontWeight','fontFamily','lineHeight','letterSpacing',
+            'textAlign','verticalAlign','color','opacity',
+            'borderRadius','overflow','overflowX','overflowY',
+            'objectFit','objectPosition',
+            'background','backgroundColor','backgroundImage','backgroundSize','backgroundPosition',
+            'border','borderColor','borderWidth','borderStyle',
+            'borderTop','borderRight','borderBottom','borderLeft',
+            'transform','transformOrigin',
+            'whiteSpace','wordBreak','overflowWrap',
+            'textDecoration','textTransform',
+            'gridTemplateColumns','gridTemplateRows','gridColumn','gridRow',
+            'boxShadow',
+        ];
+
+        liveAll.forEach((liveEl, i) => {
+            const cloneEl = cloneAll[i];
+            if (!cloneEl || liveEl.tagName === 'TEXTAREA') return;
+            const cs = window.getComputedStyle(liveEl);
+            PROPS.forEach(prop => {
+                try { cloneEl.style[prop] = cs[prop]; } catch(_) {}
+            });
+        });
+
+        // ── Step 6: Place clone in a fixed off-screen wrapper ────────────────
+        offscreen = document.createElement('div');
+        offscreen.style.cssText = [
+            'position: fixed',
+            'top: 0',
+            'left: -99999px',
+            `width: ${W}px`,
+            `height: ${H}px`,
+            'overflow: visible',
+            'pointer-events: none',
+            'z-index: -1',
+            'background: #0f111a',
+        ].join('; ');
+
+        // The clone itself must also be sized explicitly
+        clone.style.cssText += `; width:${W}px; max-width:${W}px; height:auto;`;
+
+        offscreen.appendChild(clone);
+        document.body.appendChild(offscreen);
+
+        // Give browser one frame to paint the off-screen clone
+        await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+
+        // ── Step 7: Inject inline-block fix for html2canvas measurement div ──
+        const h2cFix = document.createElement('style');
+        h2cFix.textContent = 'body > div:last-child img { display: inline-block !important; }';
+        document.head.appendChild(h2cFix);
+
+        // ── Step 8: Render the off-screen clone ──────────────────────────────
+        const canvas = await html2canvas(clone, {
             useCORS:         true,
             allowTaint:      false,
             backgroundColor: '#0f111a',
             scale:           2,
             logging:         false,
             imageTimeout:    0,
-            // No x/y/width/height — capture the element directly
-            // scrollX/scrollY still needed to handle page scroll
-            scrollX: -window.scrollX,
-            scrollY: -window.scrollY,
-
-            onclone: (doc, cloneTarget) => {
-                // ── 1. Hide FontAwesome icons (no font loaded in clone) ──────
-                doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
-                    i.style.display = 'none';
-                });
-
-                // ── 2. Fix img display inside the cloned doc ─────────────────
-                const imgStyle = doc.createElement('style');
-                imgStyle.textContent = 'img { display: inline-block !important; }';
-                doc.head.appendChild(imgStyle);
-
-                // ── 3. Panel visibility — mirror live DOM ────────────────────
-                //    Ensure only the currently active panel shows.
-                const liveDmgPanel   = document.getElementById('battle-stats-panel');
-                const liveNotesPanel = document.getElementById('comments-panel');
-                const cloneDmgPanel  = doc.getElementById('battle-stats-panel');
-                const cloneNotesPanel = doc.getElementById('comments-panel');
-
-                if (liveDmgPanel && cloneDmgPanel) {
-                    cloneDmgPanel.style.display =
-                        window.getComputedStyle(liveDmgPanel).display;
-                }
-                if (liveNotesPanel && cloneNotesPanel) {
-                    const notesVisible = liveNotesPanel.classList.contains('visible');
-                    cloneNotesPanel.style.display = notesVisible ? 'flex' : 'none';
-                }
-
-                // ── 4. Replace textarea with a rendered div ──────────────────
-                //    html2canvas cannot read textarea.value — only the DOM
-                //    attribute. We swap each textarea for a styled <div>.
-                cloneTarget.querySelectorAll('textarea').forEach((cloneTa, idx) => {
-                    const liveTa = target.querySelectorAll('textarea')[idx];
-                    const value  = liveTa ? liveTa.value : '';
-                    const cs     = liveTa ? window.getComputedStyle(liveTa) : null;
-
-                    const div = doc.createElement('div');
-
-                    if (cs) {
-                        [
-                            'width', 'height', 'minHeight', 'maxHeight', 'boxSizing',
-                            'padding', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
-                            'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
-                            'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'letterSpacing',
-                            'color', 'backgroundColor', 'background',
-                            'border', 'borderColor', 'borderWidth', 'borderStyle', 'borderRadius',
-                            'whiteSpace', 'wordBreak', 'overflowWrap', 'textAlign',
-                        ].forEach(p => { try { div.style[p] = cs[p]; } catch(_) {} });
-                    }
-
-                    div.style.display    = 'block';
-                    div.style.overflow   = 'hidden';
-                    div.style.whiteSpace = 'pre-wrap';
-                    div.style.resize     = 'none';
-
-                    if (value.trim() === '') {
-                        div.textContent     = cloneTa.getAttribute('placeholder') || '';
-                        div.style.color     = '#475569';
-                        div.style.fontStyle = 'italic';
-                    } else {
-                        div.textContent = value;
-                    }
-
-                    cloneTa.parentNode.replaceChild(div, cloneTa);
-                });
-
-                // ── 5. Copy computed styles from every live element to clone ──
-                //    Prevents Tailwind/flex drift in the html2canvas iframe.
-                const liveEls  = target.querySelectorAll('*');
-                const cloneEls = cloneTarget.querySelectorAll('*');
-
-                const PROPS = [
-                    'display', 'flexDirection', 'alignItems', 'justifyContent',
-                    'alignSelf', 'justifySelf', 'flexWrap', 'gap', 'rowGap', 'columnGap',
-                    'padding', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
-                    'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
-                    'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
-                    'boxSizing', 'position', 'top', 'left', 'right', 'bottom',
-                    'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'letterSpacing',
-                    'textAlign', 'verticalAlign', 'color', 'opacity',
-                    'borderRadius', 'overflow', 'objectFit', 'objectPosition',
-                    'background', 'backgroundColor', 'backgroundImage',
-                    'border', 'borderColor', 'borderWidth', 'borderStyle',
-                    'transform', 'transformOrigin',
-                    'whiteSpace', 'wordBreak', 'overflowWrap',
-                ];
-
-                liveEls.forEach((liveEl, i) => {
-                    const cloneEl = cloneEls[i];
-                    if (!cloneEl || liveEl.tagName === 'TEXTAREA') return;
-                    const cs = window.getComputedStyle(liveEl);
-                    PROPS.forEach(prop => {
-                        try { cloneEl.style[prop] = cs[prop]; } catch(_) {}
-                    });
-                });
+            scrollX:         0,
+            scrollY:         0,
+            onclone: (doc) => {
+                // Fix img display in html2canvas's internal clone too
+                const s = doc.createElement('style');
+                s.textContent = 'img { display: inline-block !important; }';
+                doc.head.appendChild(s);
+                // Hide FA icons
+                doc.querySelectorAll('i[class*="fa-"]').forEach(i => i.style.display = 'none');
             }
         });
 
+        h2cFix.remove();
+
+        // ── Step 9: Download ─────────────────────────────────────────────────
         const dataUrl = canvas.toDataURL('image/png');
         const title   = (document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'LSTB_Team')
             .replace(/[^a-zA-Z0-9\s_-]/g, '').replace(/\s+/g, '_').substring(0, 40) || 'LSTB_Team';
@@ -162,6 +193,6 @@ async function exportCapturePNG() {
         btn.innerHTML = origHTML;
         btn.disabled  = false;
     } finally {
-        h2cStyleFix.remove();
+        if (offscreen && offscreen.parentNode) offscreen.parentNode.removeChild(offscreen);
     }
 }
