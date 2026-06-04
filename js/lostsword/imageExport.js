@@ -86,14 +86,14 @@ async function exportCapturePNG() {
             }
         });
 
-        // ── Step 3: Replace textareas with divs (html2canvas can't read .value)
-        const liveTAs = target.querySelectorAll('textarea');
-        clone.querySelectorAll('textarea').forEach((cloneTa, idx) => {
-            const liveTa = liveTAs[idx];
-            const value  = liveTa ? liveTa.value : '';
-            const cs     = liveTa ? window.getComputedStyle(liveTa) : null;
-
-            const div = document.createElement('div');
+        // ── Step 3: Replace textareas AND text inputs with divs ──────────────
+        //    html2canvas cannot read .value on form controls, so we replace them
+        //    with styled divs showing the live value as textContent.
+        //    Covers: notes textarea + ult-rotation time inputs.
+        function replaceFormControlWithDiv(cloneEl, liveEl) {
+            const value = liveEl ? liveEl.value : '';
+            const cs    = liveEl ? window.getComputedStyle(liveEl) : null;
+            const div   = document.createElement('div');
             if (cs) {
                 [
                     'width','height','minHeight','maxHeight','boxSizing',
@@ -102,25 +102,41 @@ async function exportCapturePNG() {
                     'color','backgroundColor','background',
                     'border','borderColor','borderWidth','borderStyle','borderRadius',
                     'whiteSpace','wordBreak','overflowWrap','textAlign',
+                    'flexShrink','flexGrow','flexBasis',
                 ].forEach(p => { try { div.style[p] = cs[p]; } catch(_){} });
             }
-            div.style.display    = 'block';
-            div.style.overflow   = 'hidden';
-            div.style.whiteSpace = 'pre-wrap';
-
+            div.style.display        = 'flex';
+            div.style.alignItems     = 'center';
+            div.style.justifyContent = 'center';
+            div.style.overflow       = 'hidden';
             if (value.trim() === '') {
-                div.textContent     = cloneTa.getAttribute('placeholder') || '';
+                div.textContent     = cloneEl.getAttribute('placeholder') || '';
                 div.style.color     = '#475569';
                 div.style.fontStyle = 'italic';
             } else {
                 div.textContent = value;
             }
-            cloneTa.parentNode.replaceChild(div, cloneTa);
+            cloneEl.parentNode.replaceChild(div, cloneEl);
+        }
+
+        const liveTAs = Array.from(target.querySelectorAll('textarea'));
+        Array.from(clone.querySelectorAll('textarea')).forEach((cloneTa, idx) => {
+            replaceFormControlWithDiv(cloneTa, liveTAs[idx] || null);
         });
 
-        // ── Step 4: Hide FontAwesome icons ───────────────────────────────────
+        // Text inputs (ult-time-input etc.) — skip checkbox/radio/file
+        const liveInputs = Array.from(target.querySelectorAll('input[type="text"], input:not([type])'));
+        Array.from(clone.querySelectorAll('input[type="text"], input:not([type])')).forEach((cloneIn, idx) => {
+            replaceFormControlWithDiv(cloneIn, liveInputs[idx] || null);
+        });
+
+        // ── Step 4: Replace FA icons with zero-size placeholders ─────────────
+        //    display:none collapses the flex gap inside panel-toggle buttons,
+        //    shifting the label text. A zero-size invisible span preserves layout.
         clone.querySelectorAll('i[class*="fa-"]').forEach(i => {
-            i.style.display = 'none';
+            const span = document.createElement('span');
+            span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
+            i.parentNode.replaceChild(span, i);
         });
 
         // ── Step 5: Copy ALL computed styles from every live element to clone ─
@@ -161,6 +177,13 @@ async function exportCapturePNG() {
             // Kill all transitions — nothing should animate during the off-screen render
             try { cloneEl.style.transition = 'none'; } catch(_) {}
         });
+
+        // ── Step 5c: Force clone root to transparent background ───────────────
+        //    #capture-area has class="bg-[#0f111a]" which Step 5 copies as a
+        //    computed backgroundColor onto the clone. Clear it explicitly so the
+        //    exported PNG has no background fill.
+        clone.style.background      = 'transparent';
+        clone.style.backgroundColor = 'transparent';
 
         // ── Step 5b: Replace <img> elements with background-image divs ──────────
         //    html2canvas has two key failures with <img> tags:
@@ -294,8 +317,15 @@ async function exportCapturePNG() {
                 const s = doc.createElement('style');
                 s.textContent = 'img { display: inline-block !important; }';
                 doc.head.appendChild(s);
-                // Hide FA icons
-                doc.querySelectorAll('i[class*="fa-"]').forEach(i => i.style.display = 'none');
+                // Force capture-area background transparent
+                const ca = doc.getElementById('capture-area');
+                if (ca) { ca.style.background = 'transparent'; ca.style.backgroundColor = 'transparent'; }
+                // Replace FA icons with zero-size spans to preserve flex layout
+                doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
+                    const span = doc.createElement('span');
+                    span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
+                    i.parentNode.replaceChild(span, i);
+                });
             }
         });
 
