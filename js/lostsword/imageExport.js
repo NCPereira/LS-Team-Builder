@@ -1,7 +1,8 @@
 // ── imageExport.js ────────────────────────────────────────────────────────────
 // PNG export via html2canvas.
-// Always captures from the team title header down to the bottom of the
-// Ultimate Rotation section — completely independent of scroll position.
+// Captures #capture-area at its absolute document position — scroll-independent.
+// onclone fixes vertical text/flex drift caused by html2canvas's iframe not
+// fully inheriting Tailwind's computed styles in time.
 
 async function exportCapturePNG() {
     const btn    = document.getElementById('export-png-btn');
@@ -17,23 +18,15 @@ async function exportCapturePNG() {
     btn.disabled   = true;
 
     try {
-        // ── Get the element's absolute position in the document ─────────────
-        // offsetTop/offsetLeft walk up the offset parent chain — no viewport,
-        // no scroll position involved at all.
+        // ── Absolute document position (scroll-independent) ─────────────────
         function getDocOffset(el) {
             let top = 0, left = 0;
-            while (el) {
-                top  += el.offsetTop  || 0;
-                left += el.offsetLeft || 0;
-                el    = el.offsetParent;
-            }
+            while (el) { top += el.offsetTop || 0; left += el.offsetLeft || 0; el = el.offsetParent; }
             return { top, left };
         }
-
         const { top: elTop, left: elLeft } = getDocOffset(target);
         const elW = target.offsetWidth;
         const elH = target.offsetHeight;
-
         const docW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
         const docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
 
@@ -44,20 +37,50 @@ async function exportCapturePNG() {
             scale:           2,
             logging:         false,
             imageTimeout:    0,
-            // Absolute document coordinates — scroll position irrelevant
             x:            elLeft,
             y:            elTop,
             width:        elW,
             height:       elH,
-            // Must match true document size so html2canvas lays out correctly
             windowWidth:  docW,
             windowHeight: docH,
-            // Tell html2canvas the page is at scroll 0 for its internal math
             scrollX:      0,
             scrollY:      0,
+
             onclone: (doc) => {
+                // ── 1. Hide FontAwesome icons (render as boxes) ──────────────
                 doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
                     i.style.display = 'none';
+                });
+
+                // ── 2. Copy every element's live computed styles into inline
+                //       styles on the clone. This is the most reliable fix for
+                //       html2canvas not fully inheriting Tailwind/FA styles.
+                const liveEls  = target.querySelectorAll('*');
+                const cloneEls = doc.getElementById('capture-area').querySelectorAll('*');
+
+                const PROPS = [
+                    'display', 'flexDirection', 'alignItems', 'justifyContent',
+                    'alignSelf', 'justifySelf', 'flexWrap', 'gap', 'rowGap', 'columnGap',
+                    'padding', 'paddingTop', 'paddingBottom', 'paddingLeft', 'paddingRight',
+                    'margin', 'marginTop', 'marginBottom', 'marginLeft', 'marginRight',
+                    'width', 'height', 'minWidth', 'minHeight', 'maxWidth', 'maxHeight',
+                    'boxSizing', 'position', 'top', 'left', 'right', 'bottom',
+                    'fontSize', 'fontWeight', 'fontFamily', 'lineHeight', 'letterSpacing',
+                    'textAlign', 'verticalAlign', 'color', 'opacity',
+                    'borderRadius', 'overflow', 'objectFit', 'objectPosition',
+                    'background', 'backgroundColor', 'backgroundImage',
+                    'border', 'borderColor', 'borderWidth', 'borderStyle',
+                    'transform', 'transformOrigin',
+                    'whiteSpace', 'wordBreak', 'overflowWrap',
+                ];
+
+                liveEls.forEach((liveEl, i) => {
+                    const cloneEl = cloneEls[i];
+                    if (!cloneEl) return;
+                    const cs = window.getComputedStyle(liveEl);
+                    PROPS.forEach(prop => {
+                        try { cloneEl.style[prop] = cs[prop]; } catch(_) {}
+                    });
                 });
             }
         });
