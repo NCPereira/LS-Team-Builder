@@ -1,6 +1,6 @@
 // ── imageExport.js ────────────────────────────────────────────────────────────
-// PNG export via html2canvas — captures #capture-area directly.
-// Region: team title → bottom of Ultimate Rotation (excludes footer & graph).
+// PNG export via html2canvas — captures #capture-area.
+// Scrolls to top before capture so scroll position never affects the output.
 
 async function exportCapturePNG() {
     const btn    = document.getElementById('export-png-btn');
@@ -15,11 +15,12 @@ async function exportCapturePNG() {
     btn.innerHTML  = 'Rendering…';
     btn.disabled   = true;
 
-    // Hide FontAwesome icons inside capture area (render as boxes in html2canvas)
-    const icons = target.querySelectorAll('i[class*="fa-"]');
-    icons.forEach(i => { i._exp = i.style.display; i.style.display = 'none'; });
+    // Stash scroll position and snap to top so html2canvas sees the page unscrolled
+    const savedScrollX = window.scrollX || window.pageXOffset || 0;
+    const savedScrollY = window.scrollY || window.pageYOffset || 0;
+    window.scrollTo(0, 0);
 
-    // Wait for DOM to settle after hiding icons
+    // Wait two frames for the browser to repaint at scroll 0
     await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
     try {
@@ -30,17 +31,15 @@ async function exportCapturePNG() {
             scale:           2,
             logging:         false,
             imageTimeout:    0,
-            // No x/y/width/height — let html2canvas measure the element itself
             onclone: (doc) => {
-                // In the cloned document, hide FA icons
                 doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
                     i.style.display = 'none';
                 });
             }
         });
 
-        // Restore icons
-        icons.forEach(i => { i.style.display = i._exp || ''; });
+        // Restore scroll position
+        window.scrollTo(savedScrollX, savedScrollY);
 
         const dataUrl = canvas.toDataURL('image/png');
         const title   = (document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'LSTB_Team')
@@ -64,7 +63,7 @@ async function exportCapturePNG() {
 
     } catch (err) {
         console.error('[Export PNG]', err);
-        icons.forEach(i => { i.style.display = i._exp || ''; });
+        window.scrollTo(savedScrollX, savedScrollY);
         alert('Export failed: ' + err.message);
         btn.innerHTML = origHTML;
         btn.disabled  = false;
