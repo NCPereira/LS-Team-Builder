@@ -162,76 +162,89 @@ async function exportCapturePNG() {
             try { cloneEl.style.transition = 'none'; } catch(_) {}
         });
 
-        // ── Step 5b: Replace scaled <img> elements with background-image divs ──
-        //    html2canvas silently ignores CSS transform:scale() on <img> tags,
-        //    so the face-zoom effect is lost. Converting to a background-image div
-        //    lets us express the same crop via background-size + background-position,
-        //    which html2canvas renders correctly.
-        //
-        //    Targets any cloned <img> whose live counterpart has a non-identity
-        //    transform (i.e. the scale(1.25) set by the face-detection renderer),
-        //    plus any img that has an explicit object-position set (face-cropped imgs).
+        // ── Step 5b: Replace <img> elements with background-image divs ──────────
+        //    html2canvas has two key failures with <img> tags:
+        //      1. It ignores CSS transform:scale() — so face-zoom is lost.
+        //      2. It ignores object-fit:cover/contain — images stretch to fill
+        //         their container, warping pet icons, card art, gear icons, etc.
+        //    Converting ALL content images to background-image divs fixes both,
+        //    since html2canvas renders background-size/position correctly.
         liveAll.forEach((liveEl, i) => {
             if (liveEl.tagName !== 'IMG') return;
             const cloneEl = cloneAll[i];
             if (!cloneEl) return;
 
-            const cs         = window.getComputedStyle(liveEl);
-            const transform  = cs.transform || cs.webkitTransform || '';
-            const objPos     = liveEl.style.objectPosition || cs.objectPosition || '';
-            const objFit     = cs.objectFit || 'cover';
+            const cs        = window.getComputedStyle(liveEl);
+            const transform = cs.transform || cs.webkitTransform || '';
+            const objFit    = cs.objectFit || '';
+            const objPos    = liveEl.style.objectPosition || cs.objectPosition || '';
 
-            // Only process imgs that use transform:scale (the face-zoom imgs).
-            // Identity matrix is "matrix(1, 0, 0, 1, 0, 0)" or "none".
-            const isScaled = transform && transform !== 'none' && transform !== 'matrix(1, 0, 0, 1, 0, 0)';
-            if (!isScaled) return;
+            // Process imgs that have transform:scale OR object-fit:cover/contain.
+            // Plain decorative imgs with no special sizing can stay as-is.
+            const isScaled   = transform && transform !== 'none' && transform !== 'matrix(1, 0, 0, 1, 0, 0)';
+            const hasObjFit  = objFit === 'cover' || objFit === 'contain';
+            if (!isScaled && !hasObjFit) return;
 
             const src = liveEl.src || liveEl.getAttribute('src') || '';
             if (!src) return;
 
-            // Parse scale factor from matrix(sx,0,0,sy,tx,ty)
-            let scale = 1;
-            const matMatch = transform.match(/matrix\(([^,]+)/);
-            if (matMatch) scale = parseFloat(matMatch[1]) || 1;
+            // ── Determine background-size ──────────────────────────────────────
+            let bgSize;
+            if (isScaled) {
+                // Face-zoom images: scale factor baked into background-size
+                let scale = 1;
+                const matMatch = transform.match(/matrix\(([^,]+)/);
+                if (matMatch) scale = parseFloat(matMatch[1]) || 1;
+                bgSize = `${Math.round(scale * 100)}%`;
+            } else if (objFit === 'cover') {
+                bgSize = 'cover';
+            } else {
+                // contain
+                bgSize = 'contain';
+            }
 
-            // Parse transform-origin (e.g. "center 22%" → "50% 22%")
-            const originRaw = cs.transformOrigin || '50% 50%';
-            const originParts = originRaw.split(' ');
-            let ox = originParts[0] || '50%';
-            let oy = originParts[1] || '50%';
-            // Normalise keyword values
-            if (ox === 'center') ox = '50%';
-            if (oy === 'center') oy = '50%';
+            // ── Determine background-position ──────────────────────────────────
+            // For scaled imgs fall back to transform-origin; for others use object-position.
+            let bgPosX = '50%';
+            let bgPosY = '50%';
 
-            // Derive background-position from object-position (or transform-origin as fallback).
-            // object-position like "50% 8%" maps directly to background-position.
-            let bgPosX = ox;
-            let bgPosY = oy;
+            if (isScaled) {
+                // Use transform-origin as the crop anchor
+                const originRaw   = cs.transformOrigin || '50% 50%';
+                const originParts = originRaw.split(' ');
+                bgPosX = originParts[0] || '50%';
+                bgPosY = originParts[1] || '50%';
+                if (bgPosX === 'center') bgPosX = '50%';
+                if (bgPosY === 'center') bgPosY = '50%';
+            }
+
+            // object-position overrides transform-origin when present
             if (objPos && objPos !== 'auto') {
-                const pp = objPos.split(' ');
+                const pp = objPos.trim().split(/\s+/);
                 if (pp[0]) bgPosX = pp[0];
                 if (pp[1]) bgPosY = pp[1];
             }
 
-            // background-size: for object-fit:cover + scale(S), the effective size is
-            // "S * 100% auto" (or "auto S * 100%").  We want the image to fill the box
-            // at the scaled size so the crop matches what the browser shows.
-            const bgSize = `${Math.round(scale * 100)}%`;
-
-            // Build the replacement div, mirroring every visual property of the img wrapper.
+            // ── Build replacement div ──────────────────────────────────────────
             const div = document.createElement('div');
-            div.style.cssText = cloneEl.style.cssText;   // copy all already-applied styles
+            div.style.cssText = cloneEl.style.cssText;   // inherit all computed styles already applied
             div.style.backgroundImage    = `url("${src}")`;
             div.style.backgroundSize     = bgSize;
             div.style.backgroundPosition = `${bgPosX} ${bgPosY}`;
             div.style.backgroundRepeat   = 'no-repeat';
-            // Ensure the div fills its parent the same way the img did
-            div.style.display   = cloneEl.style.display || 'block';
-            div.style.width     = cs.width;
-            div.style.height    = cs.height;
+            // Ensure div fills its parent exactly as the img did
+            div.style.display    = cs.display === 'inline' ? 'inline-block' : (cs.display || 'block');
+            div.style.width      = cs.width;
+            div.style.height     = cs.height;
+            div.style.minWidth   = cs.minWidth;
+            div.style.minHeight  = cs.minHeight;
             div.style.flexShrink = cs.flexShrink;
-            // Remove transform — we've baked it into background-size
-            div.style.transform = 'none';
+            div.style.flexGrow   = cs.flexGrow;
+            div.style.flexBasis  = cs.flexBasis;
+            div.style.borderRadius = cs.borderRadius;
+            div.style.overflow   = 'hidden';
+            // Remove transform — baked into background-size for scaled imgs
+            div.style.transform  = 'none';
 
             cloneEl.parentNode.replaceChild(div, cloneEl);
             // Keep cloneAll in sync so subsequent index lookups still work
@@ -249,7 +262,7 @@ async function exportCapturePNG() {
             'overflow: visible',
             'pointer-events: none',
             'z-index: -1',
-            'background: #0f111a',
+            'background: transparent',
         ].join('; ');
 
         // The clone itself must also be sized explicitly
@@ -270,7 +283,7 @@ async function exportCapturePNG() {
         const canvas = await html2canvas(clone, {
             useCORS:         true,
             allowTaint:      false,
-            backgroundColor: '#0f111a',
+            backgroundColor: null,
             scale:           2,
             logging:         false,
             imageTimeout:    0,
