@@ -1,6 +1,7 @@
 // ── imageExport.js ────────────────────────────────────────────────────────────
-// PNG export via html2canvas — captures #capture-area.
-// Scrolls to top before capture so scroll position never affects the output.
+// PNG export via html2canvas.
+// Always captures from the team title header down to the bottom of the
+// Ultimate Rotation section — completely independent of scroll position.
 
 async function exportCapturePNG() {
     const btn    = document.getElementById('export-png-btn');
@@ -15,31 +16,51 @@ async function exportCapturePNG() {
     btn.innerHTML  = 'Rendering…';
     btn.disabled   = true;
 
-    // Stash scroll position and snap to top so html2canvas sees the page unscrolled
-    const savedScrollX = window.scrollX || window.pageXOffset || 0;
-    const savedScrollY = window.scrollY || window.pageYOffset || 0;
-    window.scrollTo(0, 0);
-
-    // Wait two frames for the browser to repaint at scroll 0
-    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
-
     try {
-        const canvas = await html2canvas(target, {
+        // ── Get the element's absolute position in the document ─────────────
+        // offsetTop/offsetLeft walk up the offset parent chain — no viewport,
+        // no scroll position involved at all.
+        function getDocOffset(el) {
+            let top = 0, left = 0;
+            while (el) {
+                top  += el.offsetTop  || 0;
+                left += el.offsetLeft || 0;
+                el    = el.offsetParent;
+            }
+            return { top, left };
+        }
+
+        const { top: elTop, left: elLeft } = getDocOffset(target);
+        const elW = target.offsetWidth;
+        const elH = target.offsetHeight;
+
+        const docW = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+        const docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+
+        const canvas = await html2canvas(document.body, {
             useCORS:         true,
             allowTaint:      false,
             backgroundColor: '#0f111a',
             scale:           2,
             logging:         false,
             imageTimeout:    0,
+            // Absolute document coordinates — scroll position irrelevant
+            x:            elLeft,
+            y:            elTop,
+            width:        elW,
+            height:       elH,
+            // Must match true document size so html2canvas lays out correctly
+            windowWidth:  docW,
+            windowHeight: docH,
+            // Tell html2canvas the page is at scroll 0 for its internal math
+            scrollX:      0,
+            scrollY:      0,
             onclone: (doc) => {
                 doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
                     i.style.display = 'none';
                 });
             }
         });
-
-        // Restore scroll position
-        window.scrollTo(savedScrollX, savedScrollY);
 
         const dataUrl = canvas.toDataURL('image/png');
         const title   = (document.querySelector('h1[contenteditable]')?.innerText?.trim() || 'LSTB_Team')
@@ -63,7 +84,6 @@ async function exportCapturePNG() {
 
     } catch (err) {
         console.error('[Export PNG]', err);
-        window.scrollTo(savedScrollX, savedScrollY);
         alert('Export failed: ' + err.message);
         btn.innerHTML = origHTML;
         btn.disabled  = false;
