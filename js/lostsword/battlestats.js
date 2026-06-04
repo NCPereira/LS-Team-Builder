@@ -424,13 +424,16 @@ function renderBStatBars() {
         let iconHtml = '';
         if (slotChar) {
             const charEntry = (typeof db !== 'undefined' && db.characters) ? db.characters.find(c => c.name === slotChar) : null;
-            if (charEntry && charEntry.img) {
-                const facePos = getFacePosition(charEntry.img);
-                const yPct = facePos.split(' ')[1] || '22%';
+            if (charEntry) {
+                // Use skin-aware image if available for this team slot
+                const imgSrc = (typeof getSlotCharImg === 'function')
+                    ? (getSlotCharImg(teamSlotIdx) || charEntry.img)
+                    : charEntry.img;
+                const facePos = getFacePosition(imgSrc);
                 const borderColor = elColors ? elColors[0] : '#2d3142';
                 iconHtml = `<div class="dmg-char-icon-wrap" title="Slot ${teamSlotIdx + 1}: ${slotChar}" style="border-color:${borderColor};">` +
-                    `<img src="${charEntry.img}" class="dmg-char-icon"` +
-                    ` style="transform-origin:50% ${yPct};object-position:${facePos};"` +
+                    `<img src="${imgSrc}" class="dmg-char-icon"` +
+                    ` style="object-position:${facePos};"` +
                     ` alt="${slotChar}"` +
                     ` onerror="this.parentElement.outerHTML='<div class=\\'dmg-char-placeholder\\'>${teamSlotIdx + 1}</div>'">` +
                     `</div>`;

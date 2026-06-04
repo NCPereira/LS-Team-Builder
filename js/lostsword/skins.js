@@ -105,9 +105,10 @@ async function _probeSkins(charName) {
         else break;
     }
     _resolvedSkins[charName] = confirmed;
-    // Re-render so the button/dots update now that we know the real count.
-    // Guard: renderTeamGrid is defined later in index.html, so check before calling.
+    // Re-render all panels so the button/dots update now that we know the real count.
     if (typeof renderTeamGrid === 'function') renderTeamGrid();
+    if (typeof renderUltimateRotation === 'function') renderUltimateRotation();
+    if (typeof bstatDealt !== 'undefined' && bstatDealt && typeof renderBStatBars === 'function') renderBStatBars();
 }
 
 // Return confirmed skins array for a character, or null if still unknown.
@@ -150,6 +151,7 @@ function cycleSkin(slotIndex, event) {
     if (!Array.isArray(skins) || skins.length === 0) return;
     const total = skins.length + 1; // +1 for base
     slotSkinIndex[slotIndex] = (slotSkinIndex[slotIndex] + 1) % total;
-    // Guard: renderTeamGrid is defined later in index.html, so check before calling.
     if (typeof renderTeamGrid === 'function') renderTeamGrid();
+    if (typeof renderUltimateRotation === 'function') renderUltimateRotation();
+    if (typeof bstatDealt !== 'undefined' && bstatDealt && typeof renderBStatBars === 'function') renderBStatBars();
 }

@@ -8,6 +8,9 @@ let ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }
 
 let _ultDragFromIdx = null;
 
+// Brawl kill counter — null means disabled, 0+ means enabled
+let brawlKillCount = null;
+
 // ── Render ────────────────────────────────────────────────────────────────────
 
 function renderUltimateRotation() {
@@ -83,11 +86,18 @@ function renderUltimateRotation() {
             iconDiv.innerHTML = '<span style="font-size:12px;font-weight:700;color:#4ade80;">Auto</span>';
         } else if (slot.character) {
             const charEntry = db.characters ? db.characters.find(c => c.name === slot.character) : null;
-            if (charEntry && charEntry.img) {
+            if (charEntry) {
+                // Use skin-aware image if this character occupies a team slot
+                const teamSlotIdx = (typeof slotData !== 'undefined')
+                    ? slotData.findIndex(s => s.character === slot.character)
+                    : -1;
+                const imgSrc = (teamSlotIdx !== -1 && typeof getSlotCharImg === 'function')
+                    ? (getSlotCharImg(teamSlotIdx) || charEntry.img)
+                    : charEntry.img;
                 const img = document.createElement('img');
-                img.src = charEntry.img;
+                img.src = imgSrc;
                 img.alt = slot.character;
-                img.style.objectPosition = getFacePosition(charEntry.img);
+                img.style.objectPosition = getFacePosition(imgSrc);
                 iconDiv.innerHTML = '';
                 iconDiv.appendChild(img);
             } else {
@@ -162,6 +172,39 @@ function renderUltimateRotation() {
         }
     });
 
+    // ── Brawl kill counter widget — appended after all rotation slots ──────────
+    if (brawlKillCount !== null) {
+        // Kill counter — inline label + typeable input, centred with the rotation row
+        const killCard = document.createElement('div');
+        killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;align-items:center;gap:6px;';
+
+        const label = document.createElement('span');
+        label.textContent = 'Kills:';
+        label.style.cssText = 'font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:0.04em;white-space:nowrap;';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id   = 'brawl-kill-input';
+        input.value = String(brawlKillCount);
+        input.style.cssText = `
+            width:52px;height:26px;
+            background:#0f111a;border:1px solid #7c3aed55;border-radius:5px;
+            color:#c4b5fd;font-size:13px;font-weight:800;text-align:center;
+            font-variant-numeric:tabular-nums;outline:none;
+            transition:border-color 0.15s;padding:0 4px;
+        `;
+        input.addEventListener('focus', () => { input.style.borderColor='#a78bfa'; input.select(); });
+        input.addEventListener('blur',  () => { input.style.borderColor='#7c3aed55'; });
+        input.addEventListener('input', () => {
+            const v = parseInt(input.value.replace(/[^0-9]/g,''), 10);
+            if (!isNaN(v)) brawlKillCount = Math.max(0, v);
+        });
+
+        killCard.appendChild(label);
+        killCard.appendChild(input);
+        container.appendChild(killCard);
+    }
+
     const controlsDiv = document.getElementById('ultimate-rotation-controls');
     if (controlsDiv) {
         controlsDiv.innerHTML = '';
@@ -195,6 +238,35 @@ function renderUltimateRotation() {
             removeBtn.textContent = '-';
             controlsDiv.appendChild(removeBtn);
         }
+
+        // ── Brawl toggle button — always visible in controls ──────────────
+        const brawlBtn = document.createElement('button');
+        const brawlActive = brawlKillCount !== null;
+        brawlBtn.onclick = toggleBrawlCounter;
+        brawlBtn.title = brawlActive ? 'Remove kill counter' : 'Add Brawl kill counter';
+        brawlBtn.style.cssText = `
+            height:24px;padding:0 8px;border-radius:0.375rem;
+            background:${brawlActive ? '#2a1f40' : '#20222f'};
+            border:1px solid ${brawlActive ? '#7c3aed' : '#2d3142'};
+            cursor:pointer;transition:all 0.2s ease;
+            display:flex;align-items:center;justify-content:center;gap:4px;
+            color:${brawlActive ? '#a78bfa' : '#64748b'};
+            font-size:10px;font-weight:700;letter-spacing:0.04em;
+            box-shadow:${brawlActive ? '0 0 8px #7c3aed44' : 'none'};
+            white-space:nowrap;
+        `;
+        brawlBtn.innerHTML = `<span style="font-size:9px;">⚔</span> Brawl`;
+        brawlBtn.onmouseover = function() {
+            this.style.borderColor = '#a78bfa';
+            this.style.background  = '#2a1f40';
+            this.style.color       = '#c4b5fd';
+        };
+        brawlBtn.onmouseout = function() {
+            this.style.borderColor = brawlActive ? '#7c3aed' : '#2d3142';
+            this.style.background  = brawlActive ? '#2a1f40' : '#20222f';
+            this.style.color       = brawlActive ? '#a78bfa' : '#64748b';
+        };
+        controlsDiv.appendChild(brawlBtn);
     }
 }
 
@@ -214,6 +286,7 @@ function removeUltimateSlot() {
 
 function resetUltimateRotation() {
     ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
+    brawlKillCount = null;
     renderUltimateRotation();
 }
 
@@ -239,4 +312,20 @@ function selectUltimateAuto() {
     ultimateRotation[currentActiveSection].time = '';
     renderUltimateRotation();
     closeModal();
+}
+
+// ── Brawl kill counter ────────────────────────────────────────────────────────
+
+function toggleBrawlCounter() {
+    brawlKillCount = brawlKillCount === null ? 0 : null;
+    renderUltimateRotation();
+}
+
+function setBrawlKills(n) {
+    if (brawlKillCount === null) return;
+    brawlKillCount = Math.max(0, n);
+    // Update the input value directly if it exists — avoids losing focus on re-render
+    const inp = document.getElementById('brawl-kill-input');
+    if (inp) { inp.value = String(brawlKillCount); return; }
+    renderUltimateRotation();
 }

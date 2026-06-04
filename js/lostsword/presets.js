@@ -200,7 +200,8 @@ async function confirmSaveToFolder(subfolderName) {
         slotData, petsData, formationSlots, ultimateRotation,
         slotSkinIndex: (typeof slotSkinIndex !== 'undefined' ? slotSkinIndex : [0,0,0,0,0]),
         bstatDealt: (typeof bstatDealt !== 'undefined' ? bstatDealt : null),
-        bstatPrev:  (typeof bstatPrev  !== 'undefined' ? bstatPrev  : null)
+        bstatPrev:  (typeof bstatPrev  !== 'undefined' ? bstatPrev  : null),
+        brawlKillCount: (typeof brawlKillCount !== 'undefined' ? brawlKillCount : null)
     }, null, 2));
     await writable.close();
     await scanPresets();
@@ -242,6 +243,7 @@ async function loadPresetByName(filename, subfolderName) {
         petsData.forEach(p => { if (!('gemStat' in p)) p.gemStat = null; });
         formationSlots = preset.formationSlots;
         ultimateRotation = preset.ultimateRotation || Array(11).fill().map(() => ({ character: null, time: '' }));
+        if (typeof brawlKillCount !== 'undefined') brawlKillCount = (preset.brawlKillCount !== undefined ? preset.brawlKillCount : null);
         slotSkinIndex = preset.slotSkinIndex || [0, 0, 0, 0, 0];
         const titleEl = document.querySelector('h1[contenteditable]');
         if (titleEl && preset.title) titleEl.innerText = preset.title;
