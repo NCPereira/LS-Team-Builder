@@ -42,6 +42,50 @@ async function exportCapturePNG() {
             cloneNotes.style.display = notesVisible ? 'flex' : 'none';
         }
 
+        // ── Step 2b: Lock the side-panel column to its exact live pixel width ───
+        //    The battle-stats/comments column uses flex:1 with min/max-width, but
+        //    in the off-screen clone it loses its flex parent context and can shrink.
+        //    Grab the live rendered width and pin it explicitly so the column stays
+        //    the same size it is on screen.
+        const livePanelCol = target.querySelector('#team-stats-wrapper > div:last-child');
+        const clonePanelCol = clone.querySelector('#team-stats-wrapper > div:last-child');
+        if (livePanelCol && clonePanelCol) {
+            const colRect = livePanelCol.getBoundingClientRect();
+            const colW    = Math.round(colRect.width);
+            const colH    = Math.round(colRect.height);
+            clonePanelCol.style.width    = `${colW}px`;
+            clonePanelCol.style.minWidth = `${colW}px`;
+            clonePanelCol.style.maxWidth = `${colW}px`;
+            clonePanelCol.style.height   = `${colH}px`;
+            clonePanelCol.style.flexShrink = '0';
+            clonePanelCol.style.flexGrow   = '0';
+        }
+
+        // ── Step 2c: Freeze ult-time-wrapper visibility state ────────────────
+        //    .ult-time-wrapper uses max-height/opacity CSS transitions for its
+        //    show/hide toggle. The transition property itself can cause html2canvas
+        //    to catch the element mid-animation, and copying computed styles alone
+        //    isn't reliable for transition-driven visibility. We freeze each wrapper
+        //    explicitly: if .visible → fully open; otherwise → fully closed.
+        //    Also kill all transitions in the clone so nothing can animate during render.
+        const liveTimeWrappers  = Array.from(target.querySelectorAll('.ult-time-wrapper'));
+        const cloneTimeWrappers = Array.from(clone.querySelectorAll('.ult-time-wrapper'));
+        liveTimeWrappers.forEach((liveW, idx) => {
+            const cloneW = cloneTimeWrappers[idx];
+            if (!cloneW) return;
+            const isVisible = liveW.classList.contains('visible');
+            cloneW.style.transition = 'none';
+            if (isVisible) {
+                cloneW.style.maxHeight = '40px';
+                cloneW.style.opacity   = '1';
+                cloneW.style.overflow  = 'visible';
+            } else {
+                cloneW.style.maxHeight = '0px';
+                cloneW.style.opacity   = '0';
+                cloneW.style.overflow  = 'hidden';
+            }
+        });
+
         // ── Step 3: Replace textareas with divs (html2canvas can't read .value)
         const liveTAs = target.querySelectorAll('textarea');
         clone.querySelectorAll('textarea').forEach((cloneTa, idx) => {
@@ -114,6 +158,8 @@ async function exportCapturePNG() {
             PROPS.forEach(prop => {
                 try { cloneEl.style[prop] = cs[prop]; } catch(_) {}
             });
+            // Kill all transitions — nothing should animate during the off-screen render
+            try { cloneEl.style.transition = 'none'; } catch(_) {}
         });
 
         // ── Step 5b: Replace scaled <img> elements with background-image divs ──
