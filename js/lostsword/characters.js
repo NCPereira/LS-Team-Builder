@@ -60,6 +60,7 @@ const rawCharacters = [
     'Pc_Rachel_01', 'Pc_Ran_01','Pc_Ray_01', 'Pc_Ria_01',
     'Pc_Rita_01', 'Pc_MaidRita_01','Pc_Sarah_01', 'Pc_Tiamat_01',
     'Pc_Tristan_01', 'Pc_Urien_01','Pc_Vivien_01', 'Pc_Yumi_01',
+    'Pc_Lumi_01',
 ];
 
 // ── Character database with class, element, position, and rarity ──
@@ -128,6 +129,7 @@ const characterDatabase = {
     'Urien':         { class: 'Knight',  element: 'Radiance', position: 'Front',  rarity: '4' },
     'Vivien':        { class: 'Wizard',  element: 'Nature',   position: 'Middle', rarity: '5' },
     'Yumi':          { class: 'Wizard',  element: 'Frost',    position: 'Back',   rarity: '5' },
+    'Lumi':          { class: 'Knight',  element: 'Shock',    position: 'Front',   rarity: '5' },
 
     // ── Pet-only entries ───────────────────────────────────────────────────────
     'Whitey':       { element: 'Radiance', rarity: '4' },

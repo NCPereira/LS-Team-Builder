@@ -75,6 +75,7 @@ const _skinCandidates = {
     'Urien':         ['Sk_Urien_01',        'Sk_Urien_02',       'Sk_Urien_03'],
     'Vivien':        ['Sk_Vivien_01',       'Sk_Vivien_02',      'Sk_Vivien_03'],
     'Yumi':          ['Sk_Yumi_01',         'Sk_Yumi_02',        'Sk_Yumi_03'],
+    'Lumi':          ['Sk_Lumi_01',         'Sk_Lumi_02',        'Sk_Lumi_03'],
 };
 
 // Resolved cache: charName → string[] of confirmed-existing filenames.

@@ -19,5 +19,5 @@ const rawCards = [
     'Card_Nesha_01', 'Card_Nimue_01', 'Card_Palamedes_01', 'Card_Percival_01',
     'Card_Rachel_01', 'Card_Ria_01', 'Card_Rita_01', 'Card_MaidRita_01',
     'Card_Sarah_01', 'Card_Tiamat_01', 'Card_Tristan_01', 'Card_Urien_01',
-    'Card_Vivien_01', 'Card_Vortigern_01', 'Card_Yumi_01',
+    'Card_Vivien_01', 'Card_Vortigern_01', 'Card_Yumi_01', 'Card_Lumi_01',
 ];
