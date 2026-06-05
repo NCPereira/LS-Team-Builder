@@ -52,13 +52,16 @@ function _patchUIForBrowser() {
         dtgBtn.closest('.relative')?.style && (dtgBtn.closest('.relative').style.display = 'none');
     }
 
-    // Show a small browser notice in the footer
-    const footer = document.getElementById('page-footer');
-    if (footer) {
-        const note = document.createElement('div');
-        note.className = 'text-[10px] text-slate-500 italic w-full text-center sm:text-left';
-        note.innerHTML = '<i class="fa-solid fa-circle-info mr-1 text-blue-500/60"></i>Firefox detected — presets save as downloads and load via file picker. <a href="https://www.google.com/chrome/" target="_blank" class="text-blue-400 hover:underline">Chrome</a> or <a href="https://www.microsoft.com/en-us/edge" target="_blank" class="text-blue-400 hover:underline">Edge</a> unlock folder-based preset management.';
-        footer.insertBefore(note, footer.firstChild);
+    // Show a small browser notice inline in the footer's left text area
+    const footerVersion = document.querySelector('#page-footer > div:first-child');
+    if (footerVersion) {
+        footerVersion.innerHTML = 'Layout Engine v3.0 | LSTB Web Edition'
+            + ' &nbsp;<span style="color:#475569;font-size:10px;">·</span>&nbsp; '
+            + '<i class="fa-solid fa-circle-info" style="color:#3b82f6;opacity:0.6;font-size:10px;"></i> '
+            + '<span style="font-size:10px;color:#475569;font-style:italic;">Firefox: presets save as downloads, load via file picker. '
+            + '<a href="https://www.google.com/chrome/" target="_blank" style="color:#60a5fa;">Chrome</a>'
+            + ' or <a href="https://www.microsoft.com/en-us/edge" target="_blank" style="color:#60a5fa;">Edge</a>'
+            + ' unlock folder management.</span>';
     }
 }
 
