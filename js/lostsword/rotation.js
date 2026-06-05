@@ -174,6 +174,13 @@ function renderUltimateRotation() {
 
     // ── Brawl kill counter widget — appended after all rotation slots ──────────
     if (brawlKillCount !== null) {
+        // = separator before the kill counter
+        const eqDiv = document.createElement('div');
+        eqDiv.className = 'ult-arrow';
+        eqDiv.style.cssText = 'color:#475569;font-size:16px;font-weight:700;display:flex;align-items:center;align-self:center;';
+        eqDiv.textContent = '=';
+        container.appendChild(eqDiv);
+
         // Kill counter — inline label + typeable input, centred with the rotation row
         const killCard = document.createElement('div');
         killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;align-items:center;gap:6px;';
@@ -187,11 +194,11 @@ function renderUltimateRotation() {
         input.id   = 'brawl-kill-input';
         input.value = String(brawlKillCount);
         input.style.cssText = `
-            width:52px;height:26px;
-            background:#0f111a;border:1px solid #7c3aed55;border-radius:5px;
-            color:#c4b5fd;font-size:13px;font-weight:800;text-align:center;
+            width:68px;height:34px;
+            background:#0f111a;border:1px solid #7c3aed55;border-radius:6px;
+            color:#c4b5fd;font-size:15px;font-weight:800;text-align:center;
             font-variant-numeric:tabular-nums;outline:none;
-            transition:border-color 0.15s;padding:0 4px;
+            transition:border-color 0.15s;padding:0 6px;
         `;
         input.addEventListener('focus', () => { input.style.borderColor='#a78bfa'; input.select(); });
         input.addEventListener('blur',  () => { input.style.borderColor='#7c3aed55'; });
