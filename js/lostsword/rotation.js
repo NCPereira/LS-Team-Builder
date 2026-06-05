@@ -302,6 +302,7 @@ function selectUltimateX2() {
     if (typeof currentActiveSection !== 'number') return;
     ultimateRotation[currentActiveSection].character = 'x2';
     ultimateRotation[currentActiveSection].time = '';
+    _ultSeqQueue = [];
     renderUltimateRotation();
     closeModal();
 }
@@ -310,6 +311,7 @@ function selectUltimateAuto() {
     if (typeof currentActiveSection !== 'number') return;
     ultimateRotation[currentActiveSection].character = 'auto';
     ultimateRotation[currentActiveSection].time = '';
+    _ultSeqQueue = [];
     renderUltimateRotation();
     closeModal();
 }

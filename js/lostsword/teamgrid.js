@@ -145,6 +145,17 @@ function toggleGearBatch() {
 let multiSelectMode = false;
 let multiSelectedItems = new Set();
 
+// ── Ult sequence mode ─────────────────────────────────────────────────────────
+// Tracks state while the modal is open for building the ultimate rotation.
+// _ultSeqEnabled:  user-toggled preference (persists across modal opens)
+// _ultSeqActive:   true while the modal is open in sequence mode
+// _ultSeqStartIdx: which rotation slot was clicked to open the modal
+// _ultSeqQueue:    array of character names selected so far this session
+let _ultSeqEnabled  = false; // off by default — toggled by the user
+let _ultSeqActive   = false;
+let _ultSeqStartIdx = 0;
+let _ultSeqQueue    = [];
+
 function toggleMultiSelect() {
     multiSelectMode = !multiSelectMode;
     if (!multiSelectMode) multiSelectedItems.clear();
@@ -728,6 +739,23 @@ function openModal(slotIndex, type, gearCat = null) {
             setTimeout(() => updateGemStatUI(petIdx), 0);
         }
     } else if (type === 'ultimate') {
+        // Always show the seq bar (it contains the toggle button)
+        const seqBar = document.getElementById('ult-seq-bar');
+        if (seqBar) seqBar.classList.remove('hidden');
+        const msBar2 = document.getElementById('multi-select-bar');
+        if (msBar2) msBar2.classList.add('hidden');
+
+        _ultSeqStartIdx = typeof slotIndex === 'number' ? slotIndex : (parseInt(slotIndex) || 0);
+        _ultSeqQueue    = [];
+
+        if (_ultSeqEnabled) {
+            _ultSeqActive = true;
+            _ultSeqUpdateUI();
+        } else {
+            _ultSeqActive = false;
+            _ultSeqUpdateToggleBtn();
+        }
+
         const teamCharacters = slotData.map(s => s.character).filter(Boolean);
         renderModalGrid((db.characters || []).filter(c => teamCharacters.includes(c.name)), false);
     } else if (type === 'card') {
@@ -964,9 +992,13 @@ function selectItem(item) {
                 if (gearEntry && gearEntry.unique) { if (firstPlaced) return; firstPlaced = true; }
                 slot.gear[currentGearCategory] = item.name;
                 if (!slot.statPriority) slot.statPriority = { Weapon: [], Armor: [], Helmet: [], Rune: [] };
-                slot.statPriority[currentGearCategory] = activeStatFilter
-                    ? [...activeStatFilter.stats]
-                    : (slot.statPriority[currentGearCategory] || []);
+                if (gearEntry && gearEntry.unique) {
+                    slot.statPriority[currentGearCategory] = [];
+                } else {
+                    slot.statPriority[currentGearCategory] = activeStatFilter
+                        ? [...activeStatFilter.stats]
+                        : (slot.statPriority[currentGearCategory] || []);
+                }
             });
             gearBatchMode = false;
             const btn  = document.getElementById('gear-batch-btn');
@@ -984,12 +1016,14 @@ function selectItem(item) {
             slotData[currentActiveSection].gear[currentGearCategory] = item.name;
             if (!slotData[currentActiveSection].statPriority)
                 slotData[currentActiveSection].statPriority = { Weapon: [], Armor: [], Helmet: [], Rune: [] };
-            if (activeStatFilter && activeStatFilter.stats.length > 0)
-                slotData[currentActiveSection].statPriority[currentGearCategory] = [...activeStatFilter.stats];
             if (item.unique) {
+                // Unique items have fixed stats — clear any saved priority for this slot
+                slotData[currentActiveSection].statPriority[currentGearCategory] = [];
                 activeStatFilter = null;
                 renderStatPresets(currentGearCategory, true);
                 updateStatFilterUI();
+            } else if (activeStatFilter && activeStatFilter.stats.length > 0) {
+                slotData[currentActiveSection].statPriority[currentGearCategory] = [...activeStatFilter.stats];
             }
         }
         autoGearMode = 'none';
@@ -1019,6 +1053,24 @@ function selectItem(item) {
         }
 
     } else if (currentActiveCategory === 'ultimate') {
+        if (_ultSeqActive && _ultSeqEnabled) {
+            // Sequence mode: append to queue, fill next available slot, stay open
+            _ultSeqQueue.push(item.name);
+            _ultSeqWriteToRotation();
+            _ultSeqUpdateUI();
+            renderUltimateRotation();
+            renderTeamGrid();
+            // Auto-close if all visible slots are now filled
+            const visibleSlots = _ultSeqVisibleSlotCount();
+            const filledFromStart = _ultSeqQueue.length;
+            if (filledFromStart >= visibleSlots) {
+                closeModal();
+            } else {
+                _ultSeqRefreshGridCaps();
+            }
+            return; // skip the closeModal() below
+        }
+        // Single-pick mode (default): assign to clicked slot and close
         ultimateRotation[currentActiveSection].character = item.name;
         ultimateRotation[currentActiveSection].time      = ultimateRotation[currentActiveSection].time || '';
         renderUltimateRotation();
@@ -1054,6 +1106,11 @@ function clearSlot() {
         const match = currentActiveSection.match(/pet_(\d+)_gem_(\d+)/);
         if (match) petsData[parseInt(match[1])].gems[parseInt(match[2])] = null;
     } else if (currentActiveCategory === 'ultimate') {
+        if (_ultSeqActive) {
+            // None tile in sequence mode = cancel without changes
+            closeModal();
+            return;
+        }
         ultimateRotation[currentActiveSection].character = null;
         renderUltimateRotation();
     }
@@ -1074,6 +1131,18 @@ function closeModal() {
     }
     multiSelectMode = false;
     multiSelectedItems.clear();
+    // Clean up ult sequence mode (keep _ultSeqEnabled so toggle persists)
+    _ultSeqActive = false;
+    _ultSeqQueue  = [];
+    const seqBar = document.getElementById('ult-seq-bar');
+    if (seqBar) seqBar.classList.add('hidden');
+    // Reset seq UI state for next open
+    const _seqCounter = document.getElementById('ult-seq-counter');
+    const _seqActions = document.getElementById('ult-seq-actions');
+    const _seqPreview = document.getElementById('ult-seq-preview');
+    if (_seqCounter) _seqCounter.classList.toggle('hidden', !_ultSeqEnabled);
+    if (_seqActions) _seqActions.classList.toggle('hidden', !_ultSeqEnabled);
+    if (_seqPreview) _seqPreview.classList.toggle('hidden', !_ultSeqEnabled);
 }
 
 // ── Clear all ─────────────────────────────────────────────────────────────────
@@ -1101,3 +1170,145 @@ function clearAllSlots() {
 
 // (No changes needed — getFacePosition is called from renderTeamGrid above
 //  and is still declared in index.html where faceapi is available.)
+
+// ── Ult sequence helpers ───────────────────────────────────────────────────────
+
+// How many visible (non-hidden) rotation slots exist from _ultSeqStartIdx onward.
+function _ultSeqVisibleSlotCount() {
+    const x2Idx   = ultimateRotation.findIndex(s => s.character === 'x2');
+    const autoIdx = ultimateRotation.findIndex(s => s.character === 'auto');
+    const repeatIdx = x2Idx === -1 && autoIdx === -1 ? -1
+        : x2Idx === -1 ? autoIdx : autoIdx === -1 ? x2Idx : Math.min(x2Idx, autoIdx);
+    const totalVisible = repeatIdx === -1 ? ultimateRotation.length : repeatIdx + 1;
+    return Math.max(0, totalVisible - _ultSeqStartIdx);
+}
+
+// Write the current queue into the rotation array starting at _ultSeqStartIdx.
+function _ultSeqWriteToRotation() {
+    _ultSeqQueue.forEach((charName, i) => {
+        const rotIdx = _ultSeqStartIdx + i;
+        if (rotIdx < ultimateRotation.length) {
+            ultimateRotation[rotIdx].character = charName;
+        }
+    });
+}
+
+// Update the sequence bar UI: counter label, preview chips, undo button visibility.
+function _ultSeqUpdateUI() {
+    const visibleSlots = _ultSeqVisibleSlotCount();
+    const filled       = _ultSeqQueue.length;
+    const remaining    = Math.max(0, visibleSlots - filled);
+
+    const counter = document.getElementById('ult-seq-counter');
+    if (counter) {
+        counter.textContent = remaining > 0
+            ? `${filled} placed · ${remaining} remaining`
+            : `All ${filled} slots filled`;
+        counter.style.color = remaining === 0 ? '#34d399' : '#64748b';
+    }
+
+    const undoBtn = document.getElementById('ult-seq-undo-btn');
+    if (undoBtn) undoBtn.classList.toggle('hidden', filled === 0);
+
+    const preview = document.getElementById('ult-seq-preview');
+    if (!preview) return;
+    if (filled === 0) {
+        preview.innerHTML = '<span class="text-[10px] text-slate-600 italic">Click characters below to build your rotation…</span>';
+        return;
+    }
+
+    preview.innerHTML = _ultSeqQueue.map((charName, i) => {
+        const charEntry = db.characters ? db.characters.find(c => c.name === charName) : null;
+        const imgSrc    = charEntry ? charEntry.img : null;
+        const info      = getCharInfo(charName);
+        const posColors = { Front: '#f87171', Middle: '#fbbf24', Back: '#60a5fa' };
+        const posColor  = posColors[info.position] || '#475569';
+        return `<div title="${charName}" style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
+            <div style="width:28px;height:28px;border-radius:5px;border:2px solid ${posColor};overflow:hidden;background:#20222f;">
+                ${imgSrc ? `<img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;object-position:50% 10%;">` : `<span style="font-size:8px;color:#94a3b8;display:flex;align-items:center;justify-content:center;height:100%;">${charName.substring(0,2)}</span>`}
+            </div>
+            <span style="font-size:8px;color:#64748b;font-weight:700;">${_ultSeqStartIdx + i + 1}</span>
+        </div>`;
+    }).join(`<span style="color:#475569;font-size:12px;align-self:center;">›</span>`);
+}
+
+// Undo last pick in sequence.
+function ultSeqUndo() {
+    if (!_ultSeqActive || _ultSeqQueue.length === 0) return;
+    _ultSeqQueue.pop();
+    _ultSeqWriteToRotation();
+    // Clear the slot that was just vacated
+    const vacatedIdx = _ultSeqStartIdx + _ultSeqQueue.length;
+    if (vacatedIdx < ultimateRotation.length) {
+        ultimateRotation[vacatedIdx].character = null;
+    }
+    _ultSeqUpdateUI();
+    renderUltimateRotation();
+    renderTeamGrid();
+    // Re-enable any greyed-out items in the modal grid
+    _ultSeqRefreshGridCaps();
+}
+
+// Done button — commit and close.
+function ultSeqDone() {
+    closeModal();
+}
+
+// After each pick, grey out items if cap reached (all slots filled).
+function _ultSeqRefreshGridCaps() {
+    const visibleSlots = _ultSeqVisibleSlotCount();
+    const atCap = _ultSeqQueue.length >= visibleSlots;
+    document.querySelectorAll('#modal-grid .item-card').forEach(card => {
+        // Skip None/x2/auto tiles (they have fa-xmark or fixed text content)
+        if (card.querySelector('.fa-xmark')) return;
+        if (atCap) {
+            card.style.opacity = '0.35';
+            card.style.cursor  = 'not-allowed';
+            card.style.pointerEvents = 'none';
+        } else {
+            card.style.opacity = '';
+            card.style.cursor  = 'pointer';
+            card.style.pointerEvents = '';
+        }
+    });
+}
+
+// ── Ult sequence toggle ────────────────────────────────────────────────────────
+
+function toggleUltSeqMode() {
+    _ultSeqEnabled = !_ultSeqEnabled;
+    _ultSeqActive  = _ultSeqEnabled;
+    _ultSeqQueue   = [];
+    _ultSeqUpdateToggleBtn();
+    if (_ultSeqEnabled) {
+        _ultSeqUpdateUI();
+    } else {
+        // Hide seq-only UI elements
+        const counter  = document.getElementById('ult-seq-counter');
+        const actions  = document.getElementById('ult-seq-actions');
+        const preview  = document.getElementById('ult-seq-preview');
+        if (counter) counter.classList.add('hidden');
+        if (actions) actions.classList.add('hidden');
+        if (preview) preview.classList.add('hidden');
+        // Re-enable any greyed items
+        _ultSeqRefreshGridCaps();
+    }
+}
+
+function _ultSeqUpdateToggleBtn() {
+    const btn = document.getElementById('ult-seq-toggle-btn');
+    if (!btn) return;
+    if (_ultSeqEnabled) {
+        btn.classList.add('active');
+        btn.querySelector('i').style.color = '#4b6bfb';
+    } else {
+        btn.classList.remove('active');
+        btn.querySelector('i').style.color = '';
+    }
+    const actions = document.getElementById('ult-seq-actions');
+    if (actions) actions.classList.toggle('hidden', !_ultSeqEnabled);
+    const preview = document.getElementById('ult-seq-preview');
+    if (preview) preview.classList.toggle('hidden', !_ultSeqEnabled);
+    const counter = document.getElementById('ult-seq-counter');
+    if (counter) counter.classList.toggle('hidden', !_ultSeqEnabled);
+}
