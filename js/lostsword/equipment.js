@@ -114,7 +114,7 @@ const weaponClasses = {
     'Fire Dragon\'s Curved Sword':{ class: 'Knight' },
     'Fire Dragon\'s Great Bow':   { class: 'Archer' },
     'Fragarach':                  { class: 'Knight' },
-    'Gambanteinn':                { class: 'Wizard' },
+    'Gambanteinn':                { classes: ['Wizard', 'Healer'] },
     'Goblin Slasher':             { class: 'Knight' },
     'Goddess Bow':                { class: 'Archer' },
     'Goddess Greatsword':         { class: 'Knight' },
@@ -136,12 +136,12 @@ const weaponClasses = {
     'Sagittarius':                { class: 'Archer' },
     'Sumarbrander':               { class: 'Knight' },
     'Tempest Bow':                { class: 'Archer' },
-    'Tempest Staff':              { class: 'Wizard' },
+    'Tempest Staff':              { classes: ['Wizard', 'Healer'] },
     'Tempest Sword':              { class: 'Knight' },
     'Thunderclap':                { class: 'Wizard' },
     'Trident':                    { class: 'Knight',  unique: true },
     'Tyrfingr':                   { class: 'Knight' },
-    'Void Staff':                 { class: 'Wizard' },
+    'Void Staff':                 { classes: ['Wizard', 'Healer'] },
     'White Feather Fan':          { class: 'Wizard' },
 };
 
