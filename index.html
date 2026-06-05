@@ -851,14 +851,40 @@
             <button id="export-png-btn" class="bg-[#1a1e2e] border border-emerald-700 hover:bg-emerald-900/40 text-emerald-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="exportCapturePNG()" title="Export team view as PNG"><i class="fa-solid fa-image"></i>Export PNG</button>
             <button class="bg-[#1c1e29] border border-slate-700 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-4 rounded-lg transition-all" onclick="clearAllSlots()"><i class="fa-solid fa-trash-can mr-2"></i>Clear</button>
             <button class="bg-[#1a1e2e] border border-blue-700 hover:bg-blue-900/40 text-blue-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all" onclick="savePreset()"><i class="fa-solid fa-floppy-disk mr-2"></i>Save Preset</button>
+            <button class="bg-[#1a1e2e] border border-violet-700 hover:bg-violet-900/40 text-violet-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="showShareCodeModal()" title="Generate a shareable code for this preset">
+                <i class="fa-solid fa-share-nodes"></i>Share Code
+            </button>
             <div class="relative">
                 <button class="bg-[#1a1e2e] border border-blue-700 hover:bg-blue-900/40 text-blue-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="togglePresetDropdown(event)">
                     <i class="fa-solid fa-folder-open"></i>Load Preset<i class="fa-solid fa-chevron-down text-[10px]"></i>
                 </button>
-                <div id="preset-dropdown" class="hidden absolute bottom-full right-0 mb-2 w-64 bg-[#181a24] border border-[#2d3142] rounded-xl shadow-2xl z-50 overflow-hidden">
+                <div id="preset-dropdown" class="hidden absolute bottom-full right-0 mb-2 w-72 bg-[#181a24] border border-[#2d3142] rounded-xl shadow-2xl z-50 overflow-hidden">
                     <div class="px-3 py-2 border-b border-[#2d3142] flex items-center justify-between">
                         <span class="text-[11px] text-slate-400 font-semibold tracking-widest uppercase">Presets</span>
                         <button onclick="scanPresets()" class="text-slate-500 hover:text-slate-300 transition text-xs" title="Refresh"><i class="fa-solid fa-arrows-rotate"></i></button>
+                    </div>
+                    <!-- Load from Code section -->
+                    <div style="border-bottom:1px solid #2d3142;">
+                        <button onclick="toggleLoadCodePanel()" style="width:100%;display:flex;align-items:center;gap:8px;padding:8px 12px;background:none;border:none;cursor:pointer;text-align:left;transition:background 0.15s;" onmouseover="this.style.background='#21243a'" onmouseout="this.style.background='none'">
+                            <i class="fa-solid fa-qrcode" style="font-size:11px;color:#a78bfa;flex-shrink:0;"></i>
+                            <span style="font-size:11px;font-weight:700;color:#a78bfa;">Load from Code</span>
+                            <i class="fa-solid fa-chevron-down" id="load-code-chevron" style="font-size:9px;color:#64748b;margin-left:auto;transition:transform 0.2s;"></i>
+                        </button>
+                        <div id="load-code-panel" class="hidden" style="padding:8px 12px 10px;border-top:1px solid #2d314240;">
+                            <textarea id="load-code-input" rows="3" placeholder="Paste share code here (LSTB1_...)" style="width:100%;box-sizing:border-box;background:#0f111a;border:1px solid #2d3142;border-radius:8px;padding:8px 10px;font-size:10px;font-family:'Courier New',Courier,monospace;color:#94a3b8;resize:none;outline:none;color-scheme:dark;line-height:1.5;word-break:break-all;" onfocus="this.style.borderColor='#a78bfa'" onblur="this.style.borderColor='#2d3142'"></textarea>
+                            <div style="display:flex;align-items:center;gap:6px;margin-top:6px;">
+                                <button onclick="applyLoadCode()" style="flex:1;background:#1a1030;border:1px solid #a78bfa;border-radius:7px;padding:6px 0;font-size:11px;font-weight:700;color:#c4b5fd;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.background='#2a1f40';this.style.color='#e9d5ff'" onmouseout="this.style.background='#1a1030';this.style.color='#c4b5fd'">
+                                    <i class="fa-solid fa-file-import" style="margin-right:5px;font-size:10px;"></i>Load
+                                </button>
+                                <button onclick="closeLoadCodePanel()" style="background:#20222f;border:1px solid #2d3142;border-radius:7px;padding:6px 10px;font-size:11px;font-weight:600;color:#475569;cursor:pointer;transition:all 0.15s;" onmouseover="this.style.color='#94a3b8';this.style.borderColor='#475569'" onmouseout="this.style.color='#475569';this.style.borderColor='#2d3142'">✕</button>
+                            </div>
+                            <div id="load-code-status" style="font-size:10px;color:#64748b;min-height:14px;margin-top:4px;text-align:center;"></div>
+                            <!-- Recent codes history -->
+                            <div style="margin-top:8px;">
+                                <div style="font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Recent</div>
+                                <div id="code-history-list" style="max-height:90px;overflow-y:auto;"></div>
+                            </div>
+                        </div>
                     </div>
                     <div id="preset-list" class="max-h-64 overflow-y-auto py-1">
                         <div class="px-3 py-3 text-xs text-slate-500 text-center italic">Click Load Preset to grant folder access</div>
@@ -913,6 +939,60 @@
             <div id="dtg-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none" style="min-height:360px;">
                 <i class="fa-solid fa-chart-area text-4xl" style="color:rgba(75,107,251,0.15)"></i>
                 <span class="text-xs text-slate-600 italic">Select a preset folder to view damage history</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── Share Code Modal ──────────────────────────────────────────────────── -->
+    <div id="share-code-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-black/80 backdrop-blur-sm">
+        <div style="background:#181a24;border:1px solid #2d3142;border-radius:1.25rem;box-shadow:0 0 60px rgba(75,107,251,0.18),0 0 0 1px #4b6bfb22;width:480px;max-width:95vw;overflow:hidden;display:flex;flex-direction:column;">
+            <!-- Header -->
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px 14px;border-bottom:1px solid #2d3142;background:linear-gradient(135deg,#0f111a 0%,#181a2a 100%);">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#7c3aed,#a78bfa);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px #7c3aed55;">
+                        <i class="fa-solid fa-share-nodes" style="font-size:14px;color:#fff;"></i>
+                    </div>
+                    <div>
+                        <div style="font-size:14px;font-weight:800;color:#e2e8f0;letter-spacing:-0.01em;">Share Preset</div>
+                        <div id="share-code-title" style="font-size:10px;color:#64748b;margin-top:1px;"></div>
+                    </div>
+                </div>
+                <button onclick="closeShareCodeModal()" style="background:none;border:none;cursor:pointer;color:#475569;font-size:18px;line-height:1;padding:4px;border-radius:6px;transition:color 0.15s,background 0.15s;" onmouseover="this.style.color='#f8fafc';this.style.background='#ffffff15'" onmouseout="this.style.color='#475569';this.style.background='none'">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <!-- Body -->
+            <div style="padding:20px;">
+                <div style="font-size:11px;color:#64748b;margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+                    <i class="fa-solid fa-circle-info" style="color:#a78bfa;"></i>
+                    Share this code with anyone — they can paste it to load your exact team setup.
+                </div>
+                <!-- Code box -->
+                <div style="position:relative;">
+                    <textarea id="share-code-value" readonly rows="4"
+                        style="width:100%;box-sizing:border-box;background:#0f111a;border:1px solid #2d3142;border-radius:10px;padding:12px 14px;font-size:10.5px;font-family:'Courier New',Courier,monospace;color:#a78bfa;letter-spacing:0.02em;line-height:1.6;resize:none;outline:none;word-break:break-all;color-scheme:dark;"
+                        onclick="this.select()"></textarea>
+                    <div id="share-code-size" style="position:absolute;bottom:8px;right:10px;font-size:9px;color:#475569;pointer-events:none;"></div>
+                </div>
+                <!-- Actions -->
+                <div style="display:flex;gap:8px;margin-top:12px;">
+                    <button id="share-copy-btn" onclick="copyShareCode()"
+                        style="flex:1;background:#1a1030;border:1px solid #a78bfa;border-radius:8px;padding:9px 0;font-size:12px;font-weight:700;color:#c4b5fd;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;"
+                        onmouseover="this.style.background='#2a1f40';this.style.borderColor='#c4b5fd';this.style.color='#e9d5ff'"
+                        onmouseout="this.style.background='#1a1030';this.style.borderColor='#a78bfa';this.style.color='#c4b5fd'">
+                        <i class="fa-solid fa-copy mr-2"></i>Copy Code
+                    </button>
+                    <button onclick="closeShareCodeModal()"
+                        style="background:#20222f;border:1px solid #2d3142;border-radius:8px;padding:9px 18px;font-size:12px;font-weight:600;color:#64748b;cursor:pointer;transition:all 0.15s;"
+                        onmouseover="this.style.borderColor='#4b6bfb';this.style.color='#94a3b8'"
+                        onmouseout="this.style.borderColor='#2d3142';this.style.color='#64748b'">
+                        Close
+                    </button>
+                </div>
+                <!-- Tip -->
+                <div style="margin-top:14px;padding:10px 12px;background:#0f111a;border:1px solid #2d314260;border-radius:8px;font-size:10px;color:#475569;line-height:1.6;">
+                    <span style="color:#a78bfa;font-weight:700;">Tip:</span> The code contains your full team — characters, gear, cards, pets, gems, rotation, and formation. Paste it into <em>Load from Code</em> on any device to restore the exact build.
+                </div>
             </div>
         </div>
     </div>
@@ -1074,6 +1154,7 @@
     <script src="js/lostsword/presets.js"></script>
     <script src="js/lostsword/damagehistory.js"></script>
     <script src="js/lostsword/imageExport.js"></script>
+    <script src="js/lostsword/sharecode.js"></script>
 
 </div>
 
