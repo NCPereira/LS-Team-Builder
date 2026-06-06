@@ -1,10 +1,18 @@
-// ── sharecode.js v3 ───────────────────────────────────────────────────────────
-// Produces short (~120-160 char) shareable codes by encoding all values as
-// indices into fixed lookup tables, then base64url encoding the resulting bytes.
+// ── sharecode.js v4 ───────────────────────────────────────────────────────────
+// Produces compact, human-readable shareable codes using letter+number tokens.
 //
-// Format:  LSTB3_<base64url bytes>
+// Format:  LSTB4_<tokens>
 //
-// Also keeps a V1/V2 legacy decoder so old codes still load correctly.
+// Each token = one letter (field type) + decimal digits (1-based table index).
+// Empty fields are omitted entirely — no padding, no separators needed.
+// Stat priorities and title are NOT encoded (left to the recipient).
+//
+// Example:  LSTB4_c3w12a1h5r2k7c14w6a3...u4t15u9
+//           c3  = character index 3 (Asuka)
+//           w12 = weapon index 12
+//           t15 = ult time 1.5 s
+//
+// Legacy V3 (LSTB3_) and V1 (LSTB1_) codes are still decoded correctly.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -121,6 +129,7 @@ function _val(table, idx) {
     return table[idx] ?? null;
 }
 
+// Still used by the V3 legacy decoder path below
 function _toBase64url(bytes) {
     let bin = '';
     for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
@@ -135,36 +144,380 @@ function _fromBase64url(str) {
     return out;
 }
 
-// Pack a card display value like "Card_Karishara_01" → index byte
+// Card helpers (still used by V3 legacy decoder)
 function _cardIdx(cardStr) {
     if (!cardStr) return _SC_NONE;
     const m = cardStr.match(/^Card_(.+)_\d+$/);
     if (!m) return _SC_NONE;
     return _idx(_SC_CARDS, m[1]);
 }
+
+// Build a display-name → _SC_CARDS index map using the same parseName logic
+// the game uses (split on _, camelCase → spaces, strip trailing _01 number).
+// This lets us encode/decode slot.card which holds the display name.
+function _scCardDisplayIndex(displayName) {
+    if (!displayName) return -1;
+    // Try exact match first (most names are identical, e.g. "Estheria")
+    let ci = _SC_CARDS.indexOf(displayName);
+    if (ci !== -1) return ci;
+    // Normalise: collapse spaces, try case-insensitive
+    const norm = displayName.replace(/\s+/g, '').toLowerCase();
+    ci = _SC_CARDS.findIndex(n => n.toLowerCase() === norm);
+    if (ci !== -1) return ci;
+    // Also try matching the display form of each entry
+    // (e.g. "Joan Of Arc" → "JoanOfArc", "Maid Rita" → "MaidRita")
+    return _SC_CARDS.findIndex(n => {
+        const disp = n.replace(/([A-Z])/g, ' $1').trim();
+        return disp.toLowerCase() === displayName.toLowerCase();
+    });
+}
+
+// Return the display name for a _SC_CARDS index (what the game stores in slot.card)
+function _scCardDisplayName(idx) {
+    const name = _val(_SC_CARDS, idx);
+    if (!name) return null;
+    // Replicate parseName: split camelCase to spaces
+    return name.replace(/([A-Z])/g, ' $1').trim();
+}
+
 function _cardVal(idx) {
     const name = _val(_SC_CARDS, idx);
     return name ? `Card_${name}_01` : null;
 }
 
-// Pack stat priority array (up to 4 stats per slot type, 2 bits each packed into bytes)
-// We store up to 4 stats per gear slot type. Each stat = 4 bits (16 possible + none).
-// 4 stats × 4 gear types = 16 nibbles = 8 bytes per character.
+// ══════════════════════════════════════════════════════════════════════════════
+// ── V4 Text-token encoder / decoder ──────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+//
+// Format:  LSTB4_<tokens>
+//
+// A token is one lowercase letter immediately followed by either:
+//   • one or more decimal digits  → 1-based index into that field's table
+//   • nothing (for 'n' = null)
+//
+// Token letters:
+//   c  character      (1-based index into _SC_CHARS)
+//   w  weapon         (1-based index into _SC_WEAPONS)
+//   a  armor          (1-based index into _SC_ARMORS)
+//   h  helmet         (1-based index into _SC_HELMETS)
+//   r  rune           (1-based index into _SC_RUNES)
+//   k  card           (1-based index into _SC_CARDS)
+//   s  skin index     (0-based, written only when non-zero)
+//   p  pet            (1-based index into _SC_PETS)
+//   g  gem            (1-based index into _SC_GEMS)
+//   f  formation slot value (0-based team-slot index; omitted for empty)
+//   u  ult-rotation character (1-based index into _SC_CHARS)
+//   t  ult time in tenths of a second (e.g. t15 = 1.5 s)
+//   n  null / empty   (no digits; skips the next logical slot in sequence)
+//   x  title text     (digits = UTF-8 byte-length, then raw UTF-8 chars follow)
+//   m  comments text  (digits = UTF-8 byte-length, then raw UTF-8 chars follow)
+//
+// Slots are written in order: for each of 5 team slots → c w a h r k [s]
+// then 3 pet slots → p g g g g [gemStat q code]
+// then up to 6 formation entries → f<slotIdx>
+// then ult rotation entries → u [t]  (t omitted if 0)
+// then optional x (title) and m (comments)
+//
+// Empty / null fields are omitted entirely (shorter) or written as 'n'
+// only where positional ambiguity would arise (pet gemStat preset: q1/q2/n).
+//
+// gemStat preset token:
+//   q1  = 4×ATK/4×HP
+//   q2  = 4×CD/4×HP
+//   (omitted = none)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const SHARE_PREFIX_V4 = 'LSTB4_';
+const SHARE_PREFIX_V3 = 'LSTB3_';
+const SHARE_PREFIX_V1 = 'LSTB1_';
+
+// ── Tokenizer: turn a raw string body into [{letter, num}] ───────────────────
+function _tokenize(str) {
+    const tokens = [];
+    // Matches: one letter, then optional run of digits, OR 'x'/'m' with
+    // length+payload handled separately after the main scan.
+    const re = /([a-z])(\d*)/g;
+    let m;
+    while ((m = re.exec(str)) !== null) {
+        tokens.push({ letter: m[1], num: m[2] === '' ? null : parseInt(m[2], 10) });
+    }
+    return tokens;
+}
+
+// ── V4 Encoder ────────────────────────────────────────────────────────────────
+function _encodeV4(payload) {
+    const parts = [];
+
+    // Helper: append a 1-based index token, or nothing if null/empty
+    function tok(letter, table, val) {
+        if (val == null || val === '') return;
+        const i = table.indexOf(val);
+        if (i === -1) return; // unknown value — skip rather than corrupt
+        parts.push(letter + (i + 1));
+    }
+
+    // ── 5 team slots ─────────────────────────────────────────────────────────
+    const slots = payload.slotData || [];
+    for (let si = 0; si < 5; si++) {
+        const s = slots[si] || {};
+        const g = s.gear || {};
+        tok('c', _SC_CHARS,   s.character);
+        tok('w', _SC_WEAPONS, g.Weapon);
+        tok('a', _SC_ARMORS,  g.Armor);
+        tok('h', _SC_HELMETS, g.Helmet);
+        tok('r', _SC_RUNES,   g.Rune);
+        // Card: stored as display name in s.card (e.g. "Estheria", "Joan Of Arc")
+        // Fallback to s.cards[0] for any legacy payload that still uses the old format
+        const cardDisplay = s.card || null;
+        const cardFallback = !cardDisplay ? (s.cards || [])[0] : null;
+        if (cardDisplay) {
+            const ci = _scCardDisplayIndex(cardDisplay);
+            if (ci !== -1) parts.push('k' + (ci + 1));
+        } else if (cardFallback) {
+            // Legacy: Card_X_01 or bare name
+            const cm = cardFallback.match(/^(?:Card_)?(.+?)(?:_\d+)?$/);
+            if (cm) {
+                const ci = _SC_CARDS.indexOf(cm[1]);
+                if (ci !== -1) parts.push('k' + (ci + 1));
+            }
+        }
+        // Skin index: only write when non-zero
+        const skin = s.skinIndex || 0;
+        if (skin > 0) parts.push('s' + skin);
+    }
+
+    // ── 3 pet slots ──────────────────────────────────────────────────────────
+    const pets = payload.petsData || [];
+    for (let pi = 0; pi < 3; pi++) {
+        const p = pets[pi] || {};
+        tok('p', _SC_PETS, p.name);
+        for (let gi = 0; gi < 4; gi++) {
+            tok('g', _SC_GEMS, (p.gems || [])[gi]);
+        }
+        // gemStat preset
+        const gs = p.gemStat;
+        if (gs && gs.length) {
+            if (gs.filter(v => v === 'CD').length  >= 4) parts.push('q2');
+            else if (gs.filter(v => v === 'ATK').length >= 4) parts.push('q1');
+        }
+    }
+
+    // ── Formation slots (write only filled ones as f<slotIdx>) ───────────────
+    const fs = payload.formationSlots || [];
+    for (let fi = 0; fi < 6; fi++) {
+        const v = fs[fi];
+        if (v != null && v !== -1) parts.push('f' + fi + 'v' + v);
+    }
+
+    // ── Ultimate rotation (non-null entries only) ─────────────────────────────
+    const ur = payload.ultimateRotation || [];
+    for (let ui = 0; ui < Math.min(ur.length, 11); ui++) {
+        const e = ur[ui] || {};
+        if (!e.character) continue;
+        const ci = _SC_CHARS.indexOf(e.character);
+        if (ci === -1) continue;
+        parts.push('u' + (ci + 1));
+        if (e.time) {
+            const tenths = Math.round(parseFloat(e.time) * 10);
+            if (tenths > 0) parts.push('t' + tenths);
+        }
+    }
+
+    // ── Comments ──────────────────────────────────────────────────────────────
+    const comments = (payload.comments || '').slice(0, 200);
+    if (comments) {
+        const cb = new TextEncoder().encode(comments);
+        parts.push('m' + cb.length + String.fromCharCode(...cb));
+    }
+
+    return parts.join('');
+}
+
+// ── V4 Decoder ────────────────────────────────────────────────────────────────
+function _decodeV4(body) {
+    // We parse the body character by character.
+    // Letters drive state; digits accumulate the current number.
+    // 'x' and 'm' use a length-prefixed raw payload.
+
+    const slotData        = Array.from({ length: 5 }, () => ({
+        character: null, gear: { Weapon: null, Armor: null, Helmet: null, Rune: null },
+        cards: [], statPriority: {}, skinIndex: 0,
+    }));
+    const petsData        = Array.from({ length: 3 }, () => ({ name: null, gems: [null,null,null,null], gemStat: null }));
+    const formationSlots  = [-1,-1,-1,-1,-1,-1];
+    const ultimateRotation = [];
+
+    let title    = 'My Lost Sword Team';
+    let comments = '';
+
+    // Slot/pet/gem write cursors
+    let slotCursor = 0; // which of the 5 team slots we're filling
+    let petCursor  = 0; // which of the 3 pet slots we're filling
+    let gemCursor  = 0; // which gem within petCursor (0-3)
+    let formPending = -1; // formation slot index waiting for 'v' value
+
+    let i = 0;
+    while (i < body.length) {
+        const letter = body[i++];
+        if (letter < 'a' || letter > 'z') continue; // skip unexpected chars
+
+        // 'x' and 'm' are length-prefixed text payloads
+        if (letter === 'x' || letter === 'm') {
+            // Read length digits
+            let lenStr = '';
+            while (i < body.length && body[i] >= '0' && body[i] <= '9') lenStr += body[i++];
+            const byteLen = parseInt(lenStr, 10) || 0;
+            // Grab exactly byteLen characters (raw UTF-8 bytes stored as chars)
+            const raw = body.slice(i, i + byteLen);
+            i += byteLen;
+            try {
+                const bytes = new Uint8Array(raw.length);
+                for (let b = 0; b < raw.length; b++) bytes[b] = raw.charCodeAt(b);
+                const decoded = new TextDecoder().decode(bytes);
+                // x = legacy title (ignored), m = comments
+                if (letter === 'm') comments = decoded;
+            } catch (_) {}
+            continue;
+        }
+
+        // All other letters: read trailing digits
+        let numStr = '';
+        while (i < body.length && body[i] >= '0' && body[i] <= '9') numStr += body[i++];
+        const num = numStr === '' ? null : parseInt(numStr, 10);
+
+        // Dispatch
+        switch (letter) {
+            case 'c': { // character → advances slotCursor
+                const ch = num != null ? (_SC_CHARS[num - 1] ?? null) : null;
+                if (slotCursor < 5) { slotData[slotCursor].character = ch; slotCursor++; }
+                break;
+            }
+            case 'w': {
+                const slot = slotData[slotCursor - 1];
+                if (slot) slot.gear.Weapon = num != null ? (_SC_WEAPONS[num - 1] ?? null) : null;
+                break;
+            }
+            case 'a': {
+                const slot = slotData[slotCursor - 1];
+                if (slot) slot.gear.Armor = num != null ? (_SC_ARMORS[num - 1] ?? null) : null;
+                break;
+            }
+            case 'h': {
+                const slot = slotData[slotCursor - 1];
+                if (slot) slot.gear.Helmet = num != null ? (_SC_HELMETS[num - 1] ?? null) : null;
+                break;
+            }
+            case 'r': {
+                const slot = slotData[slotCursor - 1];
+                if (slot) slot.gear.Rune = num != null ? (_SC_RUNES[num - 1] ?? null) : null;
+                break;
+            }
+            case 'k': { // card — write as display name into slot.card
+                const slot = slotData[slotCursor - 1];
+                if (slot && num != null) {
+                    const dispName = _scCardDisplayName(num - 1);
+                    if (dispName) {
+                        slot.card  = dispName;   // what the game reads
+                        slot.cards = [`Card_${_SC_CARDS[num-1]}_01`]; // legacy compat
+                    }
+                }
+                break;
+            }
+            case 's': { // skin index
+                const slot = slotData[slotCursor - 1];
+                if (slot) slot.skinIndex = num ?? 0;
+                break;
+            }
+            case 'p': { // pet name → advances petCursor
+                const name = num != null ? (_SC_PETS[num - 1] ?? null) : null;
+                if (petCursor < 3) {
+                    petsData[petCursor].name = name;
+                    petCursor++;
+                    gemCursor = 0;
+                }
+                break;
+            }
+            case 'g': { // gem
+                const pet = petsData[petCursor - 1];
+                if (pet && gemCursor < 4) {
+                    pet.gems[gemCursor++] = num != null ? (_SC_GEMS[num - 1] ?? null) : null;
+                }
+                break;
+            }
+            case 'q': { // gemStat preset
+                const pet = petsData[petCursor - 1];
+                if (pet) {
+                    if (num === 1) pet.gemStat = ['ATK','ATK','ATK','ATK','HP','HP','HP','HP'];
+                    else if (num === 2) pet.gemStat = ['CD','CD','CD','CD','HP','HP','HP','HP'];
+                }
+                break;
+            }
+            case 'f': { // formation slot index (next 'v' carries the value)
+                formPending = num ?? -1;
+                break;
+            }
+            case 'v': { // formation slot value, paired with preceding 'f'
+                if (formPending >= 0 && formPending < 6 && num != null) {
+                    formationSlots[formPending] = num;
+                }
+                formPending = -1;
+                break;
+            }
+            case 'u': { // ult rotation character
+                const ch = num != null ? (_SC_CHARS[num - 1] ?? null) : null;
+                ultimateRotation.push({ character: ch, time: '' });
+                break;
+            }
+            case 't': { // ult time (tenths of a second)
+                if (ultimateRotation.length > 0 && num != null && num > 0) {
+                    ultimateRotation[ultimateRotation.length - 1].time =
+                        (num / 10).toFixed(1) + 's';
+                }
+                break;
+            }
+            // 'n' and anything unrecognised: no-op
+        }
+    }
+
+    // Pad ult rotation to 11
+    while (ultimateRotation.length < 11) ultimateRotation.push({ character: null, time: '' });
+
+    // slotSkinIndex array (mirrored from per-slot skinIndex for compatibility)
+    const slotSkinIndex = slotData.map(s => s.skinIndex || 0);
+
+    return {
+        version: 4,
+        title,
+        comments,
+        slotData,
+        petsData,
+        formationSlots,
+        ultimateRotation,
+        slotSkinIndex,
+        brawlKillCount: null,
+        bstatDealt: null,
+        bstatPrev: null,
+    };
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// ── Legacy V3 decoder (binary base64url) ─────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════════
+
+// Stat pack helpers (V3 only)
 function _packStats(sp) {
     const types = ['Weapon','Armor','Helmet','Rune'];
     const bytes = [];
     for (const type of types) {
         const arr = (sp && sp[type]) || [];
-        // Pack 2 stats per byte (4 bits each)
         for (let i = 0; i < 4; i += 2) {
-            const a = arr[i]   != null ? _idx(_SC_STATS, arr[i])   : 0xF;
-            const b = arr[i+1] != null ? _idx(_SC_STATS, arr[i+1]) : 0xF;
+            const a = arr[i]   != null ? _SC_STATS.indexOf(arr[i])   : 0xF;
+            const b = arr[i+1] != null ? _SC_STATS.indexOf(arr[i+1]) : 0xF;
             bytes.push(((a & 0xF) << 4) | (b & 0xF));
         }
     }
-    return bytes; // 8 bytes
+    return bytes;
 }
-
 function _unpackStats(bytes, offset) {
     const types = ['Weapon','Armor','Helmet','Rune'];
     const sp = {};
@@ -183,99 +536,9 @@ function _unpackStats(bytes, offset) {
     return { sp, nextOffset: b };
 }
 
-// ══════════════════════════════════════════════════════════════════════════════
-// ── V3 Encoder ────────────────────────────────────────────────────────────────
-// ══════════════════════════════════════════════════════════════════════════════
-
-const SHARE_PREFIX_V3 = 'LSTB3_';
-const SHARE_PREFIX_V1 = 'LSTB1_';
-
-function _encodeV3(payload) {
-    const out = [];
-
-    // Header byte: version = 3
-    out.push(3);
-
-    // ── Slots (always 5) ─────────────────────────────────────────────────────
-    const slots = payload.slotData || [];
-    for (let i = 0; i < 5; i++) {
-        const s = slots[i] || {};
-        const g = s.gear || {};
-        out.push(_idx(_SC_CHARS,   s.character));
-        out.push(_idx(_SC_WEAPONS, g.Weapon));
-        out.push(_idx(_SC_ARMORS,  g.Armor));
-        out.push(_idx(_SC_HELMETS, g.Helmet));
-        out.push(_idx(_SC_RUNES,   g.Rune));
-        // First card only (most builds use one)
-        out.push(_cardIdx((s.cards || [])[0]));
-        // Stat priority: 8 bytes
-        _packStats(s.statPriority).forEach(b => out.push(b));
-        // Skin index (0-7 fits in one byte)
-        out.push(s.skinIndex || 0);
-    }
-
-    // ── Pets (always 3) ──────────────────────────────────────────────────────
-    const pets = payload.petsData || [];
-    for (let i = 0; i < 3; i++) {
-        const p = pets[i] || {};
-        out.push(_idx(_SC_PETS, p.name));
-        for (let g = 0; g < 4; g++) out.push(_idx(_SC_GEMS, (p.gems || [])[g]));
-        // gemStat preset: 0=none, 1=4×ATK/4×HP, 2=4×CD/4×HP, 15=custom
-        const gs = p.gemStat;
-        let gsCode = 0;
-        if (gs && gs.length) {
-            if (gs.filter(s => s === 'CD').length >= 4) gsCode = 2;
-            else if (gs.filter(s => s === 'ATK').length >= 4) gsCode = 1;
-            else gsCode = 15;
-        }
-        out.push(gsCode);
-    }
-
-    // ── Formation slots (6 bytes) ─────────────────────────────────────────────
-    const fs = payload.formationSlots || [-1,-1,-1,-1,-1,-1];
-    for (let i = 0; i < 6; i++) {
-        const v = fs[i];
-        out.push((v == null || v === -1) ? _SC_NONE : v);
-    }
-
-    // ── Ultimate rotation ─────────────────────────────────────────────────────
-    const ur = payload.ultimateRotation || [];
-    // Count non-null entries up to 11
-    const urLen = Math.min(ur.length, 11);
-    out.push(urLen);
-    for (let i = 0; i < urLen; i++) {
-        const u = ur[i] || {};
-        out.push(_idx(_SC_CHARS, u.character));
-        // time as tenths of a second (0-255 = 0 to 25.5s), 0 = no time shown
-        const t = u.time ? Math.round(parseFloat(u.time) * 10) : 0;
-        out.push(Math.min(Math.max(t, 0), 255));
-    }
-
-    // ── slotSkinIndex (5 bytes) ───────────────────────────────────────────────
-    const ssi = payload.slotSkinIndex || [0,0,0,0,0];
-    for (let i = 0; i < 5; i++) out.push(ssi[i] || 0);
-
-    // ── Title: length-prefixed UTF-8 (max 60 chars) ───────────────────────────
-    const title = (payload.title || 'My Lost Sword Team').slice(0, 60);
-    const titleBytes = new TextEncoder().encode(title);
-    out.push(titleBytes.length);
-    titleBytes.forEach(b => out.push(b));
-
-    // ── Comments (max 200 chars) ──────────────────────────────────────────────
-    const comments = (payload.comments || '').slice(0, 200);
-    const commentBytes = new TextEncoder().encode(comments);
-    // 2-byte length (big-endian)
-    out.push((commentBytes.length >> 8) & 0xFF);
-    out.push(commentBytes.length & 0xFF);
-    commentBytes.forEach(b => out.push(b));
-
-    return new Uint8Array(out);
-}
-
 function _decodeV3(bytes) {
     let i = 1; // skip version byte
 
-    // ── Slots ─────────────────────────────────────────────────────────────────
     const slotData = [];
     for (let s = 0; s < 5; s++) {
         const character = _val(_SC_CHARS,   bytes[i++]);
@@ -296,7 +559,6 @@ function _decodeV3(bytes) {
         });
     }
 
-    // ── Pets ──────────────────────────────────────────────────────────────────
     const petsData = [];
     for (let p = 0; p < 3; p++) {
         const name = _val(_SC_PETS, bytes[i++]);
@@ -309,14 +571,12 @@ function _decodeV3(bytes) {
         petsData.push({ name, gems, gemStat });
     }
 
-    // ── Formation ─────────────────────────────────────────────────────────────
     const formationSlots = [];
     for (let f = 0; f < 6; f++) {
         const v = bytes[i++];
         formationSlots.push(v === _SC_NONE ? -1 : v);
     }
 
-    // ── Ultimate rotation ─────────────────────────────────────────────────────
     const urLen = bytes[i++];
     const ultimateRotation = [];
     for (let u = 0; u < urLen; u++) {
@@ -325,14 +585,11 @@ function _decodeV3(bytes) {
         const time = timeTenths > 0 ? (timeTenths / 10).toFixed(1) + 's' : '';
         ultimateRotation.push({ character, time });
     }
-    // Pad to 11
     while (ultimateRotation.length < 11) ultimateRotation.push({ character: null, time: '' });
 
-    // ── slotSkinIndex ─────────────────────────────────────────────────────────
     const slotSkinIndex = [];
     for (let s = 0; s < 5; s++) slotSkinIndex.push(bytes[i++] || 0);
 
-    // ── Title ─────────────────────────────────────────────────────────────────
     let title = 'My Lost Sword Team';
     if (i < bytes.length) {
         const titleLen = bytes[i++];
@@ -342,7 +599,6 @@ function _decodeV3(bytes) {
         }
     }
 
-    // ── Comments ──────────────────────────────────────────────────────────────
     let comments = '';
     if (i + 1 < bytes.length) {
         const commentsLen = (bytes[i] << 8) | bytes[i + 1];
@@ -413,40 +669,44 @@ function _decodeV1(code) {
 // ══════════════════════════════════════════════════════════════════════════════
 
 /**
- * Encode the current live preset payload into a compact share code.
- * Returns a string like "LSTB3_ABC123..."  (~120-160 chars typical)
+ * Encode the current live preset payload into a compact V4 share code.
+ * Returns a string like "LSTB4_c3w12a1h5r2..."
+ *
+ * V4 format: human-readable letter+number tokens, no base64, no stats.
+ * Each letter names the field type; the digits that follow are the 1-based
+ * index into that field's lookup table.  Empty/null fields are simply omitted.
  */
 function encodePresetCode(payload) {
     const slim = { ...payload };
     delete slim.bstatDealt;
     delete slim.bstatPrev;
-    // Include comments from the textarea if present
+    // Pull live comments from textarea if present
     const ta = document.getElementById('comments-textarea');
     if (ta) slim.comments = ta.value || '';
     try {
-        const bytes = _encodeV3(slim);
-        return SHARE_PREFIX_V3 + _toBase64url(bytes);
+        return SHARE_PREFIX_V4 + _encodeV4(slim);
     } catch (e) {
-        console.warn('[ShareCode] V3 encode failed, falling back:', e);
-        // Fallback: just base64url the JSON
-        const json = JSON.stringify(slim);
-        return SHARE_PREFIX_V1 + _toBase64url(new TextEncoder().encode(json));
+        console.warn('[ShareCode] V4 encode failed:', e);
+        return '';
     }
 }
 
 /**
  * Decode any supported share code back into a preset payload object.
- * Supports V3 (LSTB3_) and legacy V1 (LSTB1_) formats.
+ * Supports V4 (LSTB4_), V3 binary (LSTB3_), and legacy V1 (LSTB1_) formats.
  */
 function decodePresetCode(code) {
     if (!code) return null;
     const trimmed = code.trim();
     try {
+        if (trimmed.startsWith(SHARE_PREFIX_V4)) {
+            return _decodeV4(trimmed.slice(SHARE_PREFIX_V4.length));
+        }
         if (trimmed.startsWith(SHARE_PREFIX_V3)) {
             const bytes = _fromBase64url(trimmed.slice(SHARE_PREFIX_V3.length));
             return _decodeV3(bytes);
         }
-        // Legacy V1 / raw base64
+        // Legacy V1 / raw base64 JSON
         return _decodeV1(trimmed);
     } catch (e) {
         console.warn('[ShareCode] decode failed:', e);
