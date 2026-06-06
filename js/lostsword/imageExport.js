@@ -217,11 +217,93 @@ async function exportCapturePNG() {
             replaceFormControlWithDiv(cloneIn, liveInputs[idx] || null);
         });
 
-        // ── Step 4: Replace FA icons with zero-size placeholders ─────────────
-        clone.querySelectorAll('i[class*="fa-"]').forEach(i => {
+        // ── Step 4: Replace FA icons with rendered Unicode spans ─────────────
+        // html2canvas cannot load the FA webfont but CAN render text nodes that
+        // are already painted by the browser.  We snapshot each icon's computed
+        // size/color from the live DOM counterpart, then replace the cloned <i>
+        // with a <span> whose textContent is the FA Unicode codepoint and whose
+        // font-family forces the correct FA subset.  Icons that have no mapping
+        // below fall back to a zero-size invisible span to preserve flex layout.
+        const FA_UNICODE = {
+            // Solid
+            'fa-chart-bar':         '\uf080',
+            'fa-note-sticky':       '\uf249',
+            'fa-upload':            '\uf093',
+            'fa-clipboard':         '\uf328',
+            'fa-user-plus':         '\uf234',
+            'fa-xmark':             '\uf00d',
+            'fa-check':             '\uf00c',
+            'fa-trash':             '\uf1f8',
+            'fa-trash-can':         '\uf2ed',
+            'fa-floppy-disk':       '\uf0c7',
+            'fa-folder-open':       '\uf07c',
+            'fa-folder':            '\uf07b',
+            'fa-image':             '\uf03e',
+            'fa-share-nodes':       '\uf1e0',
+            'fa-arrow-rotate-right':'\uf01e',
+            'fa-redo':              '\uf01e',
+            'fa-arrows-rotate':     '\uf021',
+            'fa-chevron-down':      '\uf078',
+            'fa-chevron-right':     '\uf054',
+            'fa-file-import':       '\uf56f',
+            'fa-file-code':         '\uf1c9',
+            'fa-qrcode':            '\uf029',
+            'fa-clone':             '\uf24d',
+            'fa-layer-group':       '\uf5fd',
+            'fa-fire':              '\uf06d',
+            'fa-shield-halved':     '\ue23b',
+            'fa-circle-info':       '\uf05a',
+            'fa-copy':              '\uf0c5',
+            'fa-list-ol':           '\uf0cb',
+            'fa-rotate-left':       '\uf2ea',
+            'fa-shirt':             '\ue406',
+            'fa-dragon':            '\uf6d5',
+            'fa-chart-area':        '\uf1fe',
+            'fa-arrow-up':          '\uf062',
+            'fa-arrow-down':        '\uf063',
+            'fa-lock':              '\uf023',
+            'fa-square-check':      '\uf14a',
+        };
+        // Which FA subset owns each icon (determines font-family string)
+        const FA_FONT = {
+            'fa-square-check': '"Font Awesome 6 Free"',
+        };
+        const DEFAULT_FA_FONT = '"Font Awesome 6 Free"';
+
+        // Build a parallel list of live <i> elements so we can read computed styles
+        const liveIcons  = Array.from(target.querySelectorAll('i[class*="fa-"]'));
+        const cloneIcons = Array.from(clone.querySelectorAll('i[class*="fa-"]'));
+
+        cloneIcons.forEach((cloneIcon, idx) => {
+            const liveIcon = liveIcons[idx];
+            // Identify the icon name from the class list
+            const iconClass = Array.from(cloneIcon.classList).find(c => c.startsWith('fa-') && c !== 'fa-solid' && c !== 'fa-regular' && c !== 'fa-brands');
+            const unicode   = iconClass ? FA_UNICODE[iconClass] : null;
+
             const span = document.createElement('span');
-            span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
-            i.parentNode.replaceChild(span, i);
+
+            if (unicode) {
+                // Read computed style from the live counterpart for accurate size/color
+                const cs = liveIcon ? window.getComputedStyle(liveIcon) : null;
+                span.textContent = unicode;
+                span.style.fontFamily  = FA_FONT[iconClass] || DEFAULT_FA_FONT;
+                span.style.fontWeight  = '900';  // "Solid" weight
+                span.style.fontStyle   = 'normal';
+                span.style.fontSize    = cs ? cs.fontSize    : '1em';
+                span.style.color       = cs ? cs.color       : 'inherit';
+                span.style.lineHeight  = cs ? cs.lineHeight  : '1';
+                span.style.display     = 'inline-block';
+                span.style.flexShrink  = '0';
+                span.style.verticalAlign = 'middle';
+                // Preserve any explicit inline size overrides from the original
+                if (cloneIcon.style.fontSize)  span.style.fontSize  = cloneIcon.style.fontSize;
+                if (cloneIcon.style.color)      span.style.color     = cloneIcon.style.color;
+            } else {
+                // Unknown icon — zero-size invisible placeholder preserves flex layout
+                span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
+            }
+
+            cloneIcon.parentNode.replaceChild(span, cloneIcon);
         });
 
         // ── Step 5: Copy ALL computed styles from every live element to clone ─
@@ -377,10 +459,13 @@ async function exportCapturePNG() {
                 doc.head.appendChild(s);
                 const ca = doc.getElementById('capture-area');
                 if (ca) { ca.style.background = 'transparent'; ca.style.backgroundColor = 'transparent'; }
-                doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
-                    const span = doc.createElement('span');
-                    span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
-                    i.parentNode.replaceChild(span, i);
+                // Step 4 already converted <i> tags to Unicode <span> tags in our pre-processed
+                // clone, so by the time html2canvas clones it there should be no <i> left.
+                // Zero out any stragglers just in case.
+                doc.querySelectorAll('i[class*="fa-"]').forEach(icon => {
+                    const sp = doc.createElement('span');
+                    sp.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
+                    icon.parentNode.replaceChild(sp, icon);
                 });
             }
         });
