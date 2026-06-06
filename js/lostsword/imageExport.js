@@ -43,31 +43,21 @@ async function exportCapturePNG() {
         }
 
         // ── Step 2b: Lock the side-panel column to its exact live pixel width ───
-        //    The battle-stats/comments column uses flex:1 with min/max-width, but
-        //    in the off-screen clone it loses its flex parent context and can shrink.
-        //    Grab the live rendered width and pin it explicitly so the column stays
-        //    the same size it is on screen.
-        const livePanelCol = target.querySelector('#team-stats-wrapper > div:last-child');
+        const livePanelCol  = target.querySelector('#team-stats-wrapper > div:last-child');
         const clonePanelCol = clone.querySelector('#team-stats-wrapper > div:last-child');
         if (livePanelCol && clonePanelCol) {
             const colRect = livePanelCol.getBoundingClientRect();
             const colW    = Math.round(colRect.width);
             const colH    = Math.round(colRect.height);
-            clonePanelCol.style.width    = `${colW}px`;
-            clonePanelCol.style.minWidth = `${colW}px`;
-            clonePanelCol.style.maxWidth = `${colW}px`;
-            clonePanelCol.style.height   = `${colH}px`;
+            clonePanelCol.style.width      = `${colW}px`;
+            clonePanelCol.style.minWidth   = `${colW}px`;
+            clonePanelCol.style.maxWidth   = `${colW}px`;
+            clonePanelCol.style.height     = `${colH}px`;
             clonePanelCol.style.flexShrink = '0';
             clonePanelCol.style.flexGrow   = '0';
         }
 
         // ── Step 2c: Freeze ult-time-wrapper visibility state ────────────────
-        //    .ult-time-wrapper uses max-height/opacity CSS transitions for its
-        //    show/hide toggle. The transition property itself can cause html2canvas
-        //    to catch the element mid-animation, and copying computed styles alone
-        //    isn't reliable for transition-driven visibility. We freeze each wrapper
-        //    explicitly: if .visible → fully open; otherwise → fully closed.
-        //    Also kill all transitions in the clone so nothing can animate during render.
         const liveTimeWrappers  = Array.from(target.querySelectorAll('.ult-time-wrapper'));
         const cloneTimeWrappers = Array.from(clone.querySelectorAll('.ult-time-wrapper'));
         liveTimeWrappers.forEach((liveW, idx) => {
@@ -86,10 +76,108 @@ async function exportCapturePNG() {
             }
         });
 
+        // ══════════════════════════════════════════════════════════════════════
+        // ── NEW Step 2d: Hide empty slots & fix border-color bleed ────────────
+        // ══════════════════════════════════════════════════════════════════════
+
+        // Helper: is a team slot (index) empty?
+        const _slotIsEmpty = (i) => !slotData[i] || !slotData[i].character;
+
+        // 1. Hide empty team-grid <section> cards entirely
+        const cloneGrid = clone.querySelector('#team-grid');
+        if (cloneGrid) {
+            const cloneSections = Array.from(cloneGrid.querySelectorAll('section'));
+            cloneSections.forEach((sec, i) => {
+                if (_slotIsEmpty(i)) {
+                    sec.style.display = 'none';
+                } else {
+                    // Fix border-color bleed: replace semi-transparent element colors
+                    // with their solid equivalents so html2canvas renders them cleanly.
+                    const liveSection = document.querySelector(`#team-grid section[data-index="${i}"]`);
+                    if (liveSection) {
+                        const liveBorder = window.getComputedStyle(liveSection).borderColor;
+                        sec.style.borderColor = liveBorder;
+                        sec.style.borderStyle = 'solid';
+                    }
+                }
+            });
+        }
+
+        // 2. Hide the whole team-stats-wrapper side panel if no damage data
+        //    AND notes textarea is empty — keeps the layout tidy
+        if (cloneDmg) {
+            const hasDmgData  = typeof bstatDealt !== 'undefined' && bstatDealt && bstatDealt.some(r => r.value > 0);
+            const notesText   = document.getElementById('comments-textarea')?.value?.trim() || '';
+            const notesShown  = notesPanel && notesPanel.classList.contains('visible');
+            const hasPanelContent = hasDmgData || (notesShown && notesText.length > 0);
+            if (!hasPanelContent) {
+                if (clonePanelCol) clonePanelCol.style.display = 'none';
+                // Let team-grid expand — remove the fixed width constraints we set above
+                const cloneTeamGrid = clone.querySelector('#team-grid');
+                if (cloneTeamGrid) cloneTeamGrid.style.flex = '1';
+            }
+        }
+
+        // 3. Hide empty pet slots
+        const petSlotIds = ['p1','p2','p3'];
+        petSlotIds.forEach((pid, i) => {
+            const clonePetSlot = clone.querySelector(`[onclick*="openModal('${pid}'"]`) ||
+                                 clone.querySelector(`[data-pet-idx="${i}"]`);
+            if (clonePetSlot && (!petsData[i] || !petsData[i].name)) {
+                // Hide the whole pet column (parent of the slot)
+                const col = clonePetSlot.closest('.flex.flex-col.gap-2');
+                if (col) col.style.display = 'none';
+            }
+        });
+
+        // 4. Hide empty formation slots (both individual cells and the entire
+        //    formation section if every slot is empty)
+        const allFormEmpty = formationSlots.every(v => v === -1 || _slotIsEmpty(v));
+        if (allFormEmpty) {
+            // Hide the entire right-side formation panel
+            const formSection = clone.querySelector('.flex-1.flex.flex-col.gap-2');
+            // Walk up from form-slot-0 to find the formation container
+            const formSlot0 = clone.querySelector('#form-slot-0');
+            if (formSlot0) {
+                // Go up to the flex column that holds both TOP/BOT rows
+                const formParent = formSlot0.closest('.flex.flex-col.gap-1');
+                if (formParent) {
+                    const formContainer = formParent.parentElement;
+                    if (formContainer) formContainer.style.display = 'none';
+                }
+            }
+        }
+
+        // 5. Hide empty ultimate rotation slots AND the entire rotation section
+        //    if no characters are assigned
+        const hasAnyRotation = ultimateRotation.some(s => s.character);
+        const cloneUltContainer = clone.querySelector('#ultimate-rotation-container');
+        const cloneUltSection   = cloneUltContainer?.closest('.border-t.border-borderCool');
+        if (!hasAnyRotation) {
+            if (cloneUltSection) cloneUltSection.style.display = 'none';
+        } else if (cloneUltContainer) {
+            // Hide individual empty rotation slot wrappers (the .ult-rotation-slot divs)
+            // but keep arrows between filled slots — we rebuild them
+            const liveUltSlots  = Array.from(document.querySelectorAll('.ult-rotation-slot'));
+            const cloneUltSlots = Array.from(cloneUltContainer.querySelectorAll('.ult-rotation-slot'));
+            cloneUltSlots.forEach((cloneSlot) => {
+                const idx = parseInt(cloneSlot.dataset.ultIdx);
+                if (isNaN(idx)) return;
+                const slotEntry = ultimateRotation[idx];
+                if (!slotEntry || !slotEntry.character) {
+                    // Also hide the arrow that immediately follows this slot
+                    const nextSibling = cloneSlot.nextElementSibling;
+                    if (nextSibling && nextSibling.classList.contains('ult-arrow')) {
+                        nextSibling.style.display = 'none';
+                    }
+                    cloneSlot.style.display = 'none';
+                }
+            });
+        }
+
+        // ══════════════════════════════════════════════════════════════════════
         // ── Step 3: Replace textareas AND text inputs with divs ──────────────
-        //    html2canvas cannot read .value on form controls, so we replace them
-        //    with styled divs showing the live value as textContent.
-        //    Covers: notes textarea + ult-rotation time inputs.
+        // ══════════════════════════════════════════════════════════════════════
         function replaceFormControlWithDiv(cloneEl, liveEl) {
             const value = liveEl ? liveEl.value : '';
             const cs    = liveEl ? window.getComputedStyle(liveEl) : null;
@@ -124,15 +212,12 @@ async function exportCapturePNG() {
             replaceFormControlWithDiv(cloneTa, liveTAs[idx] || null);
         });
 
-        // Text inputs (ult-time-input etc.) — skip checkbox/radio/file
         const liveInputs = Array.from(target.querySelectorAll('input[type="text"], input:not([type])'));
         Array.from(clone.querySelectorAll('input[type="text"], input:not([type])')).forEach((cloneIn, idx) => {
             replaceFormControlWithDiv(cloneIn, liveInputs[idx] || null);
         });
 
         // ── Step 4: Replace FA icons with zero-size placeholders ─────────────
-        //    display:none collapses the flex gap inside panel-toggle buttons,
-        //    shifting the label text. A zero-size invisible span preserves layout.
         clone.querySelectorAll('i[class*="fa-"]').forEach(i => {
             const span = document.createElement('span');
             span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
@@ -140,7 +225,6 @@ async function exportCapturePNG() {
         });
 
         // ── Step 5: Copy ALL computed styles from every live element to clone ─
-        //    Walk both trees in parallel (cloneNode preserves DOM order).
         const liveAll  = Array.from(target.querySelectorAll('*'));
         const cloneAll = Array.from(clone.querySelectorAll('*'));
 
@@ -174,24 +258,14 @@ async function exportCapturePNG() {
             PROPS.forEach(prop => {
                 try { cloneEl.style[prop] = cs[prop]; } catch(_) {}
             });
-            // Kill all transitions — nothing should animate during the off-screen render
             try { cloneEl.style.transition = 'none'; } catch(_) {}
         });
 
         // ── Step 5c: Force clone root to transparent background ───────────────
-        //    #capture-area has class="bg-[#0f111a]" which Step 5 copies as a
-        //    computed backgroundColor onto the clone. Clear it explicitly so the
-        //    exported PNG has no background fill.
         clone.style.background      = 'transparent';
         clone.style.backgroundColor = 'transparent';
 
         // ── Step 5b: Replace <img> elements with background-image divs ──────────
-        //    html2canvas has two key failures with <img> tags:
-        //      1. It ignores CSS transform:scale() — so face-zoom is lost.
-        //      2. It ignores object-fit:cover/contain — images stretch to fill
-        //         their container, warping pet icons, card art, gear icons, etc.
-        //    Converting ALL content images to background-image divs fixes both,
-        //    since html2canvas renders background-size/position correctly.
         liveAll.forEach((liveEl, i) => {
             if (liveEl.tagName !== 'IMG') return;
             const cloneEl = cloneAll[i];
@@ -202,8 +276,6 @@ async function exportCapturePNG() {
             const objFit    = cs.objectFit || '';
             const objPos    = liveEl.style.objectPosition || cs.objectPosition || '';
 
-            // Process imgs that have transform:scale OR object-fit:cover/contain.
-            // Plain decorative imgs with no special sizing can stay as-is.
             const isScaled   = transform && transform !== 'none' && transform !== 'matrix(1, 0, 0, 1, 0, 0)';
             const hasObjFit  = objFit === 'cover' || objFit === 'contain';
             if (!isScaled && !hasObjFit) return;
@@ -211,10 +283,8 @@ async function exportCapturePNG() {
             const src = liveEl.src || liveEl.getAttribute('src') || '';
             if (!src) return;
 
-            // ── Determine background-size ──────────────────────────────────────
             let bgSize;
             if (isScaled) {
-                // Face-zoom images: scale factor baked into background-size
                 let scale = 1;
                 const matMatch = transform.match(/matrix\(([^,]+)/);
                 if (matMatch) scale = parseFloat(matMatch[1]) || 1;
@@ -222,17 +292,13 @@ async function exportCapturePNG() {
             } else if (objFit === 'cover') {
                 bgSize = 'cover';
             } else {
-                // contain
                 bgSize = 'contain';
             }
 
-            // ── Determine background-position ──────────────────────────────────
-            // For scaled imgs fall back to transform-origin; for others use object-position.
             let bgPosX = '50%';
             let bgPosY = '50%';
 
             if (isScaled) {
-                // Use transform-origin as the crop anchor
                 const originRaw   = cs.transformOrigin || '50% 50%';
                 const originParts = originRaw.split(' ');
                 bgPosX = originParts[0] || '50%';
@@ -241,21 +307,18 @@ async function exportCapturePNG() {
                 if (bgPosY === 'center') bgPosY = '50%';
             }
 
-            // object-position overrides transform-origin when present
             if (objPos && objPos !== 'auto') {
                 const pp = objPos.trim().split(/\s+/);
                 if (pp[0]) bgPosX = pp[0];
                 if (pp[1]) bgPosY = pp[1];
             }
 
-            // ── Build replacement div ──────────────────────────────────────────
             const div = document.createElement('div');
-            div.style.cssText = cloneEl.style.cssText;   // inherit all computed styles already applied
+            div.style.cssText = cloneEl.style.cssText;
             div.style.backgroundImage    = `url("${src}")`;
             div.style.backgroundSize     = bgSize;
             div.style.backgroundPosition = `${bgPosX} ${bgPosY}`;
             div.style.backgroundRepeat   = 'no-repeat';
-            // Ensure div fills its parent exactly as the img did
             div.style.display    = cs.display === 'inline' ? 'inline-block' : (cs.display || 'block');
             div.style.width      = cs.width;
             div.style.height     = cs.height;
@@ -266,11 +329,9 @@ async function exportCapturePNG() {
             div.style.flexBasis  = cs.flexBasis;
             div.style.borderRadius = cs.borderRadius;
             div.style.overflow   = 'hidden';
-            // Remove transform — baked into background-size for scaled imgs
             div.style.transform  = 'none';
 
             cloneEl.parentNode.replaceChild(div, cloneEl);
-            // Keep cloneAll in sync so subsequent index lookups still work
             cloneAll[i] = div;
         });
 
@@ -288,13 +349,11 @@ async function exportCapturePNG() {
             'background: transparent',
         ].join('; ');
 
-        // The clone itself must also be sized explicitly
         clone.style.cssText += `; width:${W}px; max-width:${W}px; height:auto;`;
 
         offscreen.appendChild(clone);
         document.body.appendChild(offscreen);
 
-        // Give browser one frame to paint the off-screen clone
         await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
         // ── Step 7: Inject inline-block fix for html2canvas measurement div ──
@@ -313,14 +372,11 @@ async function exportCapturePNG() {
             scrollX:         0,
             scrollY:         0,
             onclone: (doc) => {
-                // Fix img display in html2canvas's internal clone too
                 const s = doc.createElement('style');
                 s.textContent = 'img { display: inline-block !important; }';
                 doc.head.appendChild(s);
-                // Force capture-area background transparent
                 const ca = doc.getElementById('capture-area');
                 if (ca) { ca.style.background = 'transparent'; ca.style.backgroundColor = 'transparent'; }
-                // Replace FA icons with zero-size spans to preserve flex layout
                 doc.querySelectorAll('i[class*="fa-"]').forEach(i => {
                     const span = doc.createElement('span');
                     span.style.cssText = 'display:inline-block;width:0;height:0;overflow:hidden;visibility:hidden;flex-shrink:0;';
