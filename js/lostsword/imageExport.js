@@ -91,14 +91,47 @@ async function exportCapturePNG() {
                 if (_slotIsEmpty(i)) {
                     sec.style.display = 'none';
                 } else {
-                    // Fix border-color bleed: replace semi-transparent element colors
-                    // with their solid equivalents so html2canvas renders them cleanly.
+                    // Fix background bleed: the section has an inline element-tinted
+                    // linear-gradient with semi-transparent colours.  html2canvas composites
+                    // that onto a transparent canvas, producing a visible colour wash.
+                    // Reset to the plain solid card colour so the export looks clean.
+                    sec.style.background      = '#181a24';
+                    sec.style.backgroundColor = '#181a24';
+
+                    // Solidify the element-tinted border colour so it renders cleanly.
                     const liveSection = document.querySelector(`#team-grid section[data-index="${i}"]`);
                     if (liveSection) {
                         const liveBorder = window.getComputedStyle(liveSection).borderColor;
                         sec.style.borderColor = liveBorder;
                         sec.style.borderStyle = 'solid';
                     }
+
+                    // Also fix the character portrait container: its inline border uses
+                    // a semi-transparent element colour (e.g. #f4728b88) that bleeds.
+                    // Replace with the same solid colour at full opacity.
+                    const charContainers = sec.querySelectorAll('.relative.rounded-lg.overflow-hidden');
+                    charContainers.forEach(cc => {
+                        const liveCC = liveSection
+                            ? liveSection.querySelectorAll('.relative.rounded-lg.overflow-hidden')[0]
+                            : null;
+                        if (liveCC) {
+                            const ccBorder = window.getComputedStyle(liveCC).borderColor;
+                            cc.style.borderColor = ccBorder;
+                            cc.style.borderStyle = 'solid';
+                        }
+                        // Neutral background — the character image covers it fully anyway
+                        cc.style.background      = '#20222f';
+                        cc.style.backgroundColor = '#20222f';
+                    });
+
+                    // Fix the card display area's element-tinted border too
+                    const cardContainers = sec.querySelectorAll('.relative.bg-slotBg');
+                    cardContainers.forEach(cd => {
+                        cd.style.background      = '#20222f';
+                        cd.style.backgroundColor = '#20222f';
+                        cd.style.borderColor     = '#2d3142';
+                        cd.style.borderStyle     = 'solid';
+                    });
                 }
             });
         }
