@@ -281,8 +281,11 @@ function _encodeV4(payload) {
                 if (ci !== -1) parts.push('k' + (ci + 1));
             }
         }
-        // Skin index: only write when non-zero
-        const skin = s.skinIndex || 0;
+        // Skin index: read from the dedicated slotSkinIndex array (authoritative live state)
+        // falling back to s.skinIndex on the slot object for any legacy payload
+        const skin = (payload.slotSkinIndex && payload.slotSkinIndex[si] != null)
+            ? payload.slotSkinIndex[si]
+            : (s.skinIndex || 0);
         if (skin > 0) parts.push('s' + skin);
     }
 
@@ -321,13 +324,6 @@ function _encodeV4(payload) {
             const tenths = Math.round(parseFloat(e.time) * 10);
             if (tenths > 0) parts.push('t' + tenths);
         }
-    }
-
-    // ── Comments ──────────────────────────────────────────────────────────────
-    const comments = (payload.comments || '').slice(0, 200);
-    if (comments) {
-        const cb = new TextEncoder().encode(comments);
-        parts.push('m' + cb.length + String.fromCharCode(...cb));
     }
 
     return parts.join('');
@@ -680,9 +676,7 @@ function encodePresetCode(payload) {
     const slim = { ...payload };
     delete slim.bstatDealt;
     delete slim.bstatPrev;
-    // Pull live comments from textarea if present
-    const ta = document.getElementById('comments-textarea');
-    if (ta) slim.comments = ta.value || '';
+    delete slim.comments;
     try {
         return SHARE_PREFIX_V4 + _encodeV4(slim);
     } catch (e) {

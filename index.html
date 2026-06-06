@@ -43,7 +43,7 @@
         }
         
         #capture-area {
-            padding: 20px;
+            padding: 10px;
             display: inline-block;
             width: 100%;
             max-width: fit-content;
@@ -580,18 +580,18 @@
     <script src="js/lostsword/teamgrid.js"></script>
 </head>
 <body class="min-h-screen p-0 m-0" style="overflow-x:hidden;">
-<div class="flex flex-col p-4 gap-4" style="min-height:100vh;">
+<div class="flex flex-col p-2 gap-2" style="min-height:100vh;">
 
     <div id="capture-area" class="bg-[#0f111a]">
-        <header class="text-center mb-6">
+        <header class="text-center mb-3">
             <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-slate-100 transition-all inline-block" contenteditable="true" spellcheck="false" style="min-width:200px;">My Lost Sword Team</h1>
         </header>
 
-        <div id="team-stats-wrapper" class="max-w-7xl mx-auto w-full flex gap-4 items-stretch">
-            <main id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-start flex-1 min-w-0"></main>
+        <div id="team-stats-wrapper" class="max-w-7xl mx-auto w-full flex gap-2 items-stretch">
+            <main id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 items-start flex-1 min-w-0"></main>
 
             <!-- Battle Stats + Notes Column -->
-            <div class="flex flex-col gap-3" style="min-width:340px;max-width:420px;align-self:stretch;">
+            <div class="flex flex-col gap-2" style="min-width:340px;max-width:420px;align-self:stretch;">
 
                 <!-- Battle Stats Panel -->
                 <div id="battle-stats-panel" style="flex:1;display:flex;flex-direction:column;">
@@ -673,18 +673,18 @@
             </div>
         </div>
 
-        <section class="max-w-7xl mx-auto w-full mt-4 mb-4 bg-cardBg border border-borderCool rounded-xl p-4 shadow-xl flex flex-col gap-6">
+        <section class="max-w-7xl mx-auto w-full mt-2 mb-2 bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex flex-col gap-3">
             <!-- Pets and Gems Section -->
-            <div class="flex flex-col gap-3">
+            <div class="flex flex-col gap-2">
                 <!-- Main container: Pets on TOP-LEFT, Formation on TOP-RIGHT -->
-                <div class="flex gap-8">
+                <div class="flex gap-4">
                     <!-- LEFT: Pets & Gems Section -->
-                    <div class="flex-1 flex flex-col gap-4">
+                    <div class="flex-1 flex flex-col gap-2">
                         <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Pets</h3>
                         
                         <!-- 3 Pets displayed horizontally with position icons above each -->
                         <!-- Gap between pets: 16px (gap-4). Pet slot = 96px, gem gap = 8px, gem grid = 96px. -->
-                        <div class="flex items-start justify-center gap-4">
+                        <div class="flex items-start justify-center gap-3">
 
                             <!-- Pet 1 -->
                             <div class="flex flex-col gap-2">
@@ -698,7 +698,7 @@
                                 <!-- Pet slot + gem grid, same gap-2 (8px) -->
                                 <div class="flex items-start gap-2">
                                     <!-- Pet slot: 96×96px -->
-                                    <div class="w-24 h-24 bg-slotBg border-2 border-blue-600 rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#252838] transition overflow-hidden flex-shrink-0" style="transform:translateZ(0);-webkit-transform:translateZ(0);" onclick="openModal('p1', 'pet')" draggable="true" data-pet-idx="0">
+                                    <div class="w-24 h-24 rounded-lg flex items-center justify-center cursor-pointer transition overflow-hidden flex-shrink-0" style="background:#0c162222;border:1px solid #60a5fa55;transform:translateZ(0);-webkit-transform:translateZ(0);" onmouseover="this.style.borderColor='#60a5fa99'" onmouseout="this.style.borderColor='#60a5fa55'" onclick="openModal('p1', 'pet')" draggable="true" data-pet-idx="0">
                                         <div id="pet-display-p1" class="flex items-center justify-center h-full w-full">
                                             <span class="text-xs text-slate-400">+</span>
                                         </div>
@@ -730,7 +730,7 @@
                                     <div id="gem-stat-badge-1" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_1_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
                                 <div class="flex items-start gap-2">
-                                    <div class="w-24 h-24 bg-slotBg border-2 border-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#252838] transition overflow-hidden flex-shrink-0" style="transform:translateZ(0);-webkit-transform:translateZ(0);" onclick="openModal('p2', 'pet')" draggable="true" data-pet-idx="1">
+                                    <div class="w-24 h-24 rounded-lg flex items-center justify-center cursor-pointer transition overflow-hidden flex-shrink-0" style="background:#1a150522;border:1px solid #fbbf2455;transform:translateZ(0);-webkit-transform:translateZ(0);" onmouseover="this.style.borderColor='#fbbf2499'" onmouseout="this.style.borderColor='#fbbf2455'" onclick="openModal('p2', 'pet')" draggable="true" data-pet-idx="1">
                                         <div id="pet-display-p2" class="flex items-center justify-center h-full w-full">
                                             <span class="text-xs text-slate-400">+</span>
                                         </div>
@@ -761,7 +761,7 @@
                                     <div id="gem-stat-badge-2" style="width:96px;height:24px;flex-shrink:0;background:#0f111a;border:1px solid #2d314255;border-radius:5px;padding:0 4px;text-align:center;font-size:9px;font-weight:800;letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s;color:#475569;" onclick="openModal('pet_2_gem_0','gem')" title="Gem stat priority — click to change">—</div>
                                 </div>
                                 <div class="flex items-start gap-2">
-                                    <div class="w-24 h-24 bg-slotBg border-2 border-red-600 rounded-lg flex items-center justify-center cursor-pointer hover:bg-[#252838] transition overflow-hidden flex-shrink-0" style="transform:translateZ(0);-webkit-transform:translateZ(0);" onclick="openModal('p3', 'pet')" draggable="true" data-pet-idx="2">
+                                    <div class="w-24 h-24 rounded-lg flex items-center justify-center cursor-pointer transition overflow-hidden flex-shrink-0" style="background:#1a0a0a22;border:1px solid #f8717155;transform:translateZ(0);-webkit-transform:translateZ(0);" onmouseover="this.style.borderColor='#f8717199'" onmouseout="this.style.borderColor='#f8717155'" onclick="openModal('p3', 'pet')" draggable="true" data-pet-idx="2">
                                         <div id="pet-display-p3" class="flex items-center justify-center h-full w-full">
                                             <span class="text-xs text-slate-400">+</span>
                                         </div>
@@ -787,7 +787,7 @@
                     </div>
                     
                     <!-- RIGHT: Formation Section -->
-                    <div class="flex-1 flex flex-col gap-4">
+                    <div class="flex-1 flex flex-col gap-2">
                         <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Formation</h3>                        
                         <div class="flex flex-col gap-1">
                             <!-- TOP row with icons above each slot -->
@@ -826,7 +826,7 @@
             </div>
 
             <!-- Ultimate Rotation — full width -->
-            <div class="border-t border-borderCool pt-4 flex flex-col gap-3">
+            <div class="border-t border-borderCool pt-3 flex flex-col gap-2">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
                         <h3 class="text-[11px] text-slate-500 font-semibold tracking-widest uppercase">Ultimate Rotation</h3>
@@ -845,7 +845,7 @@
 
     </div>
 
-    <footer id="page-footer" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-4 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-xl">
+    <footer id="page-footer" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xl">
         <div class="text-xs text-slate-400">Layout Engine v3.0 | LSTB Web Edition</div>
         <div class="flex gap-3 flex-wrap justify-end items-center">
             <button id="export-png-btn" class="bg-[#1a1e2e] border border-emerald-700 hover:bg-emerald-900/40 text-emerald-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="exportCapturePNG()" title="Export team view as PNG"><i class="fa-solid fa-image"></i>Export PNG</button>
@@ -895,7 +895,7 @@
     </footer>
 
     <!-- ── Damage Timeline Graph ───────────────────────────────────────── -->
-    <div id="dmg-timeline-section" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-5 shadow-xl flex flex-col gap-3">
+    <div id="dmg-timeline-section" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex flex-col gap-2">
 
         <!-- Header row -->
         <div class="flex items-center justify-between flex-wrap gap-2">

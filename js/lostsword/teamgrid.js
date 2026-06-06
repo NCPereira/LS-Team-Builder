@@ -525,9 +525,36 @@ function renderTeamGrid() {
     const grid = document.getElementById('team-grid');
     grid.innerHTML = '';
 
+    // ── Element → subtle dark tint colors (formation-slot style) ────────────────
+    const _elBorderColor = {
+        Fire:     '#f9731655', Frost:    '#60a5fa55', Nature:   '#4ade8055',
+        Holy:     '#fde68a55', Shock:    '#c084fc55', Chaos:    '#f472b655',
+        Radiance: '#fcd34d55',
+    };
+    const _elBgColor = {
+        Fire:     '#1c100a22', Frost:    '#0c162622', Nature:   '#091a0f22',
+        Holy:     '#1a150522', Shock:    '#180f2a22', Chaos:    '#1a0c1422',
+        Radiance: '#1a140322',
+    };
+    // Solid version for the thin character slot border
+    const _elBorderSolid = {
+        Fire:     '#f97316', Frost:    '#60a5fa', Nature:   '#4ade80',
+        Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
+        Radiance: '#fcd34d',
+    };
+
     slotData.forEach((slot, index) => {
+        const charInfo   = slot.character ? getCharInfo(slot.character) : {};
+        const el         = charInfo.element || '';
+        const elBorder   = _elBorderColor[el]  || '#2d314255';
+        const elBg       = _elBgColor[el]       || '';
+        const elSolid    = _elBorderSolid[el]   || '#2d3142';
+
         const section = document.createElement('section');
-        section.className = "bg-cardBg border border-borderCool rounded-xl p-4 flex flex-col gap-4 shadow-xl";
+        // Outer card: element-tinted border + subtle bg tint matching formation slot style
+        const sectionBg = el ? _elBgColor[el] : '#181a2400';
+        section.className = "rounded-xl p-3 flex flex-col gap-2 shadow-xl";
+        section.style.cssText = `background:${el ? `linear-gradient(135deg, ${_elBgColor[el] || '#181a24'} 0%, #181a24 60%)` : '#181a24'};border:1px solid ${elBorder};`;
         section.draggable = true;
         section.dataset.index = index;
 
@@ -536,12 +563,9 @@ function renderTeamGrid() {
                 <button id="slot-off-btn-${index}" onclick="applySlotAutoGear(${index},'offensive')" title="Auto-equip offensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#ef4444';this.style.color='#f87171'" onmouseout="resetSlotOffBtn(${index})"` : ''}>Off</button>
                 <button id="slot-def-btn-${index}" onclick="applySlotAutoGear(${index},'defensive')" title="Auto-equip defensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#3b82f6';this.style.color='#60a5fa'" onmouseout="resetSlotDefBtn(${index})"` : ''}>Def</button>
             </div>
-            <div class="relative bg-slotBg border-2 border-dashed border-slate-700 rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all hover:border-accentBlue" onclick="openModal('${index}', 'character')">
+            <div class="relative rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all" style="background:#20222f;border:1px solid ${slot.character ? elSolid + '88' : '#334155'};${slot.character ? `box-shadow:0 0 0 1px ${elSolid}22 inset;` : 'border-style:dashed;'}" onclick="openModal('${index}', 'character')">
                 <div id="char-display-${index}" class="w-full h-full">
                     ${slot.character ? (() => {
-                        const charInfo = getCharInfo(slot.character);
-                        const pos = charInfo.position || '';
-                        const posColor = pos === 'Front' ? '#f87171' : pos === 'Middle' ? '#fbbf24' : pos === 'Back' ? '#60a5fa' : 'transparent';
                         const imgSrc   = getSlotCharImg(index);
                         const skins    = getSkins(slot.character);
                         const hasSkins = Array.isArray(skins) && skins.length > 0;
@@ -552,7 +576,7 @@ function renderTeamGrid() {
                                 `<div class="skin-dot${i === skinIdx ? ' active' : ''}"></div>`).join('')}</div>`
                             : '';
                         return `
-                            <div class="relative w-full h-full" style="border-left: 4px solid ${posColor};">
+                            <div class="relative w-full h-full">
                                 <img src="${imgSrc || ''}" alt="${slot.character}" class="w-full h-full object-cover" style="object-position:${getFacePosition(imgSrc)};" onerror="this.style.display='none'">
                                 ${hasSkins ? `<button class="skin-swap-btn${skinIdx > 0 ? ' skin-active' : ''}" onclick="cycleSkin(${index}, event)" title="Swap skin"><i class="fa-solid fa-shirt" style="font-size:10px;"></i></button>` : ''}
                                 ${dotsHtml}
@@ -595,7 +619,7 @@ function renderTeamGrid() {
                     </div>`;
                 }).join('')}
             </div>
-            <div class="relative bg-slotBg border border-slate-700 rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer overflow-hidden" onclick="openModal('${index}', 'card')">
+            <div class="relative bg-slotBg rounded-lg h-40 flex flex-col items-center justify-center cursor-pointer overflow-hidden" style="border:1px solid ${elBorder || '#2d314255'};" onclick="openModal('${index}', 'card')">
                 <div id="card-display-${index}" class="card-display w-full h-full">
                     ${slot.card ? (() => {
                         const cardData = db.cards.find(c => c.name === slot.card);
