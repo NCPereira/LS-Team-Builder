@@ -272,6 +272,15 @@ function _applyPreset(preset) {
         bstatDealt = preset.bstatDealt || null;
         bstatPrev  = preset.bstatPrev  || null;
     }
+    // Restore tag and brawl kill data
+    if (typeof activeTag !== 'undefined') {
+        activeTag = preset.activeTag || null;
+        if (typeof brawlCharKills !== 'undefined') {
+            brawlCharKills = preset.brawlCharKills || [0,0,0,0,0];
+        }
+        if (typeof renderTeamTags === 'function') renderTeamTags();
+        if (typeof _applyTagEffects === 'function') _applyTagEffects();
+    }
     renderTeamGrid();
     setupFormationDragDrop();
     renderUltimateRotation();
@@ -303,6 +312,8 @@ function _buildPresetPayload(title) {
         bstatDealt:      (typeof bstatDealt       !== 'undefined' ? bstatDealt      : null),
         bstatPrev:       (typeof bstatPrev        !== 'undefined' ? bstatPrev       : null),
         brawlKillCount:  (typeof brawlKillCount   !== 'undefined' ? brawlKillCount  : null),
+        activeTag:       (typeof activeTag        !== 'undefined' ? activeTag       : null),
+        brawlCharKills:  (typeof brawlCharKills   !== 'undefined' ? brawlCharKills  : [0,0,0,0,0]),
     };
 }
 

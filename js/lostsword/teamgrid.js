@@ -1183,6 +1183,12 @@ function clearAllSlots() {
     ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
     const titleEl   = document.querySelector('h1[contenteditable]');
     if (titleEl) titleEl.innerText = 'My Lost Sword Team';
+    // Reset tags
+    if (typeof activeTag !== 'undefined') { activeTag = null; }
+    if (typeof brawlCharKills !== 'undefined') { brawlCharKills = [0,0,0,0,0]; }
+    if (typeof brawlKillCount !== 'undefined') { brawlKillCount = null; }
+    if (typeof renderTeamTags === 'function') renderTeamTags();
+    if (typeof _applyTagEffects === 'function') _applyTagEffects();
     renderTeamGrid();
     setupFormationDragDrop();
     renderUltimateRotation();
