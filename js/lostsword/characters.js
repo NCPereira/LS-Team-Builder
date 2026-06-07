@@ -71,7 +71,7 @@ const characterDatabase = {
     'Balin':         { class: 'Knight',  element: 'Nature',   position: 'Front',  rarity: '4' },
     'Bedivere':      { class: 'Archer',  element: 'Nature',   position: 'Back',   rarity: '4' },
     'NeoBedivere':   { class: 'Archer',  element: 'Holy',     position: 'Middle', rarity: '5' },
-    'Circe':         { class: 'Wizard',  element: 'Nature',   position: 'Back',   rarity: '5' },
+    'Circe':         { class: 'Wizard',  element: 'Chaos',   position: 'Back',   rarity: '5' },
     'Claire':        { class: 'Knight',  element: 'Radiance', position: 'Middle', rarity: '5' },
     'Belsey':        { class: 'Knight',  element: 'Fire',    position: 'Front',   rarity: '5' },
     'Cristina':      { class: 'Wizard',  element: 'Fire',     position: 'Middle', rarity: '5' },

@@ -172,46 +172,6 @@ function renderUltimateRotation() {
         }
     });
 
-    // ── Brawl kill counter widget — appended after all rotation slots ──────────
-    if (brawlKillCount !== null) {
-        // = separator before the kill counter
-        const eqDiv = document.createElement('div');
-        eqDiv.className = 'ult-arrow';
-        eqDiv.style.cssText = 'color:#475569;font-size:16px;font-weight:700;display:flex;align-items:center;align-self:center;';
-        eqDiv.textContent = '=';
-        container.appendChild(eqDiv);
-
-        // Kill counter — inline label + typeable input, centred with the rotation row
-        const killCard = document.createElement('div');
-        killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;align-items:center;gap:6px;';
-
-        const label = document.createElement('span');
-        label.textContent = 'Kills:';
-        label.style.cssText = 'font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:0.04em;white-space:nowrap;';
-
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.id   = 'brawl-kill-input';
-        input.value = String(brawlKillCount);
-        input.style.cssText = `
-            width:68px;height:34px;
-            background:#0f111a;border:1px solid #7c3aed55;border-radius:6px;
-            color:#c4b5fd;font-size:15px;font-weight:800;text-align:center;
-            font-variant-numeric:tabular-nums;outline:none;
-            transition:border-color 0.15s;padding:0 6px;
-        `;
-        input.addEventListener('focus', () => { input.style.borderColor='#a78bfa'; input.select(); });
-        input.addEventListener('blur',  () => { input.style.borderColor='#7c3aed55'; });
-        input.addEventListener('input', () => {
-            const v = parseInt(input.value.replace(/[^0-9]/g,''), 10);
-            if (!isNaN(v)) brawlKillCount = Math.max(0, v);
-        });
-
-        killCard.appendChild(label);
-        killCard.appendChild(input);
-        container.appendChild(killCard);
-    }
-
     const controlsDiv = document.getElementById('ultimate-rotation-controls');
     if (controlsDiv) {
         controlsDiv.innerHTML = '';
@@ -305,8 +265,7 @@ function toggleBrawlCounter() {
 function setBrawlKills(n) {
     if (brawlKillCount === null) return;
     brawlKillCount = Math.max(0, n);
-    // Update the input value directly if it exists — avoids losing focus on re-render
-    const inp = document.getElementById('brawl-kill-input');
-    if (inp) { inp.value = String(brawlKillCount); return; }
-    renderUltimateRotation();
+    // Update the brawl panel input directly to avoid a full re-render
+    const inp = document.getElementById('brawl-total-kills');
+    if (inp) inp.value = String(brawlKillCount);
 }

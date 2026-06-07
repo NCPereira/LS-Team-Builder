@@ -367,6 +367,59 @@ async function processBStatImage(file) {
     }
 }
 
+// ── Canvas face-crop for damage bar icons ─────────────────────────────────────
+// Avoids CSS object-fit zoom distortion by drawing a 1:1 crop of the face area.
+
+let _dmgFaceDrawQueue = [];
+
+// Image cache so we don't reload the same source repeatedly
+const _dmgImgCache = {};
+
+function _flushDmgFaceQueue() {
+    const queue = _dmgFaceDrawQueue.splice(0);
+    queue.forEach(({ canvasId, imgSrc, size }) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+
+        function drawCrop(img) {
+            const ctx = canvas.getContext('2d');
+            const iw = img.naturalWidth  || img.width;
+            const ih = img.naturalHeight || img.height;
+
+            // Determine the face-region vertical centre from getFacePosition
+            // getFacePosition returns "X% Y%" — we use the Y% to position the crop window
+            const posStr = (typeof getFacePosition === 'function') ? getFacePosition(imgSrc) : '50% 10%';
+            const parts  = posStr.split(' ');
+            const faceCX = parseFloat(parts[0]) / 100;  // 0–1 horizontal
+            const faceCY = parseFloat(parts[1]) / 100;  // 0–1 vertical
+
+            // Crop a square from the source image — use the full width as the crop side
+            // so the face is never zoomed in, just repositioned.
+            const cropSide = Math.min(iw, ih * 0.65); // portrait images: take upper portion
+            const srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
+            const srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
+
+            // Clip to circle and draw
+            ctx.clearRect(0, 0, size, size);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, size, size);
+            ctx.restore();
+        }
+
+        if (_dmgImgCache[imgSrc]) {
+            drawCrop(_dmgImgCache[imgSrc]);
+        } else {
+            const img = new Image();
+            img.onload = () => { _dmgImgCache[imgSrc] = img; drawCrop(img); };
+            img.onerror = () => {};
+            img.src = imgSrc;
+        }
+    });
+}
+
 // ── Render bar chart ───────────────────────────────────────────────────────────
 
 function renderBStatBars() {
@@ -387,6 +440,13 @@ function renderBStatBars() {
     const updateBtn = document.getElementById('battle-stats-update');
     if (updateBtn && !bstatUpdateMode) updateBtn.classList.remove('hidden');
 
+    // Fix the bars container to a stable height so the panel never reflows
+    barsEl.style.flex = '1';
+    barsEl.style.display = 'flex';
+    barsEl.style.flexDirection = 'column';
+    barsEl.style.justifyContent = 'space-evenly';
+    barsEl.style.gap = '0';
+
     const maxVal = Math.max(...rows.map(r => r.value));
     const total  = rows.reduce((s, r) => s + r.value, 0);
 
@@ -405,6 +465,9 @@ function renderBStatBars() {
         return { teamSlotIdx, value: ocrRow.value, pct: ocrRow.pct };
     });
 
+    // Reset the draw queue — each row push will add its canvas job
+    _dmgFaceDrawQueue = [];
+
     barsEl.innerHTML = displayRows.map((entry, i) => {
         const { teamSlotIdx, value, pct } = entry;
         const barPct = maxVal > 0 ? (value / maxVal * 100).toFixed(1) : 0;
@@ -420,28 +483,30 @@ function renderBStatBars() {
                 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)'
                 : 'linear-gradient(90deg,#4b6bfb,#7c9dff)';
 
+        const ICON_SIZE = 72; // px — display size of the circular avatar
         const slotChar = (typeof slotData !== 'undefined' && slotData[teamSlotIdx]) ? slotData[teamSlotIdx].character : null;
+        const borderColor = elColors ? elColors[0] : '#2d3142';
+        const ringStyle = `width:${ICON_SIZE}px;height:${ICON_SIZE}px;border-radius:50%;border:2px solid ${borderColor};overflow:hidden;background:#20222f;flex-shrink:0;box-shadow:0 0 8px ${borderColor}55;`;
+
         let iconHtml = '';
         if (slotChar) {
             const charEntry = (typeof db !== 'undefined' && db.characters) ? db.characters.find(c => c.name === slotChar) : null;
             if (charEntry) {
-                // Use skin-aware image if available for this team slot
                 const imgSrc = (typeof getSlotCharImg === 'function')
                     ? (getSlotCharImg(teamSlotIdx) || charEntry.img)
                     : charEntry.img;
-                const facePos = getFacePosition(imgSrc);
-                const borderColor = elColors ? elColors[0] : '#2d3142';
-                iconHtml = `<div class="dmg-char-icon-wrap" title="Slot ${teamSlotIdx + 1}: ${slotChar}" style="border-color:${borderColor};">` +
-                    `<img src="${imgSrc}" class="dmg-char-icon"` +
-                    ` style="object-position:${facePos};"` +
-                    ` alt="${slotChar}"` +
-                    ` onerror="this.parentElement.outerHTML='<div class=\\'dmg-char-placeholder\\'>${teamSlotIdx + 1}</div>'">` +
+                // Use a canvas element that we fill via JS after render — avoids CSS zoom distortion
+                const canvasId = `dmg-face-${teamSlotIdx}-${Date.now()}`;
+                iconHtml = `<div style="${ringStyle}position:relative;" title="${slotChar}">` +
+                    `<canvas id="${canvasId}" width="${ICON_SIZE}" height="${ICON_SIZE}" style="width:${ICON_SIZE}px;height:${ICON_SIZE}px;display:block;border-radius:50%;"></canvas>` +
                     `</div>`;
+                // Schedule the face-crop draw after this HTML is injected into the DOM
+                _dmgFaceDrawQueue.push({ canvasId, imgSrc, size: ICON_SIZE });
             } else {
-                iconHtml = `<div class="dmg-char-placeholder" title="${slotChar}">${teamSlotIdx + 1}</div>`;
+                iconHtml = `<div style="${ringStyle}display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#475569;" title="${slotChar}">${teamSlotIdx + 1}</div>`;
             }
         } else {
-            iconHtml = `<div class="dmg-char-placeholder">${teamSlotIdx + 1}</div>`;
+            iconHtml = `<div style="${ringStyle}display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#475569;">${teamSlotIdx + 1}</div>`;
         }
 
         let deltaHtml = '';
@@ -456,26 +521,25 @@ function renderBStatBars() {
 
         const zeroStyle = value === 0 ? 'opacity:0.45;' : '';
 
-        return `<div style="display:flex;flex-direction:column;gap:2px;${zeroStyle}">
-            <div style="display:flex;align-items:center;gap:10px;">
-                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
-                    ${iconHtml}
-                </div>
-                <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:5px;align-self:stretch;">
+        return `<div style="display:flex;align-items:center;gap:10px;height:72px;${zeroStyle}">
+                <div style="flex-shrink:0;">${iconHtml}</div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:5px;">
                     <div style="display:flex;align-items:center;gap:6px;">
-                        <div style="flex:1;height:14px;background:#20222f;border-radius:7px;overflow:hidden;">
-                            <div style="width:${barPct}%;height:100%;background:${fill};border-radius:7px;transition:width 0.7s cubic-bezier(.22,.68,0,1.2);"></div>
+                        <div style="flex:1;max-width:160px;height:7px;background:#20222f;border-radius:4px;overflow:hidden;">
+                            <div style="width:${barPct}%;height:100%;background:${fill};border-radius:4px;transition:width 0.7s cubic-bezier(.22,.68,0,1.2);"></div>
                         </div>
-                        <span style="font-size:12px;color:#94a3b8;min-width:46px;text-align:right;font-weight:700;">${value > 0 ? pct.toFixed(1) + '%' : '—'}</span>
+                        <span style="font-size:11px;color:#94a3b8;min-width:42px;text-align:right;font-weight:700;">${value > 0 ? pct.toFixed(1) + '%' : '—'}</span>
                     </div>
-                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;">
-                        <span style="font-size:11px;color:#64748b;font-variant-numeric:tabular-nums;">${value > 0 ? value.toLocaleString() : '—'}</span>
+                    <div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;">
+                        <span style="font-size:10px;color:#64748b;font-variant-numeric:tabular-nums;">${value > 0 ? value.toLocaleString() : '—'}</span>
                         ${deltaHtml}
                     </div>
                 </div>
-            </div>
         </div>`;
     }).join('');
+
+    // Canvas elements are now in the DOM — draw face crops
+    requestAnimationFrame(_flushDmgFaceQueue);
 
     totalVal.textContent = total.toLocaleString();
 

@@ -1243,18 +1243,18 @@
                     height:100%;
                 `;
                 pill.innerHTML = tag.label
-                    + `<span style="font-size:8px;opacity:0.5;margin-left:1px;">▾</span>`;
+                    + `<span style="font-size:11px;opacity:0.6;margin-left:2px;">▾</span>`;
             } else {
                 pill.style.cssText = `
                     display:inline-flex;align-items:center;justify-content:center;gap:5px;
                     padding:6px 16px;
                     background:transparent;border:none;border-radius:0 13px 13px 0;
-                    font-size:10px;font-weight:600;letter-spacing:0.04em;
+                    font-size:10px;font-weight:700;letter-spacing:0.05em;
                     color:#475569;cursor:pointer;
                     transition:all 0.18s ease;white-space:nowrap;
                     height:100%;
                 `;
-                pill.innerHTML = 'Tag <span style="font-size:8px;opacity:0.4;margin-left:1px;">▾</span>';
+                pill.innerHTML = 'TAG <span style="font-size:11px;opacity:0.5;margin-left:2px;">▾</span>';
             }
             pill.onclick = function(e) {
                 e.stopPropagation();
@@ -1270,16 +1270,16 @@
                 dd.style.cssText = `
                     position:absolute;top:calc(100% + 6px);right:0;
                     background:#181a24;border:1px solid #2d3142;border-radius:10px;
-                    padding:5px;z-index:200;min-width:130px;
+                    padding:5px;z-index:200;min-width:150px;
                     box-shadow:0 8px 32px rgba(0,0,0,0.5);
                 `;
  
                 // "None" option
                 const noneRow = document.createElement('button');
                 noneRow.style.cssText = `
-                    width:100%;text-align:left;padding:6px 10px;border-radius:6px;
+                    width:100%;text-align:left;padding:7px 12px;border-radius:6px;
                     background:${activeTag === null ? '#20222f' : 'none'};border:none;
-                    font-size:10px;font-weight:600;letter-spacing:0.04em;
+                    font-size:11px;font-weight:600;letter-spacing:0.04em;
                     color:${activeTag === null ? '#94a3b8' : '#475569'};
                     cursor:pointer;transition:background 0.12s;
                     display:flex;align-items:center;justify-content:space-between;
@@ -1299,9 +1299,9 @@
                     const row = document.createElement('button');
                     const isSelected = activeTag === t.id;
                     row.style.cssText = `
-                        width:100%;text-align:left;padding:6px 10px;border-radius:6px;
+                        width:100%;text-align:left;padding:7px 12px;border-radius:6px;
                         background:${isSelected ? t.activeBg : 'none'};border:none;
-                        font-size:10px;font-weight:700;letter-spacing:0.05em;
+                        font-size:11px;font-weight:700;letter-spacing:0.05em;
                         color:${isSelected ? t.color : '#64748b'};
                         cursor:pointer;transition:background 0.12s;
                         display:flex;align-items:center;justify-content:space-between;
