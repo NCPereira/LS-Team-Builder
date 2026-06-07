@@ -32,14 +32,7 @@ async function exportCapturePNG() {
         const cloneDmg   = clone.querySelector('#battle-stats-panel');
         const cloneNotes = clone.querySelector('#comments-panel');
 
-        if (cloneDmg && dmgPanel) {
-            cloneDmg.style.display = window.getComputedStyle(dmgPanel).display;
-        }
-        if (cloneNotes) {
-            // Don't hide notes here based on active tab — step 5d will decide
-            // whether to show it based on whether there is actual text content.
-            // For now just leave cloneNotes as-is; 5d will override if needed.
-        }
+        // Panels are managed entirely in step 5d below — don't touch display here.
 
         // Step 2b: Lock side-panel column to its exact live pixel width
         const livePanelCol  = target.querySelector('#team-stats-wrapper > div:last-child');
@@ -92,16 +85,35 @@ async function exportCapturePNG() {
                     try { div.style[p] = cs[p]; } catch(e) {}
                 });
             }
-            div.style.display        = 'flex';
-            div.style.alignItems     = 'center';
-            div.style.justifyContent = 'center';
-            div.style.overflow       = 'hidden';
-            if (value.trim() === '') {
-                div.textContent     = cloneEl.getAttribute('placeholder') || '';
-                div.style.color     = '#475569';
-                div.style.fontStyle = 'italic';
+            var isTextarea = cloneEl.tagName === 'TEXTAREA';
+            if (isTextarea) {
+                // Textarea: block layout, text starts top-left, newlines preserved
+                div.style.display      = 'block';
+                div.style.overflow     = 'hidden';
+                div.style.whiteSpace   = 'pre-wrap';
+                div.style.wordBreak    = 'break-word';
+                div.style.verticalAlign = 'top';
+                div.style.textAlign    = 'left';
+                if (value.trim() === '') {
+                    div.textContent     = cloneEl.getAttribute('placeholder') || '';
+                    div.style.color     = '#475569';
+                    div.style.fontStyle = 'italic';
+                } else {
+                    div.textContent = value;
+                }
             } else {
-                div.textContent = value;
+                // Single-line inputs: centred as before
+                div.style.display        = 'flex';
+                div.style.alignItems     = 'center';
+                div.style.justifyContent = 'center';
+                div.style.overflow       = 'hidden';
+                if (value.trim() === '') {
+                    div.textContent     = cloneEl.getAttribute('placeholder') || '';
+                    div.style.color     = '#475569';
+                    div.style.fontStyle = 'italic';
+                } else {
+                    div.textContent = value;
+                }
             }
             cloneEl.parentNode.replaceChild(div, cloneEl);
         }
@@ -218,11 +230,28 @@ async function exportCapturePNG() {
             'boxShadow',
         ];
 
+        // Collect all descendants of the two managed panels so Step 5 never
+        // overwrites their display/visibility (we set those explicitly in step 5d).
+        var _notesPanelLive = document.getElementById('comments-panel');
+        var _dmgPanelLive   = document.getElementById('battle-stats-panel');
+        var _managedLiveSet = new Set();
+        function _addDescendants(root) {
+            if (!root) return;
+            _managedLiveSet.add(root);
+            root.querySelectorAll('*').forEach(function(el) { _managedLiveSet.add(el); });
+        }
+        _addDescendants(_notesPanelLive);
+        _addDescendants(_dmgPanelLive);
+
         liveAll.forEach(function(liveEl, i) {
             var cloneEl = cloneAll[i];
             if (!cloneEl || liveEl.tagName === 'TEXTAREA') return;
             var cs = window.getComputedStyle(liveEl);
+            var isManaged = _managedLiveSet.has(liveEl);
             PROPS.forEach(function(prop) {
+                // Never copy display/visibility for the panels we own in step 5d —
+                // includes the panel root AND every child inside it.
+                if (isManaged && (prop === 'display' || prop === 'visibility')) return;
                 try { cloneEl.style[prop] = cs[prop]; } catch(e) {}
             });
             try { cloneEl.style.transition = 'none'; } catch(e) {}
@@ -371,53 +400,63 @@ async function exportCapturePNG() {
                     var cat = gearCats[gi];
                     if (!cat) return;
                     if (!slot.gear[cat]) {
-                        wrapper.style.display    = 'none';
+                        // visibility:hidden keeps grid layout intact — display:none
+                        // collapses the cell and shifts the remaining filled slots.
                         wrapper.style.visibility = 'hidden';
+                        wrapper.style.opacity    = '0';
                     }
                 });
                 // If all 4 gear slots empty, hide the whole gear grid
                 if (allGearEmpty) {
                     var gearGrid = sec.querySelector('.grid.grid-cols-2');
                     if (gearGrid) {
-                        gearGrid.style.display    = 'none';
                         gearGrid.style.visibility = 'hidden';
+                        gearGrid.style.opacity    = '0';
                     }
                 }
 
-                // Hide empty card slot
+                // Hide empty card slot — visibility keeps the space, no reflow
                 if (!slot.card) {
                     var cardSlot = sec.querySelector('.relative.bg-slotBg');
                     if (cardSlot) {
-                        cardSlot.style.display    = 'none';
                         cardSlot.style.visibility = 'hidden';
+                        cardSlot.style.opacity    = '0';
                     }
                 }
             });
         }
 
-        // 2. Side panel (damage/notes) -- hide if no content
-        var hasDmgData   = typeof bstatDealt !== 'undefined' && bstatDealt && bstatDealt.some(function(r) { return r.value > 0; });
-        var notesTextEl  = document.getElementById('comments-textarea');
-        var notesText    = notesTextEl ? notesTextEl.value.trim() : '';
-        // Notes has content regardless of which panel tab is currently visible --
-        // if there is any text, always include the notes panel in the export.
-        var hasNotes       = notesText.length > 0;
-        var hasSideContent = hasDmgData || hasNotes;
+        // 2. Side panel — notes always shown if text exists; damage shown if data exists.
+        var hasDmgData  = typeof bstatDealt !== 'undefined' && bstatDealt && bstatDealt.some(function(r) { return r.value > 0; });
+        var notesTextEl = document.getElementById('comments-textarea');
+        var notesText   = notesTextEl ? notesTextEl.value.trim() : '';
+        var hasNotes    = notesText.length > 0;
 
-        var clonePanelFinal = clone.querySelector('#team-stats-wrapper > div:last-child');
+        var clonePanelFinal    = clone.querySelector('#team-stats-wrapper > div:last-child');
+        var cloneNotesPanel    = clonePanelFinal ? clonePanelFinal.querySelector('#comments-panel')    : null;
+        var cloneDmgPanel      = clonePanelFinal ? clonePanelFinal.querySelector('#battle-stats-panel') : null;
+
         if (clonePanelFinal) {
-            if (!hasSideContent) {
+            if (!hasDmgData && !hasNotes) {
+                // Nothing to show — collapse the whole side column
                 clonePanelFinal.style.display    = 'none';
                 clonePanelFinal.style.visibility = 'hidden';
                 var cGrid = clone.querySelector('#team-grid');
                 if (cGrid) cGrid.style.flex = '1';
-            } else if (hasNotes) {
-                // Ensure notes panel is shown in the clone even if the damage tab
-                // is currently the active one in the live UI.
-                var cloneNotesForExport = clonePanelFinal.querySelector('#comments-panel');
-                var cloneDmgForExport   = clonePanelFinal.querySelector('#battle-stats-panel');
-                if (cloneNotesForExport) cloneNotesForExport.style.display = 'flex';
-                if (!hasDmgData && cloneDmgForExport) cloneDmgForExport.style.display = 'none';
+            } else {
+                // Keep side column visible; force correct panel display states.
+                clonePanelFinal.style.display = 'flex';
+
+                // Notes panel: always show when there is text, regardless of active tab
+                if (cloneNotesPanel) {
+                    cloneNotesPanel.style.display    = hasNotes ? 'flex' : 'none';
+                    cloneNotesPanel.style.visibility = hasNotes ? 'visible' : 'hidden';
+                }
+                // Damage panel: show only when there is actual damage data
+                if (cloneDmgPanel) {
+                    cloneDmgPanel.style.display    = hasDmgData ? 'flex' : 'none';
+                    cloneDmgPanel.style.visibility = hasDmgData ? 'visible' : 'hidden';
+                }
             }
         }
 
@@ -433,10 +472,11 @@ async function exportCapturePNG() {
                     if (!gemCellEl) continue;
                     var gemCellParent = gemCellEl.parentElement; // the cell div
                     if (!gems[gi]) {
-                        // Hide this cell
+                        // visibility:hidden preserves grid cell size — display:none
+                        // would collapse the cell and reflow the other gems.
                         if (gemCellParent) {
-                            gemCellParent.style.display    = 'none';
                             gemCellParent.style.visibility = 'hidden';
+                            gemCellParent.style.opacity    = '0';
                         }
                     } else {
                         allGemsEmpty = false;
@@ -448,21 +488,27 @@ async function exportCapturePNG() {
                     if (firstGemCell) {
                         var gemGrid = firstGemCell.parentElement && firstGemCell.parentElement.parentElement;
                         if (gemGrid) {
-                            gemGrid.style.display    = 'none';
                             gemGrid.style.visibility = 'hidden';
+                            gemGrid.style.opacity    = '0';
                         }
                     }
                     // Also hide the gem-stat badge
                     var gemBadge = clone.querySelector('#gem-stat-badge-' + pi);
-                    if (gemBadge) { gemBadge.style.display = 'none'; gemBadge.style.visibility = 'hidden'; }
+                    if (gemBadge) {
+                        gemBadge.style.visibility = 'hidden';
+                        gemBadge.style.opacity    = '0';
+                    }
                 }
                 continue;
             }
-            // Pet slot empty — hide the whole column
+            // Pet slot empty — hide column but keep its space so layout doesn't reflow
             var petSlotEl = clone.querySelector('[data-pet-idx="' + pi + '"]');
             if (!petSlotEl) continue;
             var petCol = petSlotEl.closest('.flex.flex-col.gap-2');
-            if (petCol) { petCol.style.display = 'none'; petCol.style.visibility = 'hidden'; }
+            if (petCol) {
+                petCol.style.visibility = 'hidden';
+                petCol.style.opacity    = '0';
+            }
         }
 
         // 4. Formation section -- hide if entirely empty
@@ -490,9 +536,15 @@ async function exportCapturePNG() {
             Array.from(cloneUltCont.querySelectorAll('.ult-rotation-slot')).forEach(function(slot) {
                 var idx = parseInt(slot.dataset.ultIdx);
                 if (!isNaN(idx) && ultimateRotation[idx] && ultimateRotation[idx].character) return;
-                slot.style.display = 'none';
+                // visibility:hidden keeps the flex row layout intact — display:none
+                // would collapse the slot and shift the arrows/remaining slots.
+                slot.style.visibility = 'hidden';
+                slot.style.opacity    = '0';
                 var next = slot.nextElementSibling;
-                if (next && next.classList.contains('ult-arrow')) next.style.display = 'none';
+                if (next && next.classList.contains('ult-arrow')) {
+                    next.style.visibility = 'hidden';
+                    next.style.opacity    = '0';
+                }
             });
         }
 
