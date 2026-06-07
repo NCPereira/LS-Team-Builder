@@ -172,6 +172,46 @@ function renderUltimateRotation() {
         }
     });
 
+    // ── Brawl kill counter widget — appended after all rotation slots ──────────
+    if (brawlKillCount !== null) {
+        // = separator before the kill counter
+        const eqDiv = document.createElement('div');
+        eqDiv.className = 'ult-arrow';
+        eqDiv.style.cssText = 'color:#475569;font-size:16px;font-weight:700;display:flex;align-items:center;align-self:center;';
+        eqDiv.textContent = '=';
+        container.appendChild(eqDiv);
+
+        // Kill counter — inline label + typeable input, centred with the rotation row
+        const killCard = document.createElement('div');
+        killCard.style.cssText = 'flex-shrink:0;align-self:center;display:flex;align-items:center;gap:6px;';
+
+        const label = document.createElement('span');
+        label.textContent = 'Kills:';
+        label.style.cssText = 'font-size:11px;font-weight:700;color:#a78bfa;letter-spacing:0.04em;white-space:nowrap;';
+
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.id   = 'brawl-kill-input';
+        input.value = String(brawlKillCount);
+        input.style.cssText = `
+            width:68px;height:34px;
+            background:#0f111a;border:1px solid #7c3aed55;border-radius:6px;
+            color:#c4b5fd;font-size:15px;font-weight:800;text-align:center;
+            font-variant-numeric:tabular-nums;outline:none;
+            transition:border-color 0.15s;padding:0 6px;
+        `;
+        input.addEventListener('focus', () => { input.style.borderColor='#a78bfa'; input.select(); });
+        input.addEventListener('blur',  () => { input.style.borderColor='#7c3aed55'; });
+        input.addEventListener('input', () => {
+            const v = parseInt(input.value.replace(/[^0-9]/g,''), 10);
+            if (!isNaN(v)) brawlKillCount = Math.max(0, v);
+        });
+
+        killCard.appendChild(label);
+        killCard.appendChild(input);
+        container.appendChild(killCard);
+    }
+
     const controlsDiv = document.getElementById('ultimate-rotation-controls');
     if (controlsDiv) {
         controlsDiv.innerHTML = '';
@@ -205,6 +245,35 @@ function renderUltimateRotation() {
             removeBtn.textContent = '-';
             controlsDiv.appendChild(removeBtn);
         }
+
+        // ── Brawl toggle button — always visible in controls ──────────────
+        const brawlBtn = document.createElement('button');
+        const brawlActive = brawlKillCount !== null;
+        brawlBtn.onclick = toggleBrawlCounter;
+        brawlBtn.title = brawlActive ? 'Remove kill counter' : 'Add Brawl kill counter';
+        brawlBtn.style.cssText = `
+            height:24px;padding:0 8px;border-radius:0.375rem;
+            background:${brawlActive ? '#2a1f40' : '#20222f'};
+            border:1px solid ${brawlActive ? '#7c3aed' : '#2d3142'};
+            cursor:pointer;transition:all 0.2s ease;
+            display:flex;align-items:center;justify-content:center;gap:4px;
+            color:${brawlActive ? '#a78bfa' : '#64748b'};
+            font-size:10px;font-weight:700;letter-spacing:0.04em;
+            box-shadow:${brawlActive ? '0 0 8px #7c3aed44' : 'none'};
+            white-space:nowrap;
+        `;
+        brawlBtn.innerHTML = `<span style="font-size:9px;">⚔</span> Brawl`;
+        brawlBtn.onmouseover = function() {
+            this.style.borderColor = '#a78bfa';
+            this.style.background  = '#2a1f40';
+            this.style.color       = '#c4b5fd';
+        };
+        brawlBtn.onmouseout = function() {
+            this.style.borderColor = brawlActive ? '#7c3aed' : '#2d3142';
+            this.style.background  = brawlActive ? '#2a1f40' : '#20222f';
+            this.style.color       = brawlActive ? '#a78bfa' : '#64748b';
+        };
+        controlsDiv.appendChild(brawlBtn);
     }
 }
 
@@ -224,6 +293,7 @@ function removeUltimateSlot() {
 
 function resetUltimateRotation() {
     ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
+    brawlKillCount = null;
     renderUltimateRotation();
 }
 
