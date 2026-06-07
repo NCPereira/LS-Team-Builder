@@ -305,38 +305,15 @@ async function exportCapturePNG() {
 
         function slotIsEmpty(i) { return !slotData[i] || !slotData[i].character; }
 
-        // 1. Team-grid sections — reorder filled slots to be contiguous (no gaps)
+        // 1. Team-grid sections
         var cloneGridFinal = clone.querySelector('#team-grid');
         if (cloneGridFinal) {
-            var allSections = Array.from(cloneGridFinal.querySelectorAll('section'));
-
-            // Separate filled vs empty sections
-            var filledSections = [];
-            var emptySections  = [];
-            allSections.forEach(function(sec, i) {
-                if (slotIsEmpty(i)) emptySections.push(sec);
-                else filledSections.push({ sec: sec, origIdx: i });
-            });
-
-            // Remove all sections from the grid, then re-append: filled first, empty last (hidden)
-            allSections.forEach(function(sec) { cloneGridFinal.removeChild(sec); });
-            filledSections.forEach(function(obj) { cloneGridFinal.appendChild(obj.sec); });
-            emptySections.forEach(function(sec) {
-                sec.style.display    = 'none';
-                sec.style.visibility = 'hidden';
-                cloneGridFinal.appendChild(sec);
-            });
-
-            // Adjust grid column count to match only the filled slots (no phantom columns)
-            var filledCount = filledSections.length;
-            if (filledCount > 0) {
-                cloneGridFinal.style.gridTemplateColumns = 'repeat(' + filledCount + ', minmax(0, 1fr))';
-            }
-
-            // Now style the filled sections (iterate by original index)
-            filledSections.forEach(function(obj) {
-                var sec = obj.sec;
-                var i   = obj.origIdx;
+            Array.from(cloneGridFinal.querySelectorAll('section')).forEach(function(sec, i) {
+                if (slotIsEmpty(i)) {
+                    sec.style.display    = 'none';
+                    sec.style.visibility = 'hidden';
+                    return;
+                }
                 // Strip element-tinted gradient -- composites badly on transparent canvas
                 sec.style.background      = '#181a24';
                 sec.style.backgroundColor = '#181a24';
@@ -349,11 +326,14 @@ async function exportCapturePNG() {
                     sec.style.borderStyle = 'solid';
                 }
 
-                // Character portrait container
+                // Character portrait container — read bg from live element to preserve element color
                 var livePortraitDiv = liveSec ? liveSec.querySelector('.relative.rounded-lg.overflow-hidden') : null;
                 Array.from(sec.querySelectorAll('.relative.rounded-lg.overflow-hidden')).forEach(function(pd) {
-                    pd.style.background      = '#20222f';
-                    pd.style.backgroundColor = '#20222f';
+                    var portraitBg = livePortraitDiv
+                        ? window.getComputedStyle(livePortraitDiv).backgroundColor
+                        : '#20222f';
+                    pd.style.background      = portraitBg;
+                    pd.style.backgroundColor = portraitBg;
                     pd.style.backgroundImage = 'none';
                     if (livePortraitDiv) {
                         pd.style.borderColor = window.getComputedStyle(livePortraitDiv).borderColor;
