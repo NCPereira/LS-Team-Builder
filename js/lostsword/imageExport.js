@@ -441,11 +441,19 @@ async function exportCapturePNG() {
             });
         }
 
-        // 2. Side panel — always visible. Both sub-panels are always shown;
+        // 2. Side panel — show only whichever sub-panel is currently active in the live UI.
         // Step 5 is prevented from touching their display/visibility via _managedLiveSet.
         var clonePanelFinal = clone.querySelector('#team-stats-wrapper > div:last-child');
         var cloneNotesPanel = clonePanelFinal ? clonePanelFinal.querySelector('#comments-panel')     : null;
         var cloneDmgPanel   = clonePanelFinal ? clonePanelFinal.querySelector('#battle-stats-panel') : null;
+
+        // Determine which panel is active in the live DOM right now.
+        var _liveDmgPanel   = document.getElementById('battle-stats-panel');
+        var _liveNotesPanel = document.getElementById('comments-panel');
+        var _dmgIsActive    = _liveDmgPanel   && _liveDmgPanel.style.display   === 'flex';
+        var _notesIsActive  = _liveNotesPanel && _liveNotesPanel.classList.contains('visible');
+        // Fallback: if neither clearly active, default to notes
+        if (!_dmgIsActive && !_notesIsActive) _notesIsActive = true;
 
         if (clonePanelFinal) {
             // Force the column itself visible
@@ -453,30 +461,38 @@ async function exportCapturePNG() {
             clonePanelFinal.style.visibility = 'visible';
             clonePanelFinal.style.opacity    = '1';
 
-            // Always show the notes panel
+            // Show notes panel only if it is the active panel
             if (cloneNotesPanel) {
-                cloneNotesPanel.style.display    = 'flex';
-                cloneNotesPanel.style.visibility = 'visible';
-                cloneNotesPanel.style.opacity    = '1';
-                // Make every child inside notes visible too
-                cloneNotesPanel.querySelectorAll('*').forEach(function(el) {
-                    el.style.visibility = 'visible';
-                    el.style.opacity    = '1';
-                    if (el.style.display === 'none') el.style.display = '';
-                });
+                if (_notesIsActive) {
+                    cloneNotesPanel.style.display    = 'flex';
+                    cloneNotesPanel.style.visibility = 'visible';
+                    cloneNotesPanel.style.opacity    = '1';
+                    cloneNotesPanel.querySelectorAll('*').forEach(function(el) {
+                        el.style.visibility = 'visible';
+                        el.style.opacity    = '1';
+                        if (el.style.display === 'none') el.style.display = '';
+                    });
+                } else {
+                    cloneNotesPanel.style.display    = 'none';
+                    cloneNotesPanel.style.visibility = 'hidden';
+                }
             }
 
-            // Always show the damage panel
+            // Show damage panel only if it is the active panel
             if (cloneDmgPanel) {
-                cloneDmgPanel.style.display    = 'flex';
-                cloneDmgPanel.style.visibility = 'visible';
-                cloneDmgPanel.style.opacity    = '1';
-                // Make every child inside damage panel visible too
-                cloneDmgPanel.querySelectorAll('*').forEach(function(el) {
-                    el.style.visibility = 'visible';
-                    el.style.opacity    = '1';
-                    if (el.style.display === 'none') el.style.display = '';
-                });
+                if (_dmgIsActive) {
+                    cloneDmgPanel.style.display    = 'flex';
+                    cloneDmgPanel.style.visibility = 'visible';
+                    cloneDmgPanel.style.opacity    = '1';
+                    cloneDmgPanel.querySelectorAll('*').forEach(function(el) {
+                        el.style.visibility = 'visible';
+                        el.style.opacity    = '1';
+                        if (el.style.display === 'none') el.style.display = '';
+                    });
+                } else {
+                    cloneDmgPanel.style.display    = 'none';
+                    cloneDmgPanel.style.visibility = 'hidden';
+                }
             }
         }
 
