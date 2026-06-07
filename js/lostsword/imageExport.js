@@ -406,6 +406,19 @@ async function exportCapturePNG() {
                         // collapses the cell and shifts the remaining filled slots.
                         wrapper.style.visibility = 'hidden';
                         wrapper.style.opacity    = '0';
+                    } else {
+                        // Gear is equipped — hide the stat-priority badge if no stats are set
+                        var statBadge = wrapper.querySelector('div[style*="font-size:8px"]');
+                        if (!statBadge) {
+                            // Fallback: last child div is the stat badge
+                            var children = Array.from(wrapper.children);
+                            statBadge = children[children.length - 1];
+                        }
+                        var sp = (slot.statPriority && slot.statPriority[cat]) || [];
+                        if (statBadge && sp.length === 0) {
+                            statBadge.style.visibility = 'hidden';
+                            statBadge.style.opacity    = '0';
+                        }
                     }
                 });
                 // If all 4 gear slots empty, hide the whole gear grid
@@ -504,6 +517,16 @@ async function exportCapturePNG() {
                     if (gemBadge) {
                         gemBadge.style.visibility = 'hidden';
                         gemBadge.style.opacity    = '0';
+                    }
+                } else {
+                    // Gems present but no stat preset chosen — hide the stat badge
+                    var gemStat = petsData[pi].gemStat;
+                    if (!gemStat || gemStat.length === 0) {
+                        var gemStatBadge = clone.querySelector('#gem-stat-badge-' + pi);
+                        if (gemStatBadge) {
+                            gemStatBadge.style.visibility = 'hidden';
+                            gemStatBadge.style.opacity    = '0';
+                        }
                     }
                 }
                 continue;
