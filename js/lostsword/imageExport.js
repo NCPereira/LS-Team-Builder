@@ -396,25 +396,18 @@ async function exportCapturePNG() {
                 // Hide empty gear slot wrappers (squircle + stat badge)
                 var gearCats = ['Weapon', 'Armor', 'Helmet', 'Rune'];
                 var slot = slotData[i];
-                var gearWrappers = Array.from(sec.querySelectorAll('.grid.grid-cols-2 > .flex.flex-col'));
                 var allGearEmpty = gearCats.every(function(cat) { return !slot.gear[cat]; });
-                gearWrappers.forEach(function(wrapper, gi) {
-                    var cat = gearCats[gi];
-                    if (!cat) return;
+                gearCats.forEach(function(cat) {
+                    var wrapper = sec.querySelector('[data-gear-cat="' + cat + '"]');
+                    if (!wrapper) return;
                     if (!slot.gear[cat]) {
-                        // visibility:hidden keeps grid layout intact — display:none
-                        // collapses the cell and shifts the remaining filled slots.
                         wrapper.style.visibility = 'hidden';
                         wrapper.style.opacity    = '0';
                     } else {
-                        // Gear is equipped — hide the stat-priority badge if no stats are set
-                        var statBadge = wrapper.querySelector('div[style*="font-size:8px"]');
-                        if (!statBadge) {
-                            // Fallback: last child div is the stat badge
-                            var children = Array.from(wrapper.children);
-                            statBadge = children[children.length - 1];
-                        }
+                        // Gear equipped — hide the stat badge only if no stats set
                         var sp = (slot.statPriority && slot.statPriority[cat]) || [];
+                        var statBadge = wrapper.querySelector('[data-stat-badge]') ||
+                                        wrapper.children[wrapper.children.length - 1];
                         if (statBadge && sp.length === 0) {
                             statBadge.style.visibility = 'hidden';
                             statBadge.style.opacity    = '0';

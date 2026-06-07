@@ -617,7 +617,7 @@ function renderTeamGrid() {
                     const firstStat  = sp[0] || '';
                     const badgeColor = statColors[firstStat] || '#4b6bfb';
                     return `
-                    <div class="flex flex-col gap-0.5">
+                    <div class="flex flex-col gap-0.5" data-gear-cat="${cat}">
                         <div class="slot-squircle bg-slotBg border border-slate-700 flex flex-col items-center justify-center cursor-pointer p-1 relative" onclick="openModal('${index}', 'gear', '${cat}')">
                             <div id="gear-display-${index}-${cat}" class="gear-display">
                                 ${slot.gear[cat] ? (() => {
@@ -628,7 +628,7 @@ function renderTeamGrid() {
                                 })() : `<span class="text-[10px] text-slate-400 font-mono">${cat}</span>`}
                             </div>
                         </div>
-                        <div style="background:#0f111a;border:1px solid ${spLabel ? badgeColor+'55' : '#2d314255'};border-radius:5px;padding:0 4px;text-align:center;font-size:8px;font-weight:800;color:${spLabel ? badgeColor : '#475569'};letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;height:24px;display:flex;align-items:center;justify-content:center;" onclick="openModal('${index}', 'gear', '${cat}')" title="${spLabel ? 'Stat priority: '+spLabel : 'Set stat priority'}">${spLabel || '—'}</div>
+                        <div data-stat-badge style="background:#0f111a;border:1px solid ${spLabel ? badgeColor+'55' : '#2d314255'};border-radius:5px;padding:0 4px;text-align:center;font-size:8px;font-weight:800;color:${spLabel ? badgeColor : '#475569'};letter-spacing:0.03em;line-height:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;height:24px;display:flex;align-items:center;justify-content:center;" onclick="openModal('${index}', 'gear', '${cat}')" title="${spLabel ? 'Stat priority: '+spLabel : 'Set stat priority'}">${spLabel || '—'}</div>
                     </div>`;
                 }).join('')}
             </div>
