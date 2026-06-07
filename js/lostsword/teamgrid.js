@@ -542,13 +542,20 @@ function renderTeamGrid() {
         Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
         Radiance: '#fcd34d',
     };
+    // Rich dark element color for the character portrait background
+    const _elPortraitBg = {
+        Fire:     '#3d1505', Frost:    '#071428', Nature:   '#061a08',
+        Holy:     '#1c1403', Shock:    '#160a2a', Chaos:    '#1a0812',
+        Radiance: '#1a1200',
+    };
 
     slotData.forEach((slot, index) => {
         const charInfo   = slot.character ? getCharInfo(slot.character) : {};
         const el         = charInfo.element || '';
-        const elBorder   = _elBorderColor[el]  || '#2d314255';
-        const elBg       = _elBgColor[el]       || '';
-        const elSolid    = _elBorderSolid[el]   || '#2d3142';
+        const elBorder      = _elBorderColor[el]  || '#2d314255';
+        const elBg          = _elBgColor[el]       || '';
+        const elSolid       = _elBorderSolid[el]   || '#2d3142';
+        const elPortraitBg  = el ? (_elPortraitBg[el] || '#20222f') : '#20222f';
 
         const section = document.createElement('section');
         // Outer card: element-tinted border + subtle bg tint matching formation slot style
@@ -563,7 +570,7 @@ function renderTeamGrid() {
                 <button id="slot-off-btn-${index}" onclick="applySlotAutoGear(${index},'offensive')" title="Auto-equip offensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#ef4444';this.style.color='#f87171'" onmouseout="resetSlotOffBtn(${index})"` : ''}>Off</button>
                 <button id="slot-def-btn-${index}" onclick="applySlotAutoGear(${index},'defensive')" title="Auto-equip defensive preset" ${!slot.character ? 'disabled' : ''} style="flex:1;height:24px;background:#1a1c28;border:1px solid #2d3142;border-radius:5px;font-size:10px;font-weight:700;color:${slot.character ? '#475569' : '#2d3142'};cursor:${slot.character ? 'pointer' : 'not-allowed'};transition:all 0.15s ease;display:flex;align-items:center;justify-content:center;gap:3px;opacity:${slot.character ? '1' : '0.4'};" ${slot.character ? `onmouseover="this.style.borderColor='#3b82f6';this.style.color='#60a5fa'" onmouseout="resetSlotDefBtn(${index})"` : ''}>Def</button>
             </div>
-            <div class="relative rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all" style="background:#20222f;border:1px solid ${slot.character ? elSolid + '88' : '#334155'};${slot.character ? `box-shadow:0 0 0 1px ${elSolid}22 inset;` : 'border-style:dashed;'}" onclick="openModal('${index}', 'character')">
+            <div class="relative rounded-lg overflow-hidden flex flex-col items-center justify-center cursor-pointer p-0 h-48 group transition-all" style="background:${elPortraitBg};${slot.character ? `box-shadow:0 0 0 1px ${elSolid}88 inset,0 0 0 3px ${elSolid}22 inset;` : `box-shadow:0 0 0 1px #334155 inset;border:1px dashed #334155;`}" onclick="openModal('${index}', 'character')">
                 <div id="char-display-${index}" class="w-full h-full">
                     ${slot.character ? (() => {
                         const imgSrc   = getSlotCharImg(index);
@@ -797,6 +804,9 @@ function openModal(slotIndex, type, gearCat = null) {
 function renderModalGrid(items, isChar) {
     const grid = document.getElementById('modal-grid');
     grid.innerHTML = '';
+
+    // Sort items alphabetically by name
+    items = [...items].sort((a, b) => a.name.localeCompare(b.name));
 
     // Determine currently equipped gear item (if a gear modal is open)
     const equippedGearName = (currentActiveCategory === 'gear' && currentActiveSection !== null)
@@ -1183,6 +1193,12 @@ function clearAllSlots() {
     ultimateRotation = Array(11).fill().map(() => ({ character: null, time: '' }));
     const titleEl   = document.querySelector('h1[contenteditable]');
     if (titleEl) titleEl.innerText = 'My Lost Sword Team';
+    // Reset tags
+    if (typeof activeTag !== 'undefined') { activeTag = null; }
+    if (typeof brawlCharKills !== 'undefined') { brawlCharKills = [0,0,0,0,0]; }
+    if (typeof brawlKillCount !== 'undefined') { brawlKillCount = null; }
+    if (typeof renderTeamTags === 'function') renderTeamTags();
+    if (typeof _applyTagEffects === 'function') _applyTagEffects();
     renderTeamGrid();
     setupFormationDragDrop();
     renderUltimateRotation();
