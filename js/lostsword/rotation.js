@@ -246,34 +246,6 @@ function renderUltimateRotation() {
             controlsDiv.appendChild(removeBtn);
         }
 
-        // ── Brawl toggle button — always visible in controls ──────────────
-        const brawlBtn = document.createElement('button');
-        const brawlActive = brawlKillCount !== null;
-        brawlBtn.onclick = toggleBrawlCounter;
-        brawlBtn.title = brawlActive ? 'Remove kill counter' : 'Add Brawl kill counter';
-        brawlBtn.style.cssText = `
-            height:24px;padding:0 8px;border-radius:0.375rem;
-            background:${brawlActive ? '#2a1f40' : '#20222f'};
-            border:1px solid ${brawlActive ? '#7c3aed' : '#2d3142'};
-            cursor:pointer;transition:all 0.2s ease;
-            display:flex;align-items:center;justify-content:center;gap:4px;
-            color:${brawlActive ? '#a78bfa' : '#64748b'};
-            font-size:10px;font-weight:700;letter-spacing:0.04em;
-            box-shadow:${brawlActive ? '0 0 8px #7c3aed44' : 'none'};
-            white-space:nowrap;
-        `;
-        brawlBtn.innerHTML = `<span style="font-size:9px;">⚔</span> Brawl`;
-        brawlBtn.onmouseover = function() {
-            this.style.borderColor = '#a78bfa';
-            this.style.background  = '#2a1f40';
-            this.style.color       = '#c4b5fd';
-        };
-        brawlBtn.onmouseout = function() {
-            this.style.borderColor = brawlActive ? '#7c3aed' : '#2d3142';
-            this.style.background  = brawlActive ? '#2a1f40' : '#20222f';
-            this.style.color       = brawlActive ? '#a78bfa' : '#64748b';
-        };
-        controlsDiv.appendChild(brawlBtn);
     }
 }
 
