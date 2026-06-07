@@ -805,6 +805,9 @@ function renderModalGrid(items, isChar) {
     const grid = document.getElementById('modal-grid');
     grid.innerHTML = '';
 
+    // Sort items alphabetically by name
+    items = [...items].sort((a, b) => a.name.localeCompare(b.name));
+
     // Determine currently equipped gear item (if a gear modal is open)
     const equippedGearName = (currentActiveCategory === 'gear' && currentActiveSection !== null)
         ? slotData[currentActiveSection]?.gear?.[currentGearCategory] || null
