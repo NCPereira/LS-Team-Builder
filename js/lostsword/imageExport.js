@@ -307,23 +307,10 @@ async function exportCapturePNG() {
         function slotIsEmpty(i) { return !slotData[i] || !slotData[i].character; }
 
         // 1. Team-grid sections
-        // Element colour maps — must match the values in teamgrid.js renderTeamGrid()
-        var _exportElPortraitBg = {
-            Fire:     '#5a1e08', Frost:    '#0a1e3d', Nature:   '#0a2810',
-            Holy:     '#2a1f05', Shock:    '#200f3e', Chaos:    '#270c1c',
-            Radiance: '#261b00',
-        };
-        var _exportElBorderSolid = {
-            Fire:     '#f97316', Frost:    '#60a5fa', Nature:   '#4ade80',
-            Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
-            Radiance: '#fcd34d',
-        };
-        var _exportElBorderColor = {
-            Fire:     'rgba(249,115,22,0.33)',  Frost:    'rgba(96,165,250,0.33)',
-            Nature:   'rgba(74,222,128,0.33)',  Holy:     'rgba(253,230,138,0.33)',
-            Shock:    'rgba(192,132,252,0.33)', Chaos:    'rgba(244,114,182,0.33)',
-            Radiance: 'rgba(252,211,77,0.33)',
-        };
+        // Use the module-level colour maps from teamgrid.js directly.
+        var _exportElPortraitBg  = EL_PORTRAIT_BG;
+        var _exportElBorderSolid = EL_BORDER_SOLID;
+        var _exportElBorderColor = EL_BORDER_COLOR;
 
         var cloneGridFinal = clone.querySelector('#team-grid');
         if (cloneGridFinal) {

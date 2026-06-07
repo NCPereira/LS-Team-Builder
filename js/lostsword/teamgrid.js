@@ -517,6 +517,30 @@ function validateSlotGear(slotIndex) {
     }
 }
 
+// ── Element colour maps — module-level so imageExport.js can reference them ───
+
+const EL_BORDER_COLOR = {
+    Fire:     '#f9731655', Frost:    '#60a5fa55', Nature:   '#4ade8055',
+    Holy:     '#fde68a55', Shock:    '#c084fc55', Chaos:    '#f472b655',
+    Radiance: '#fcd34d55',
+};
+const EL_BG_COLOR = {
+    Fire:     '#1c100a22', Frost:    '#0c162622', Nature:   '#091a0f22',
+    Holy:     '#1a150522', Shock:    '#180f2a22', Chaos:    '#1a0c1422',
+    Radiance: '#1a140322',
+};
+const EL_BORDER_SOLID = {
+    Fire:     '#f97316', Frost:    '#60a5fa', Nature:   '#4ade80',
+    Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
+    Radiance: '#fcd34d',
+};
+// Rich dark element color for the character portrait background
+const EL_PORTRAIT_BG = {
+    Fire:     '#3d1505', Frost:    '#071428', Nature:   '#061a08',
+    Holy:     '#1c1403', Shock:    '#160a2a', Chaos:    '#1a0812',
+    Radiance: '#1a1200',
+};
+
 // ── Team grid render ──────────────────────────────────────────────────────────
 
 function renderTeamGrid() {
@@ -525,29 +549,11 @@ function renderTeamGrid() {
     const grid = document.getElementById('team-grid');
     grid.innerHTML = '';
 
-    // ── Element → subtle dark tint colors (formation-slot style) ────────────────
-    const _elBorderColor = {
-        Fire:     '#f9731655', Frost:    '#60a5fa55', Nature:   '#4ade8055',
-        Holy:     '#fde68a55', Shock:    '#c084fc55', Chaos:    '#f472b655',
-        Radiance: '#fcd34d55',
-    };
-    const _elBgColor = {
-        Fire:     '#1c100a22', Frost:    '#0c162622', Nature:   '#091a0f22',
-        Holy:     '#1a150522', Shock:    '#180f2a22', Chaos:    '#1a0c1422',
-        Radiance: '#1a140322',
-    };
-    // Solid version for the thin character slot border
-    const _elBorderSolid = {
-        Fire:     '#f97316', Frost:    '#60a5fa', Nature:   '#4ade80',
-        Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
-        Radiance: '#fcd34d',
-    };
-    // Rich dark element color for the character portrait background
-    const _elPortraitBg = {
-        Fire:     '#3d1505', Frost:    '#071428', Nature:   '#061a08',
-        Holy:     '#1c1403', Shock:    '#160a2a', Chaos:    '#1a0812',
-        Radiance: '#1a1200',
-    };
+    // Local aliases — reference the module-level maps
+    const _elBorderColor = EL_BORDER_COLOR;
+    const _elBgColor     = EL_BG_COLOR;
+    const _elBorderSolid = EL_BORDER_SOLID;
+    const _elPortraitBg  = EL_PORTRAIT_BG;
 
     slotData.forEach((slot, index) => {
         const charInfo   = slot.character ? getCharInfo(slot.character) : {};
