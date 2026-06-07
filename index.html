@@ -32,7 +32,7 @@
             color: #f8fafc;
             font-family: system-ui, sans-serif;
         }
-
+ 
         /* ── Global crisp image rendering ── */
         /* display:inline-block overrides Tailwind preflight's display:block on img,
            preventing html2canvas from rendering unwanted line-breaks below images */
@@ -49,7 +49,7 @@
             max-width: fit-content;
             margin: 0 auto;
         }
-
+ 
         .slot-squircle { width: 65px; height: 65px; border-radius: 0.5rem; transition: all 0.2s ease; padding: 0 !important; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
         .slot-squircle:hover { border-color: #4b6bfb; background-color: #2a2d44; }
         .gear-display, .card-display { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; }
@@ -60,11 +60,12 @@
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #16161e; }
         ::-webkit-scrollbar-thumb { background: #4b6bfb; border-radius: 3px; }
-        [contenteditable]:focus { outline: 2px solid #4b6bfb; border-radius: 12px; padding: 0 4px; background: rgba(0,0,0,0.5); }
-        h1[contenteditable] { background: rgba(0,0,0,0.3); padding: 8px 12px; border-radius: 12px; min-width: 200px; transition: all 0.2s ease; }
+        [contenteditable]:not(h1):focus { outline: 2px solid #4b6bfb; border-radius: 12px; padding: 0 4px; background: rgba(0,0,0,0.5); }
+        h1[contenteditable] { background: transparent; padding: 6px 16px; min-width: 120px; transition: all 0.2s ease; outline: none; }
+        h1[contenteditable]:focus { outline: none; background: rgba(75,107,251,0.08); }
         .img-fallback { background-color: #1a1c26; display: flex; align-items: center; justify-content: center; color: #475569; font-size: 0.75rem; text-align: center; }
         [draggable="true"] { cursor: grab; }
-
+ 
         /* ── Filter buttons ── */
         .filter-label {
             font-size: 9px; font-weight: 700; letter-spacing: 0.1em;
@@ -81,14 +82,14 @@
         }
         .filter-btn:hover { border-color: #4b6bfb; background: #21243a; }
         .filter-btn.active { border-color: #4b6bfb; background: #1e2240; box-shadow: 0 0 0 1px #4b6bfb44 inset; }
-
+ 
         /* All / star button */
         .filter-all-btn {
             font-size: 14px; font-weight: 900; color: #64748b;
             line-height: 1;
         }
         .filter-btn.active .filter-all-btn { color: #e2e8f0; }
-
+ 
         /* Rarity buttons */
         .star-badge {
             font-size: 10px; font-weight: 800;
@@ -100,7 +101,7 @@
         .filter-btn.active .star-badge.r3 { color: #cbd5e1; }
         .filter-btn.active .star-badge.r4 { color: #c4b5fd; }
         .filter-btn.active .star-badge.r5 { color: #fde68a; }
-
+ 
         /* Icon image filter buttons */
         .filter-icon-img {
             width: 28px; height: 28px; object-fit: contain;
@@ -110,7 +111,7 @@
         }
         .filter-btn:hover .filter-icon-img { filter: grayscale(0) brightness(1); }
         .filter-btn.active .filter-icon-img { filter: grayscale(0) brightness(1.15); }
-
+ 
         /* Active glow per element */
         #fbtn-element-Fire.active   { border-color: #f97316; background: #1c100a; }
         #fbtn-element-Frost.active  { border-color: #60a5fa; background: #0c1626; }
@@ -119,18 +120,18 @@
         #fbtn-element-Shock.active  { border-color: #c084fc; background: #180f2a; }
         #fbtn-element-Chaos.active  { border-color: #f472b6; background: #1a0c14; }
         #fbtn-element-Radiance.active { border-color: #fcd34d; background: #1a1403; }
-
+ 
         /* Active glow per class */
         #fbtn-class-Knight.active { border-color: #94a3b8; background: #111520; }
         #fbtn-class-Archer.active { border-color: #fb923c; background: #1a0e06; }
         #fbtn-class-Wizard.active { border-color: #a78bfa; background: #170f2a; }
         #fbtn-class-Healer.active { border-color: #34d399; background: #091a12; }
-
+ 
         /* Active glow per position */
         #fbtn-position-Forward.active  { border-color: #f87171; background: #1a0a0a; }
         #fbtn-position-Center.active { border-color: #fbbf24; background: #1a1505; }
         #fbtn-position-Backward.active   { border-color: #60a5fa; background: #0c1626; }
-
+ 
         /* ── Ultimate Rotation ── */
         .ult-rotation-slot {
             display: flex;
@@ -204,7 +205,7 @@
             border-color: #4b6bfb;
             background: #21243a;
         }
-
+ 
         /* ── ULT time slot toggle ── */
         .ult-time-wrapper {
             overflow: hidden;
@@ -218,7 +219,7 @@
             opacity: 1;
             margin-top: 0;
         }
-
+ 
         /* ── ULT add-time button (top-right of icon, relative to slotDiv) ── */
         .ult-add-time-btn {
             position: absolute;
@@ -274,7 +275,7 @@
             align-self: center;
             margin-top: 0;
         }
-
+ 
         /* ── Multi-select toggle button ── */
         .multi-select-btn {
             background: #1a1c28;
@@ -296,7 +297,7 @@
         .multi-select-btn:hover { border-color: #4b6bfb; background: #21243a; color: #e2e8f0; }
         .multi-select-btn.active { border-color: #4b6bfb; background: #1e2240; color: #e2e8f0; box-shadow: 0 0 0 1px #4b6bfb44 inset; }
         .multi-select-btn i { font-size: 12px; }
-
+ 
         /* ── Auto Gear button ── */
         .auto-gear-btn {
             background: #1a1c28;
@@ -318,7 +319,7 @@
         .auto-gear-btn:hover { background: #21243a; }
         .auto-gear-btn.offensive { border-color: #ef4444; background: #1a0a0a; color: #f87171; }
         .auto-gear-btn.defensive { border-color: #3b82f6; background: #0a1020; color: #60a5fa; }
-
+ 
         /* ── Panel toggle buttons (Damage / Comments) ── */
         .panel-toggle-btn {
             background: #1a1c28;
@@ -340,7 +341,7 @@
         .panel-toggle-btn:hover { background: #21243a; border-color: #4b6bfb; color: #e2e8f0; }
         .panel-toggle-btn.active-dmg  { border-color: #4b6bfb; background: #1e2240; color: #7c9dff; }
         .panel-toggle-btn.active-notes { border-color: #a78bfa; background: #1a1030; color: #c4b5fd; }
-
+ 
         /* ── Comments Panel ── */
         #comments-panel {
             background: #181a24;
@@ -377,24 +378,24 @@
         #comments-textarea:focus { outline: none; border-color: #a78bfa; background-color: #1e1a2e !important; }
         #comments-textarea::placeholder { color: #475569 !important; }
         .comments-char-count { font-size: 10px; color: #475569; text-align: right; }
-
+ 
         /* ── Color coding for formation slots ── */
         .form-slot-backward { border-color: #60a5fa55 !important; background: #0c162622 !important; }
         .form-slot-center   { border-color: #fbbf2455 !important; background: #1a150522 !important; }
         .form-slot-forward  { border-color: #f8717155 !important; background: #1a0a0a22 !important; }
-
+ 
         /* ── Team slot position color coding ── */
         .slot-pos-forward  { border-left: 3px solid #f87171 !important; }
         .slot-pos-center   { border-left: 3px solid #fbbf24 !important; }
         .slot-pos-backward { border-left: 3px solid #60a5fa !important; }
-
+ 
         /* ── Item selected highlight in multi-select ── */
         .item-card.multi-selected {
             border-color: #4b6bfb !important;
             background: #1e2240 !important;
             box-shadow: 0 0 0 2px #4b6bfb66 inset;
         }
-
+ 
         /* ── Battle Stats Panel ── */
         #battle-stats-panel {
             background: #181a24;
@@ -477,7 +478,7 @@
             font-size: 20px; font-weight: 700; color: #475569;
             flex-shrink: 0;
         }
-
+ 
         /* ── Outer layout wrapper ── */
         #team-stats-wrapper {
             max-width: 7xl;
@@ -490,7 +491,7 @@
             flex: 1;
             min-width: 0;
         }
-
+ 
         /* Character card element badge */
         /* ── Skin swap button ── */
         .skin-swap-btn {
@@ -558,7 +559,7 @@
             background: #4b6bfb;
             border-color: #7c9dff;
         }
-
+ 
         .char-el-badge {
             font-size: 8px; font-weight: 700; padding: 1px 5px;
             border-radius: 9999px; letter-spacing: 0.04em; display: inline-block;
@@ -581,18 +582,23 @@
 </head>
 <body class="min-h-screen p-0 m-0" style="overflow-x:hidden;">
 <div class="flex flex-col p-2 gap-2" style="min-height:100vh;">
-
+ 
     <div id="capture-area" class="bg-[#0f111a]">
-        <header class="text-center mb-3">
-            <h1 class="text-2xl md:text-3xl font-bold tracking-wider text-slate-100 transition-all inline-block" contenteditable="true" spellcheck="false" style="min-width:200px;">My Lost Sword Team</h1>
+        <header class="max-w-7xl mx-auto w-full flex items-center justify-center mb-3 px-1">
+            <!-- Centered pill: title + tag inside, sized to content -->
+            <div style="display:inline-flex;align-items:stretch;background:rgba(0,0,0,0.3);border:1px solid #2d3142;border-radius:14px;">
+                <h1 class="text-lg font-bold tracking-wider text-slate-100 transition-all" contenteditable="true" spellcheck="false" style="padding:6px 16px;background:none;outline:none;white-space:nowrap;border-radius:14px 0 0 14px;">My Lost Sword Team</h1>
+                <!-- Team Tag pill + dropdown -->
+                <div id="team-tags" class="relative flex-shrink-0" style="border-left:1px solid #2d3142;border-radius:0 14px 14px 0;overflow:visible;"></div>
+            </div>
         </header>
-
+ 
         <div id="team-stats-wrapper" class="max-w-7xl mx-auto w-full flex gap-2 items-stretch">
             <main id="team-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2 items-start flex-1 min-w-0"></main>
-
+ 
             <!-- Battle Stats + Notes Column -->
             <div class="flex flex-col gap-2" style="min-width:340px;max-width:420px;align-self:stretch;">
-
+ 
                 <!-- Battle Stats Panel -->
                 <div id="battle-stats-panel" style="flex:1;display:flex;flex-direction:column;">
                     <div class="flex items-center justify-between mb-2">
@@ -609,7 +615,7 @@
                             </button>
                         </div>
                     </div>
-
+ 
                     <!-- Upload + Paste buttons (hidden when image is loaded) -->
                     <div id="bstat-upload-row" class="flex gap-2">
                         <div id="battle-stats-upload-zone" class="flex-1" title="Click to upload or drag a screenshot here">
@@ -623,18 +629,18 @@
                             <span class="text-[10px] text-slate-400 leading-tight text-center">Paste<br>Clipboard</span>
                         </button>
                     </div>
-
+ 
                     <!-- Bars -->
                     <div id="battle-stats-bars" class="flex flex-col gap-2 mt-2" style="flex:1;justify-content:space-evenly;">
                         <div class="text-center text-[11px] text-slate-600 italic mt-2">No data yet</div>
                     </div>
-
+ 
                     <!-- Total -->
                     <div id="battle-stats-total" class="hidden text-right text-[12px] text-slate-200 font-bold pt-2 border-t border-slate-700 mt-2 flex items-center justify-end gap-2">
                         <span id="battle-stats-total-delta"></span>
                         Total: <span id="battle-stats-total-val">—</span>
                     </div>
-
+ 
                     <!-- Status + Clear row -->
                     <div class="flex items-center justify-between mt-1 gap-2">
                         <div id="battle-stats-status" class="text-[10px] text-slate-500 min-h-[14px] flex-1"></div>
@@ -646,7 +652,7 @@
                         </button>
                     </div>
                 </div>
-
+ 
                 <!-- Comments Panel -->
                 <div id="comments-panel">
                     <div class="flex items-center justify-between mb-2">
@@ -663,16 +669,35 @@
                             </button>
                         </div>
                     </div>
-                    <textarea id="comments-textarea" placeholder="Add notes, strategy tips, reminders, or any comments about your team build..." maxlength="2000" oninput="updateCommentsCount()"></textarea>
+                    <textarea id="comments-textarea" placeholder="Add notes, strategy tips, reminders, or any comments about your team build..." maxlength="200" oninput="updateCommentsCount()"></textarea>
                     <div class="flex items-center justify-between mt-1">
                         <span class="text-[10px] text-slate-600 italic">Saved with preset</span>
-                        <span id="comments-char-count" class="comments-char-count">0 / 2000</span>
+                        <span id="comments-char-count" class="comments-char-count">0 / 200</span>
                     </div>
                 </div>
-
+ 
+                <!-- Brawl Stats Panel — only visible when Brawl tag is active -->
+                <div id="brawl-stats-panel" style="display:none;flex-direction:column;gap:8px;background:#181a24;border:1px solid #a855f755;border-radius:0.75rem;padding:0.875rem 1rem;flex-shrink:0;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <div style="font-size:10px;font-weight:700;color:#c084fc;letter-spacing:0.1em;text-transform:uppercase;display:flex;align-items:center;gap:6px;">
+                            <span style="font-size:12px;">⚔</span> Brawl Kills
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            <span style="font-size:10px;color:#64748b;font-weight:600;">Team Total</span>
+                            <input id="brawl-total-kills" type="text" inputmode="numeric" value="0"
+                                style="width:64px;padding:4px 8px;background:#0f111a;border:1px solid #a855f755;border-radius:6px;
+                                       font-size:18px;font-weight:800;color:#c084fc;text-align:center;outline:none;
+                                       font-variant-numeric:tabular-nums;transition:border-color 0.15s;"
+                                onfocus="this.style.borderColor='#c084fc';this.select()"
+                                onblur="this.style.borderColor='#a855f755'"
+                                oninput="brawlUpdateTotal(this.value)">
+                        </div>
+                    </div>
+                </div>
+ 
             </div>
         </div>
-
+ 
         <section class="max-w-7xl mx-auto w-full mt-2 mb-2 bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex flex-col gap-3">
             <!-- Pets and Gems Section -->
             <div class="flex flex-col gap-2">
@@ -685,7 +710,7 @@
                         <!-- 3 Pets displayed horizontally with position icons above each -->
                         <!-- Gap between pets: 16px (gap-4). Pet slot = 96px, gem gap = 8px, gem grid = 96px. -->
                         <div class="flex items-start justify-center gap-3">
-
+ 
                             <!-- Pet 1 -->
                             <div class="flex flex-col gap-2">
                                 <!-- Header row: position icon centred over pet (96px), stat badge centred over gem grid (96px) -->
@@ -720,7 +745,7 @@
                                     </div>
                                 </div>
                             </div>
-
+ 
                             <!-- Pet 2 -->
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
@@ -751,7 +776,7 @@
                                     </div>
                                 </div>
                             </div>
-
+ 
                             <!-- Pet 3 -->
                             <div class="flex flex-col gap-2">
                                 <div class="flex items-end gap-2">
@@ -782,7 +807,7 @@
                                     </div>
                                 </div>
                             </div>
-
+ 
                         </div>
                     </div>
                     
@@ -824,7 +849,7 @@
                     </div>
                 </div>
             </div>
-
+ 
             <!-- Ultimate Rotation — full width -->
             <div class="border-t border-borderCool pt-3 flex flex-col gap-2">
                 <div class="flex items-center justify-between">
@@ -841,10 +866,10 @@
                 </div>
             </div>
         </section>
-
-
+ 
+ 
     </div>
-
+ 
     <footer id="page-footer" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xl">
         <div class="text-xs text-slate-400">Layout Engine v3.0 | LSTB Web Edition</div>
         <div class="flex gap-3 flex-wrap justify-end items-center">
@@ -893,10 +918,10 @@
             </div>
         </div>
     </footer>
-
+ 
     <!-- ── Damage Timeline Graph ───────────────────────────────────────── -->
     <div id="dmg-timeline-section" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex flex-col gap-2">
-
+ 
         <!-- Header row -->
         <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
@@ -931,7 +956,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Canvas wrapper — dark gradient bg matching the reference image -->
         <div id="dtg-canvas-wrap" class="relative rounded-xl overflow-hidden" style="background:linear-gradient(160deg,#040d1e 0%,#071628 45%,#040e1c 100%);border:1px solid #0e2040;min-height:360px;">
             <canvas id="dtg-canvas" width="1500" height="380" style="width:100%;display:block;"></canvas>
@@ -942,7 +967,7 @@
             </div>
         </div>
     </div>
-
+ 
     <!-- ── Share Code Modal ──────────────────────────────────────────────────── -->
     <div id="share-code-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-black/80 backdrop-blur-sm">
         <div style="background:#181a24;border:1px solid #2d3142;border-radius:1.25rem;box-shadow:0 0 60px rgba(75,107,251,0.18),0 0 0 1px #4b6bfb22;width:480px;max-width:95vw;overflow:hidden;display:flex;flex-direction:column;">
@@ -996,7 +1021,7 @@
             </div>
         </div>
     </div>
-
+ 
     <!-- Subfolder Picker Modal -->
     <div id="subfolder-modal" class="hidden fixed inset-0 z-[200] flex items-center justify-center bg-black/75 backdrop-blur-sm">
         <div class="bg-[#181a24] border border-[#2d3142] rounded-2xl shadow-2xl w-[420px] max-h-[80vh] flex flex-col overflow-hidden">
@@ -1025,15 +1050,15 @@
             </div>
         </div>
     </div>
-
+ 
     <script>
         // ── Face Detection & Smart Crop ────────────────────────────────────
         const _faceCache = {};
-
+ 
         // face-api.js model state
         let _faceApiReady = false;
         let _faceApiLoading = false;
-
+ 
         async function _initFaceApi() {
             if (_faceApiReady || _faceApiLoading) return;
             _faceApiLoading = true;
@@ -1046,7 +1071,7 @@
             }
             _faceApiLoading = false;
         }
-
+ 
         function _loadImg(src) {
             return new Promise((resolve, reject) => {
                 const img = new Image();
@@ -1055,7 +1080,7 @@
                 img.src = src;
             });
         }
-
+ 
         async function _detectNative(src) {
             if (!('FaceDetector' in window)) return null;
             try {
@@ -1072,7 +1097,7 @@
                 return null;
             }
         }
-
+ 
         async function _detectFaceApi(src) {
             if (!_faceApiReady) {
                 await _initFaceApi();
@@ -1092,7 +1117,7 @@
                 return null;
             }
         }
-
+ 
         async function detectFace(imgUrl) {
             if (!imgUrl || _faceCache[imgUrl] !== undefined) return;
             _faceCache[imgUrl] = 'pending';
@@ -1103,7 +1128,7 @@
             _faceCache[imgUrl] = result || null;
             renderTeamGrid();
         }
-
+ 
         function getFacePosition(imgUrl) {
             if (!imgUrl) return '50% 10%';
             const cached = _faceCache[imgUrl];
@@ -1113,21 +1138,241 @@
             }
             return `${cached.x}% ${cached.y}%`;
         }
-
+ 
         // Initialize
         renderTeamGrid();
         setupFormationDragDrop();
         renderUltimateRotation();
 
+        // ── Asset Preloader ───────────────────────────────────────────────────
+        // Kicks off background Image() loads for every asset in the db so
+        // the browser caches them before the user opens any modal.
+        // Uses a small concurrent batch (8 at a time) to avoid saturating the
+        // network on slower connections.
+        (function preloadAllAssets() {
+            const BATCH = 8;
+
+            function collectUrls() {
+                const urls = new Set();
+                // Wait until db is ready (teamgrid.js must be loaded)
+                if (typeof db === 'undefined') return urls;
+
+                const lists = [
+                    db.characters, db.cards, db.pets, db.gems,
+                    db.Weapon, db.Armor, db.Helmet, db.Rune
+                ];
+                lists.forEach(list => {
+                    if (!list) return;
+                    list.forEach(item => { if (item && item.img) urls.add(item.img); });
+                });
+
+                // Also preload skin candidates from _skinCandidates
+                if (typeof _skinCandidates !== 'undefined') {
+                    Object.values(_skinCandidates).forEach(stems => {
+                        stems.forEach(stem => {
+                            urls.add(`Assets/lostsword/skins/${stem}.webp`);
+                        });
+                    });
+                }
+
+                return urls;
+            }
+
+            function runQueue(urls) {
+                const queue = [...urls];
+                let active = 0;
+
+                function next() {
+                    while (active < BATCH && queue.length > 0) {
+                        const src = queue.shift();
+                        active++;
+                        const img = new Image();
+                        img.onload = img.onerror = () => { active--; next(); };
+                        img.src = src;
+                    }
+                }
+                next();
+            }
+
+            // db may not exist yet if teamgrid.js hasn't run; defer to next tick
+            function tryStart() {
+                const urls = collectUrls();
+                if (urls.size === 0) {
+                    setTimeout(tryStart, 50);
+                    return;
+                }
+                runQueue(urls);
+            }
+
+            // Defer slightly so page rendering isn't blocked
+            setTimeout(tryStart, 200);
+        })();
+ 
+        // ── Team Tags ────────────────────────────────────────────────────────
+        const TEAM_TAGS = [
+            { id: 'Brawl', label: 'BRAWL', border: '#a855f7', bg: '#180f2a', color: '#c084fc', activeBg: '#2a1040' },
+            { id: 'Raid',  label: 'RAID',  border: '#f97316', bg: '#1c0f0a', color: '#fb923c', activeBg: '#2a1408' },
+            { id: 'PVP',   label: 'PVP',   border: '#ef4444', bg: '#1a0a0a', color: '#f87171', activeBg: '#2a0f0f' },
+            { id: 'Star',  label: 'STAR',  border: '#60a5fa', bg: '#0c1626', color: '#7dd3fc', activeBg: '#0c1e36' },
+            { id: 'Story', label: 'STORY', border: '#4ade80', bg: '#091a0f', color: '#86efac', activeBg: '#0d2414' },
+            { id: 'Tower', label: 'TOWER', border: '#94a3b8', bg: '#111520', color: '#cbd5e1', activeBg: '#1a1e2e' },
+        ];
+ 
+        let activeTag = null;
+        let _tagDropdownOpen = false;
+ 
+        function renderTeamTags() {
+            const container = document.getElementById('team-tags');
+            if (!container) return;
+            container.innerHTML = '';
+ 
+            const tag = TEAM_TAGS.find(t => t.id === activeTag);
+ 
+            // ── Active pill ──────────────────────────────────────────────────
+            const pill = document.createElement('button');
+            pill.id = 'tag-pill';
+            if (tag) {
+                pill.style.cssText = `
+                    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+                    padding:6px 16px;
+                    background:${tag.activeBg};
+                    border:none;border-radius:0 13px 13px 0;
+                    font-size:10px;font-weight:700;letter-spacing:0.05em;
+                    color:${tag.color};cursor:pointer;
+                    transition:all 0.18s ease;white-space:nowrap;
+                    height:100%;
+                `;
+                pill.innerHTML = tag.label
+                    + `<span style="font-size:8px;opacity:0.5;margin-left:1px;">▾</span>`;
+            } else {
+                pill.style.cssText = `
+                    display:inline-flex;align-items:center;justify-content:center;gap:5px;
+                    padding:6px 16px;
+                    background:transparent;border:none;border-radius:0 13px 13px 0;
+                    font-size:10px;font-weight:600;letter-spacing:0.04em;
+                    color:#475569;cursor:pointer;
+                    transition:all 0.18s ease;white-space:nowrap;
+                    height:100%;
+                `;
+                pill.innerHTML = 'Tag <span style="font-size:8px;opacity:0.4;margin-left:1px;">▾</span>';
+            }
+            pill.onclick = function(e) {
+                e.stopPropagation();
+                _tagDropdownOpen = !_tagDropdownOpen;
+                renderTeamTags();
+            };
+            container.appendChild(pill);
+
+            // ── Dropdown ─────────────────────────────────────────────────────
+            if (_tagDropdownOpen) {
+                const dd = document.createElement('div');
+                dd.id = 'tag-dropdown';
+                dd.style.cssText = `
+                    position:absolute;top:calc(100% + 6px);right:0;
+                    background:#181a24;border:1px solid #2d3142;border-radius:10px;
+                    padding:5px;z-index:200;min-width:130px;
+                    box-shadow:0 8px 32px rgba(0,0,0,0.5);
+                `;
+ 
+                // "None" option
+                const noneRow = document.createElement('button');
+                noneRow.style.cssText = `
+                    width:100%;text-align:left;padding:6px 10px;border-radius:6px;
+                    background:${activeTag === null ? '#20222f' : 'none'};border:none;
+                    font-size:10px;font-weight:600;letter-spacing:0.04em;
+                    color:${activeTag === null ? '#94a3b8' : '#475569'};
+                    cursor:pointer;transition:background 0.12s;
+                    display:flex;align-items:center;justify-content:space-between;
+                `;
+                noneRow.innerHTML = 'None' + (activeTag === null ? ' <span style="font-size:9px;">✓</span>' : '');
+                noneRow.onmouseover = function() { this.style.background = '#20222f'; };
+                noneRow.onmouseout  = function() { this.style.background = activeTag === null ? '#20222f' : 'none'; };
+                noneRow.onclick = function(e) { e.stopPropagation(); _selectTag(null); };
+                dd.appendChild(noneRow);
+ 
+                // Divider
+                const div = document.createElement('div');
+                div.style.cssText = 'height:1px;background:#2d3142;margin:4px 2px;';
+                dd.appendChild(div);
+ 
+                TEAM_TAGS.forEach(t => {
+                    const row = document.createElement('button');
+                    const isSelected = activeTag === t.id;
+                    row.style.cssText = `
+                        width:100%;text-align:left;padding:6px 10px;border-radius:6px;
+                        background:${isSelected ? t.activeBg : 'none'};border:none;
+                        font-size:10px;font-weight:700;letter-spacing:0.05em;
+                        color:${isSelected ? t.color : '#64748b'};
+                        cursor:pointer;transition:background 0.12s;
+                        display:flex;align-items:center;justify-content:space-between;
+                    `;
+                    row.innerHTML = t.label + (isSelected ? ` <span style="font-size:9px;">✓</span>` : '');
+                    row.onmouseover = function() { this.style.background = t.activeBg; this.style.color = t.color; };
+                    row.onmouseout  = function() {
+                        this.style.background = isSelected ? t.activeBg : 'none';
+                        this.style.color = isSelected ? t.color : '#64748b';
+                    };
+                    row.onclick = function(e) { e.stopPropagation(); _selectTag(t.id); };
+                    dd.appendChild(row);
+                });
+ 
+                container.appendChild(dd);
+            }
+        }
+ 
+        function _selectTag(id) {
+            activeTag = id;
+            _tagDropdownOpen = false;
+            renderTeamTags();
+            _applyTagEffects();
+        }
+ 
+        // Keep toggleTag for backward compat (presets etc.)
+        function toggleTag(id) {
+            _selectTag(activeTag === id ? null : id);
+        }
+ 
+        // Close dropdown on outside click
+        document.addEventListener('click', function() {
+            if (_tagDropdownOpen) {
+                _tagDropdownOpen = false;
+                renderTeamTags();
+            }
+        });
+ 
+        function _applyTagEffects() {
+            const brawlPanel = document.getElementById('brawl-stats-panel');
+            if (brawlPanel) {
+                if (activeTag === 'Brawl') {
+                    brawlPanel.style.display = 'flex';
+                    const totalInput = document.getElementById('brawl-total-kills');
+                    if (totalInput) totalInput.value = String(brawlKillCount ?? 0);
+                } else {
+                    brawlPanel.style.display = 'none';
+                }
+            }
+            if (typeof brawlKillCount !== 'undefined') {
+                brawlKillCount = (activeTag === 'Brawl') ? (brawlKillCount ?? 0) : null;
+            }
+        }
+ 
+        function brawlUpdateTotal(val) {
+            const v = parseInt(String(val).replace(/[^0-9]/g,''), 10);
+            if (typeof brawlKillCount !== 'undefined') brawlKillCount = isNaN(v) ? 0 : Math.max(0, v);
+        }
+ 
+        // Initialize tags
+        renderTeamTags();
+ 
         // ── Panel toggle (Damage / Comments) ────────────────────────────
         function switchPanel(which) {
             const dmgPanel   = document.getElementById('battle-stats-panel');
             const notesPanel = document.getElementById('comments-panel');
-
+ 
             // All 4 buttons (2 in each panel)
             const allDmgBtns   = [document.getElementById('panel-toggle-dmg'),  document.getElementById('panel-toggle-dmg2')];
             const allNotesBtns = [document.getElementById('panel-toggle-notes'), document.getElementById('panel-toggle-notes2')];
-
+ 
             if (which === 'dmg') {
                 dmgPanel.style.display = 'flex';
                 notesPanel.classList.remove('visible');
@@ -1140,24 +1385,24 @@
                 allDmgBtns.forEach(b   => b && b.classList.remove('active-dmg'));
             }
         }
-
+ 
         function updateCommentsCount() {
             const ta  = document.getElementById('comments-textarea');
             const cnt = document.getElementById('comments-char-count');
             if (!ta || !cnt) return;
-            cnt.textContent = `${ta.value.length} / 2000`;
-            cnt.style.color = ta.value.length > 1800 ? '#f87171' : '#475569';
+            cnt.textContent = `${ta.value.length} / 200`;
+            cnt.style.color = ta.value.length > 180 ? '#f87171' : '#475569';
         }
     </script>
-
+ 
     <script src="js/lostsword/battlestats.js"></script>
     <script src="js/lostsword/presets.js"></script>
     <script src="js/lostsword/damagehistory.js"></script>
     <script src="js/lostsword/imageExport.js"></script>
     <script src="js/lostsword/sharecode.js"></script>
-
+ 
 </div>
-
+ 
 <!-- Selection modal -->
 <div id="selection-modal" class="hidden" style="position:fixed;inset:0;z-index:200;display:none;align-items:center;justify-content:center;padding:1rem;background:rgba(0,0,0,0.80);backdrop-filter:blur(4px);">
     <div class="bg-cardBg border border-borderCool w-full rounded-xl p-6 flex flex-col" style="max-width:72rem;max-height:90vh;">
@@ -1165,7 +1410,7 @@
             <h3 id="modal-title" class="text-lg font-bold tracking-wide text-slate-100 capitalize">Select Item</h3>
             <button onclick="closeModal()" class="text-slate-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
         </div>
-
+ 
         <!-- Character Filters -->
         <div id="character-filters" class="hidden mb-4 pb-3 border-b border-borderCool flex flex-col gap-2">
             <!-- Row 1: Class + Rarity -->
@@ -1248,7 +1493,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Pet Filters -->
         <div id="pet-filters" class="hidden mb-4 pb-3 border-b border-borderCool">
             <div class="flex items-center gap-1.5 flex-wrap">
@@ -1297,7 +1542,7 @@
                 </div>
             </div>
         </div>
-
+ 
         <!-- Gem Filters -->
         <div id="gem-filters" class="hidden mb-4 pb-3 border-b border-borderCool flex flex-col gap-2">
             <div class="flex items-center gap-2 flex-wrap">
@@ -1322,7 +1567,7 @@
                 <span class="text-[10px] text-slate-600 italic ml-1">Saved above gem slots</span>
             </div>
         </div>
-
+ 
         <!-- Gear Filters -->
         <div id="gear-filters" class="hidden mb-3 pb-3 border-b border-borderCool flex flex-col gap-2">
             <div class="flex items-center gap-2 flex-wrap">
@@ -1348,7 +1593,7 @@
                 <span class="text-[10px] text-slate-600 italic">Open a gear slot to see options</span>
             </div>
         </div>
-
+ 
         <!-- Multi-select bar -->
         <div id="multi-select-bar" class="hidden mb-3 flex items-center gap-2">
             <button id="multi-select-toggle-btn" onclick="toggleMultiSelect()" class="multi-select-btn">
@@ -1359,7 +1604,7 @@
             </button>
             <span class="text-[10px] text-slate-500 italic" id="multi-select-hint">Select multiple items to fill slots at once</span>
         </div>
-
+ 
         <!-- Ult sequence bar — shown only when ultimate rotation modal is open -->
         <div id="ult-seq-bar" class="hidden mb-3 pb-3 border-b border-borderCool flex flex-col gap-2">
             <div class="flex items-center justify-between gap-3 flex-wrap">
@@ -1383,11 +1628,11 @@
                 <span class="text-[10px] text-slate-600 italic">Click characters below to build your rotation…</span>
             </div>
         </div>
-
+ 
         <input type="text" id="modal-search" placeholder="Search by name..." class="w-full bg-[#111218] border border-slate-700 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:border-accentBlue mb-4" onkeyup="filterGrid(event)">
         <div id="modal-grid" class="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 gap-3 overflow-y-auto pr-2 pb-4"></div>
     </div>
 </div>
-
+ 
 </body>
 </html>
