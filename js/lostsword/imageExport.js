@@ -232,9 +232,10 @@ async function exportCapturePNG() {
 
         // Collect all descendants of the two managed panels so Step 5 never
         // overwrites their display/visibility (we set those explicitly in step 5d).
-        var _notesPanelLive = document.getElementById('comments-panel');
-        var _dmgPanelLive   = document.getElementById('battle-stats-panel');
-        var _managedLiveSet = new Set();
+        var _notesPanelLive  = document.getElementById('comments-panel');
+        var _dmgPanelLive    = document.getElementById('battle-stats-panel');
+        var _sidePanelColLive = document.querySelector('#team-stats-wrapper > div:last-child');
+        var _managedLiveSet  = new Set();
         function _addDescendants(root) {
             if (!root) return;
             _managedLiveSet.add(root);
@@ -242,6 +243,7 @@ async function exportCapturePNG() {
         }
         _addDescendants(_notesPanelLive);
         _addDescendants(_dmgPanelLive);
+        _addDescendants(_sidePanelColLive);
 
         liveAll.forEach(function(liveEl, i) {
             var cloneEl = cloneAll[i];
@@ -426,37 +428,42 @@ async function exportCapturePNG() {
             });
         }
 
-        // 2. Side panel — notes always shown if text exists; damage shown if data exists.
-        var hasDmgData  = typeof bstatDealt !== 'undefined' && bstatDealt && bstatDealt.some(function(r) { return r.value > 0; });
-        var notesTextEl = document.getElementById('comments-textarea');
-        var notesText   = notesTextEl ? notesTextEl.value.trim() : '';
-        var hasNotes    = notesText.length > 0;
-
-        var clonePanelFinal    = clone.querySelector('#team-stats-wrapper > div:last-child');
-        var cloneNotesPanel    = clonePanelFinal ? clonePanelFinal.querySelector('#comments-panel')    : null;
-        var cloneDmgPanel      = clonePanelFinal ? clonePanelFinal.querySelector('#battle-stats-panel') : null;
+        // 2. Side panel — always visible. Both sub-panels are always shown;
+        // Step 5 is prevented from touching their display/visibility via _managedLiveSet.
+        var clonePanelFinal = clone.querySelector('#team-stats-wrapper > div:last-child');
+        var cloneNotesPanel = clonePanelFinal ? clonePanelFinal.querySelector('#comments-panel')     : null;
+        var cloneDmgPanel   = clonePanelFinal ? clonePanelFinal.querySelector('#battle-stats-panel') : null;
 
         if (clonePanelFinal) {
-            if (!hasDmgData && !hasNotes) {
-                // Nothing to show — collapse the whole side column
-                clonePanelFinal.style.display    = 'none';
-                clonePanelFinal.style.visibility = 'hidden';
-                var cGrid = clone.querySelector('#team-grid');
-                if (cGrid) cGrid.style.flex = '1';
-            } else {
-                // Keep side column visible; force correct panel display states.
-                clonePanelFinal.style.display = 'flex';
+            // Force the column itself visible
+            clonePanelFinal.style.display    = 'flex';
+            clonePanelFinal.style.visibility = 'visible';
+            clonePanelFinal.style.opacity    = '1';
 
-                // Notes panel: always show when there is text, regardless of active tab
-                if (cloneNotesPanel) {
-                    cloneNotesPanel.style.display    = hasNotes ? 'flex' : 'none';
-                    cloneNotesPanel.style.visibility = hasNotes ? 'visible' : 'hidden';
-                }
-                // Damage panel: show only when there is actual damage data
-                if (cloneDmgPanel) {
-                    cloneDmgPanel.style.display    = hasDmgData ? 'flex' : 'none';
-                    cloneDmgPanel.style.visibility = hasDmgData ? 'visible' : 'hidden';
-                }
+            // Always show the notes panel
+            if (cloneNotesPanel) {
+                cloneNotesPanel.style.display    = 'flex';
+                cloneNotesPanel.style.visibility = 'visible';
+                cloneNotesPanel.style.opacity    = '1';
+                // Make every child inside notes visible too
+                cloneNotesPanel.querySelectorAll('*').forEach(function(el) {
+                    el.style.visibility = 'visible';
+                    el.style.opacity    = '1';
+                    if (el.style.display === 'none') el.style.display = '';
+                });
+            }
+
+            // Always show the damage panel
+            if (cloneDmgPanel) {
+                cloneDmgPanel.style.display    = 'flex';
+                cloneDmgPanel.style.visibility = 'visible';
+                cloneDmgPanel.style.opacity    = '1';
+                // Make every child inside damage panel visible too
+                cloneDmgPanel.querySelectorAll('*').forEach(function(el) {
+                    el.style.visibility = 'visible';
+                    el.style.opacity    = '1';
+                    if (el.style.display === 'none') el.style.display = '';
+                });
             }
         }
 
