@@ -307,6 +307,24 @@ async function exportCapturePNG() {
         function slotIsEmpty(i) { return !slotData[i] || !slotData[i].character; }
 
         // 1. Team-grid sections
+        // Element colour maps — must match the values in teamgrid.js renderTeamGrid()
+        var _exportElPortraitBg = {
+            Fire:     '#5a1e08', Frost:    '#0a1e3d', Nature:   '#0a2810',
+            Holy:     '#2a1f05', Shock:    '#200f3e', Chaos:    '#270c1c',
+            Radiance: '#261b00',
+        };
+        var _exportElBorderSolid = {
+            Fire:     '#f97316', Frost:    '#60a5fa', Nature:   '#4ade80',
+            Holy:     '#fde68a', Shock:    '#c084fc', Chaos:    '#f472b6',
+            Radiance: '#fcd34d',
+        };
+        var _exportElBorderColor = {
+            Fire:     'rgba(249,115,22,0.33)',  Frost:    'rgba(96,165,250,0.33)',
+            Nature:   'rgba(74,222,128,0.33)',  Holy:     'rgba(253,230,138,0.33)',
+            Shock:    'rgba(192,132,252,0.33)', Chaos:    'rgba(244,114,182,0.33)',
+            Radiance: 'rgba(252,211,77,0.33)',
+        };
+
         var cloneGridFinal = clone.querySelector('#team-grid');
         if (cloneGridFinal) {
             Array.from(cloneGridFinal.querySelectorAll('section')).forEach(function(sec, i) {
@@ -318,31 +336,33 @@ async function exportCapturePNG() {
                     sec.style.opacity       = '0';
                     return;
                 }
-                // Strip element-tinted gradient -- composites badly on transparent canvas
+
+                // Read element for this slot
+                var charInfo = slotData[i].character ? getCharInfo(slotData[i].character) : {};
+                var el       = charInfo.element || '';
+
+                // Outer card: solid background, no gradient (composites badly on transparent canvas)
                 sec.style.background      = '#181a24';
                 sec.style.backgroundColor = '#181a24';
                 sec.style.backgroundImage = 'none';
+                sec.style.borderColor     = _exportElBorderColor[el] || 'rgba(45,49,66,0.33)';
+                sec.style.borderStyle     = 'solid';
+                sec.style.borderWidth     = '1px';
 
-                // Solidify element-colour border
-                var liveSec = document.querySelector('#team-grid section[data-index="' + i + '"]');
-                if (liveSec) {
-                    sec.style.borderColor = window.getComputedStyle(liveSec).borderColor;
-                    sec.style.borderStyle = 'solid';
-                }
-
-                // Character portrait container — read bg from live element to preserve element color
-                var livePortraitDiv = liveSec ? liveSec.querySelector('.relative.rounded-lg.overflow-hidden') : null;
-                Array.from(sec.querySelectorAll('.relative.rounded-lg.overflow-hidden')).forEach(function(pd) {
-                    var portraitBg = livePortraitDiv
-                        ? window.getComputedStyle(livePortraitDiv).backgroundColor
-                        : '#20222f';
+                // Portrait container — apply correct element background directly,
+                // remove box-shadow insets that cause visible overlay artifacts.
+                var portraitBg = el ? (_exportElPortraitBg[el] || '#20222f') : '#20222f';
+                var elSolid    = el ? (_exportElBorderSolid[el] || '#2d3142') : '#2d3142';
+                Array.from(sec.querySelectorAll('.relative.rounded-lg.overflow-hidden')).forEach(function(pd, pdIdx) {
+                    // Only target the character portrait (first one); skip card container
+                    if (pdIdx > 0) return;
                     pd.style.background      = portraitBg;
                     pd.style.backgroundColor = portraitBg;
                     pd.style.backgroundImage = 'none';
-                    if (livePortraitDiv) {
-                        pd.style.borderColor = window.getComputedStyle(livePortraitDiv).borderColor;
-                        pd.style.borderStyle = 'solid';
-                    }
+                    // Remove inset box-shadows entirely — they render as solid-colour
+                    // overlapping rectangles in html2canvas and darken/tint the portrait.
+                    pd.style.boxShadow  = 'none';
+                    pd.style.border     = '1px solid ' + elSolid + '88';
                 });
 
                 // Card display container
@@ -350,8 +370,9 @@ async function exportCapturePNG() {
                     cd.style.background      = '#20222f';
                     cd.style.backgroundColor = '#20222f';
                     cd.style.backgroundImage = 'none';
-                    cd.style.borderColor     = '#2d3142';
+                    cd.style.borderColor     = _exportElBorderColor[el] || '#2d3142';
                     cd.style.borderStyle     = 'solid';
+                    cd.style.boxShadow       = 'none';
                 });
 
                 // Hide empty gear slot wrappers (squircle + stat badge)
