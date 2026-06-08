@@ -331,15 +331,11 @@ async function exportCapturePNG() {
 
         // =====================================================================
         // Step 5c-canvas: Copy live canvas pixel data into clone canvases.
-        // html2canvas clones canvas elements as blank — we must manually copy
-        // the drawn pixel content (e.g. damage-bar face-crop icons) from the
-        // live DOM canvases into their cloned counterparts BEFORE rendering.
-        //
-        // We also re-flush any pending face-crop draws from the image cache so
-        // icons that hadn't finished loading at render time are painted first.
+        // html2canvas clones <canvas> elements as blank — pixel content drawn
+        // via JS (e.g. damage-bar face-crop icons) must be copied manually.
+        // Also re-flushes any pending face-crop jobs from the image cache so
+        // icons that hadn't loaded yet are painted before we copy.
         // =====================================================================
-
-        // Re-draw pending queued items synchronously from the image cache
         if (typeof _dmgFaceDrawQueue !== 'undefined' && typeof _dmgImgCache !== 'undefined') {
             _dmgFaceDrawQueue.forEach(function(job) {
                 var liveCanvas = document.getElementById(job.canvasId);
@@ -348,10 +344,10 @@ async function exportCapturePNG() {
                 var ctx = liveCanvas.getContext('2d');
                 var iw = cachedImg.naturalWidth  || cachedImg.width;
                 var ih = cachedImg.naturalHeight || cachedImg.height;
-                var posStr  = (typeof getFacePosition === 'function') ? getFacePosition(job.imgSrc) : '50% 10%';
-                var parts   = posStr.split(' ');
-                var faceCX  = parseFloat(parts[0]) / 100;
-                var faceCY  = parseFloat(parts[1]) / 100;
+                var posStr   = (typeof getFacePosition === 'function') ? getFacePosition(job.imgSrc) : '50% 10%';
+                var parts    = posStr.split(' ');
+                var faceCX   = parseFloat(parts[0]) / 100;
+                var faceCY   = parseFloat(parts[1]) / 100;
                 var cropSide = Math.min(iw, ih * 0.65);
                 var srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
                 var srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
@@ -364,8 +360,6 @@ async function exportCapturePNG() {
                 ctx.restore();
             });
         }
-
-        // Copy every live dmg-face canvas into its clone counterpart
         var liveCanvases  = Array.from(target.querySelectorAll('canvas[id^="dmg-face-"]'));
         var cloneCanvases = Array.from(clone.querySelectorAll('canvas[id^="dmg-face-"]'));
         liveCanvases.forEach(function(liveC, idx) {
@@ -433,52 +427,82 @@ async function exportCapturePNG() {
                     pd.style.border     = '1px solid ' + elSolid + '88';
                 });
 
-                // Card display container
-                Array.from(sec.querySelectorAll('.relative.bg-slotBg')).forEach(function(cd) {
-                    cd.style.background      = '#20222f';
-                    cd.style.backgroundColor = '#20222f';
-                    cd.style.backgroundImage = 'none';
-                    cd.style.borderColor     = _exportElBorderColor[el] || '#2d3142';
-                    cd.style.borderStyle     = 'solid';
-                    cd.style.boxShadow       = 'none';
-                });
+                // Card display container — use #card-display-N id to avoid matching
+                // gear squircles which share the .relative.bg-slotBg classes
+                var cardDisplayEl = sec.querySelector('#card-display-' + i);
+                var cardContainer = cardDisplayEl ? cardDisplayEl.parentElement : null;
+                if (cardContainer) {
+                    cardContainer.style.background      = '#20222f';
+                    cardContainer.style.backgroundColor = '#20222f';
+                    cardContainer.style.backgroundImage = 'none';
+                    cardContainer.style.borderColor     = _exportElBorderColor[el] || '#2d3142';
+                    cardContainer.style.borderStyle     = 'solid';
+                    cardContainer.style.boxShadow       = 'none';
+                }
 
-                // Hide empty gear slot wrappers (squircle + stat badge)
+                // Gear slot hide/show — explicit on every slot, no assumptions.
+                // data-gear-cat targets the wrapper div precisely; visibility is
+                // always set (not just toggled) so Step 5 style-copy can't bleed through.
                 var gearCats = ['Weapon', 'Armor', 'Helmet', 'Rune'];
                 var slot = slotData[i];
                 var allGearEmpty = gearCats.every(function(cat) { return !slot.gear[cat]; });
-                gearCats.forEach(function(cat) {
-                    var wrapper = sec.querySelector('[data-gear-cat="' + cat + '"]');
-                    if (!wrapper) return;
-                    if (!slot.gear[cat]) {
-                        wrapper.style.visibility = 'hidden';
-                        wrapper.style.opacity    = '0';
-                    } else {
-                        // Gear equipped — hide the stat badge only if no stats set
-                        var sp = (slot.statPriority && slot.statPriority[cat]) || [];
-                        var statBadge = wrapper.querySelector('[data-stat-badge]') ||
-                                        wrapper.children[wrapper.children.length - 1];
-                        if (statBadge && sp.length === 0) {
-                            statBadge.style.visibility = 'hidden';
-                            statBadge.style.opacity    = '0';
-                        }
-                    }
-                });
-                // If all 4 gear slots empty, hide the whole gear grid
+
                 if (allGearEmpty) {
+                    // Hide the entire 2×2 gear grid when nothing is equipped
                     var gearGrid = sec.querySelector('.grid.grid-cols-2');
                     if (gearGrid) {
                         gearGrid.style.visibility = 'hidden';
                         gearGrid.style.opacity    = '0';
                     }
+                } else {
+                    // Some gear equipped — ensure the grid itself is visible,
+                    // then control each individual slot wrapper
+                    var gearGrid = sec.querySelector('.grid.grid-cols-2');
+                    if (gearGrid) {
+                        gearGrid.style.visibility = 'visible';
+                        gearGrid.style.opacity    = '1';
+                    }
+                    gearCats.forEach(function(cat) {
+                        var wrapper = sec.querySelector('[data-gear-cat="' + cat + '"]');
+                        if (!wrapper) return;
+                        if (!slot.gear[cat]) {
+                            // Empty slot — hide wrapper (squircle + stat badge together)
+                            wrapper.style.visibility = 'hidden';
+                            wrapper.style.opacity    = '0';
+                        } else {
+                            // Gear equipped — explicitly keep visible
+                            wrapper.style.visibility = 'visible';
+                            wrapper.style.opacity    = '1';
+                            // Find the squircle and force it visible too
+                            var squircle = wrapper.querySelector('.slot-squircle');
+                            if (squircle) {
+                                squircle.style.visibility = 'visible';
+                                squircle.style.opacity    = '1';
+                            }
+                            // Stat badge: hide only if no priority stats saved
+                            var sp = (slot.statPriority && slot.statPriority[cat]) || [];
+                            var statBadge = wrapper.querySelector('[data-stat-badge]');
+                            if (statBadge) {
+                                if (sp.length === 0) {
+                                    statBadge.style.visibility = 'hidden';
+                                    statBadge.style.opacity    = '0';
+                                } else {
+                                    statBadge.style.visibility = 'visible';
+                                    statBadge.style.opacity    = '1';
+                                }
+                            }
+                        }
+                    });
                 }
 
-                // Hide empty card slot — visibility keeps the space, no reflow
-                if (!slot.card) {
-                    var cardSlot = sec.querySelector('.relative.bg-slotBg');
-                    if (cardSlot) {
-                        cardSlot.style.visibility = 'hidden';
-                        cardSlot.style.opacity    = '0';
+                // Card slot — explicitly show or hide based on slot.card
+                if (cardContainer) {
+                    if (!slot.card) {
+                        cardContainer.style.visibility = 'hidden';
+                        cardContainer.style.opacity    = '0';
+                    } else {
+                        cardContainer.style.visibility = 'visible';
+                        cardContainer.style.opacity    = '1';
                     }
                 }
             });
