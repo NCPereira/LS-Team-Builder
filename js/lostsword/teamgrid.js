@@ -33,7 +33,16 @@ function parseName(filename) {
 
 const db = {
     characters: rawCharacters.map(f => ({ name: parseName(f), img: `Assets/lostsword/rawCharacters/${f}.webp` })),
-    cards:      rawCards.map(f => ({ name: parseName(f), img: `Assets/lostsword/rawCards/${f}.webp` })),
+    cards:      rawCards.map(f => {
+        const key   = f.replace(/^Card_/, '').replace(/_\d+$/, '');
+        const info  = (typeof cardNames !== 'undefined' && cardNames[key]) || null;
+        return {
+            name:     parseName(f),
+            cardName: info ? info.cardName : parseName(f),
+            charName: info ? info.charName : parseName(f),
+            img:      `Assets/lostsword/rawCards/${f}.webp`,
+        };
+    }),
     pets:       rawPets.map(f => ({ name: parseName(f), img: `Assets/lostsword/rawPets/${f}.webp` })),
     gems:       rawGems.map(name => ({ name, img: `Assets/lostsword/gems/${name}.webp`, element: gemElements[name] })),
     Weapon: rawWeapons.map(name => ({ name, img: `Assets/lostsword/weapons/${weaponFilenames[name]}.webp`, class: weaponClasses[name]?.class, classes: weaponClasses[name]?.classes, excludeClass: weaponClasses[name]?.excludeClass, unique: weaponClasses[name]?.unique || false })),
@@ -636,12 +645,16 @@ function renderTeamGrid() {
                 <div id="card-display-${index}" class="card-display w-full h-full">
                     ${slot.card ? (() => {
                         const cardData = db.cards.find(c => c.name === slot.card);
+                        const cName    = cardData?.cardName || slot.card;
+                        const cChar    = cardData?.charName || '';
+                        const showChar = cChar && cChar !== cName;
                         return `
                             <div class="relative w-full h-full">
                                 <img src="${cardData?.img || ''}" alt="${slot.card}" class="w-full h-full object-cover">
-                                <div class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/80 to-transparent"></div>
-                                <div class="absolute bottom-1 left-1 right-1 text-center">
-                                    <span class="text-[10px] text-white font-bold drop-shadow-lg">${slot.card}</span>
+                                <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/90 to-transparent"></div>
+                                <div class="absolute bottom-1 left-1 right-1 text-center flex flex-col items-center gap-0">
+                                    <span class="text-[10px] text-white font-bold drop-shadow-lg leading-tight">${cName}</span>
+                                    ${showChar ? `<span class="text-[9px] drop-shadow-lg leading-tight" style="color:rgba(255,255,255,0.55);">(${cChar})</span>` : ''}
                                 </div>
                             </div>`;
                     })() : `<span class="text-xs text-slate-400">Add Card</span>`}
@@ -992,12 +1005,20 @@ function renderModalGrid(items, isChar) {
             const equippedBadge = isEquipped
                 ? `<div style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);background:#4b6bfb;color:#fff;font-size:7px;font-weight:800;padding:1px 5px;border-radius:3px;letter-spacing:0.05em;white-space:nowrap;">EQUIPPED</div>`
                 : '';
+            // Cards: show cardName + (charName) as two stacked lines
+            const isCard     = currentActiveCategory === 'card';
+            const dispName   = isCard ? (item.cardName || item.name) : item.name;
+            const dispSub    = isCard && item.charName && item.charName !== dispName ? item.charName : null;
+            const nameColor  = isEquipped ? '#7c9dff' : '#e2e8f0';
             itemBox.innerHTML = `
                 <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
                     <img src="${item.img}" alt="${item.name}" class="w-full h-full object-contain" loading="lazy" onerror="this.style.display='none'">
                     ${selOverlay}${equippedBadge}
                 </div>
-                <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${isEquipped ? `<span style="color:#7c9dff">${item.name}</span>` : item.name}</span>`;
+                <div class="flex flex-col items-center w-full" style="gap:1px;">
+                    <span class="text-[10px] font-bold text-center leading-tight w-full truncate" style="color:${nameColor};">${dispName}</span>
+                    ${dispSub ? `<span class="text-[9px] text-center w-full truncate" style="color:#64748b;">(${dispSub})</span>` : ''}
+                </div>`;
         }
 
         grid.appendChild(itemBox);
@@ -1054,7 +1075,15 @@ function applyGenericSearch() {
     }
 
     let filtered = [...items];
-    if (search) filtered = filtered.filter(i => i.name.toLowerCase().includes(search));
+    if (search) {
+        filtered = filtered.filter(i => {
+            if (i.name.toLowerCase().includes(search)) return true;
+            // For cards: also search on cardName and charName
+            if (i.cardName && i.cardName.toLowerCase().includes(search)) return true;
+            if (i.charName && i.charName.toLowerCase().includes(search)) return true;
+            return false;
+        });
+    }
 
     // Keep equipped item pinned to top even while searching
     if (currentActiveCategory === 'gear') {

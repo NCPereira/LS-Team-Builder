@@ -1,41 +1,127 @@
 // ── Pets & Gems Data and Logic ─────────────────────────────────────────────
 
+// ── Pet list ──────────────────────────────────────────────────────────────────
+// Format: 'Pet_InternalName_01'
+// To add a pet: append a new entry here and add a row to petDatabase below.
+
 const rawPets = [
-    'Pet_Agravaine_01', 'Pet_Anessa_01','Pet_Asuka_01', 'Pet_Athena_01',
-    'Pet_Bedivere_01', 'Pet_NeoBedivere_01','Pet_Cheese_01', 'Pet_Momo_01',
-    'Pet_Coco_01', 'Pet_Neo_01','Pet_Nabi_01', 'Pet_Chick_01',
-    'Pet_Hen_01', 'Pet_Belsey_01','Pet_Cristina_01', 'Pet_DianCecht_01',
-    'Pet_Elizabeth_01', 'Pet_Erin_01','Pet_Estheria_01', 'Pet_Eva_01',
-    'Pet_UnleashedEva_01', 'Pet_Fenrir_01','Pet_Galahad_01', 'Pet_Griffon_01',
-    'Pet_Guinevere_01', 'Pet_Hikage_01','Pet_Isabel_01', 'Pet_Joanofarc_01',
-    'Pet_Karishara_01', 'Pet_Katrin_01','Pet_Kay_01', 'Pet_Circe_01',
-    'Pet_Lancelot_01', 'Pet_Lilith_01','Pet_Lisa_01', 'Pet_Lohengrin_01',
-    'Pet_Lua_01', 'Pet_Lueira_01','Pet_Merlin_01', 'Pet_SMerry_01',
-    'Pet_Morgana_01', 'Pet_Morganlefay_01','Pet_Nesha_01', 'Pet_Nightsong_01',
-    'Pet_Midnight_01', 'Pet_Palamedes_01','Pet_Phoenix_01', 'Pet_Belle_01',
-    'Pet_Raccoon_01', 'Pet_Ran_01','Pet_Retriever_01', 'Pet_Gold_01',
-    'Pet_MaidRita_01', 'Pet_Shiba_01','Pet_Slime_01', 'Pet_Tiamat_01',
-    'Pet_Tristan_01', 'Pet_Vivien_01','Pet_Whitey_01', 'Pet_Yumi_01', 'Pet_Lumi_01'
+    'Pet_Agravaine_01', 'Pet_Anessa_01',    'Pet_Asuka_01',      'Pet_Athena_01',
+    'Pet_Bedivere_01',  'Pet_NeoBedivere_01','Pet_Cheese_01',     'Pet_Momo_01',
+    'Pet_Coco_01',      'Pet_Neo_01',       'Pet_Nabi_01',       'Pet_Chick_01',
+    'Pet_Hen_01',       'Pet_Belsey_01',    'Pet_Cristina_01',   'Pet_DianCecht_01',
+    'Pet_Elizabeth_01', 'Pet_Erin_01',      'Pet_Estheria_01',   'Pet_Eva_01',
+    'Pet_UnleashedEva_01','Pet_Fenrir_01',  'Pet_Galahad_01',    'Pet_Griffon_01',
+    'Pet_Guinevere_01', 'Pet_Hikage_01',    'Pet_Isabel_01',     'Pet_Joanofarc_01',
+    'Pet_Karishara_01', 'Pet_Katrin_01',    'Pet_Kay_01',        'Pet_Circe_01',
+    'Pet_Lancelot_01',  'Pet_Lilith_01',    'Pet_Lisa_01',       'Pet_Lohengrin_01',
+    'Pet_Lua_01',       'Pet_Lueira_01',    'Pet_Merlin_01',     'Pet_SMerry_01',
+    'Pet_Morgana_01',   'Pet_Morganlefay_01','Pet_Nesha_01',     'Pet_Nightsong_01',
+    'Pet_Midnight_01',  'Pet_Palamedes_01', 'Pet_Phoenix_01',    'Pet_Belle_01',
+    'Pet_Raccoon_01',   'Pet_Ran_01',       'Pet_Retriever_01',  'Pet_Gold_01',
+    'Pet_MaidRita_01',  'Pet_Shiba_01',     'Pet_Slime_01',      'Pet_Tiamat_01',
+    'Pet_Tristan_01',   'Pet_Vivien_01',    'Pet_Whitey_01',     'Pet_Yumi_01',
+    'Pet_Lumi_01',
 ];
+
+// ── Pet database ──────────────────────────────────────────────────────────────
+// Columns: element, rarity
+// element : Fire | Frost | Nature | Holy | Shock | Chaos | Radiance
+// rarity  : '3' | '4' | '5'
+//
+// To add a pet: add one line below and one entry in rawPets above.
+// getCharInfo() will fall through to this table for pets used in the filter UI.
+
+const petDatabase = {
+//  Name              element      rarity
+    // ── Creature pets ────────────────────────────────────────────────────────
+    'Whitey':        { element:'Radiance', rarity:'4' },
+    'Gold':          { element:'Fire',     rarity:'3' },
+    'Neo':           { element:'Frost',    rarity:'4' },
+    'Nightsong':     { element:'Chaos',    rarity:'4' },
+    'Shiba':         { element:'Fire',     rarity:'4' },
+    'Belle':         { element:'Nature',   rarity:'4' },
+    'Slime':         { element:'Nature',   rarity:'3' },
+    'Retriever':     { element:'Radiance', rarity:'3' },
+    'Raccoon':       { element:'Shock',    rarity:'3' },
+    'Hen':           { element:'Shock',    rarity:'3' },
+    'Chick':         { element:'Fire',     rarity:'3' },
+    'Momo':          { element:'Nature',   rarity:'3' },
+    'Nabi':          { element:'Chaos',    rarity:'3' },
+    'Cheese':        { element:'Holy',     rarity:'3' },
+    'Coco':          { element:'Frost',    rarity:'3' },
+    'Midnight':      { element:'Shock',    rarity:'4' },
+    'Phoenix':       { element:'Fire',     rarity:'5' },
+    'Fenrir':        { element:'Shock',    rarity:'5' },
+    'Griffon':       { element:'Nature',   rarity:'5' },
+    'Athena':        { element:'Radiance', rarity:'5' },
+
+    // ── Character-form pets ───────────────────────────────────────────────────
+    'UnleashedEva':  { element:'Shock',    rarity:'5' },
+    'Agravaine':     { element:'Chaos',    rarity:'5' },
+    'Anessa':        { element:'Frost',    rarity:'5' },
+    'Asuka':         { element:'Nature',   rarity:'5' },
+    'Bedivere':      { element:'Nature',   rarity:'4' },
+    'NeoBedivere':   { element:'Holy',     rarity:'5' },
+    'Belsey':        { element:'Fire',     rarity:'5' },
+    'Cristina':      { element:'Fire',     rarity:'5' },
+    'DianCecht':     { element:'Radiance', rarity:'5' },
+    'Elizabeth':     { element:'Fire',     rarity:'5' },
+    'Erin':          { element:'Radiance', rarity:'5' },
+    'Estheria':      { element:'Chaos',    rarity:'5' },
+    'Eva':           { element:'Shock',    rarity:'5' },
+    'Galahad':       { element:'Radiance', rarity:'5' },
+    'Guinevere':     { element:'Frost',    rarity:'5' },
+    'Hikage':        { element:'Nature',   rarity:'5' },
+    'Isabel':        { element:'Frost',    rarity:'5' },
+    'Joanofarc':     { element:'Shock',    rarity:'5' },
+    'Karishara':     { element:'Fire',     rarity:'5' },
+    'Katrin':        { element:'Frost',    rarity:'5' },
+    'Kay':           { element:'Fire',     rarity:'5' },
+    'Circe':         { element:'Chaos',    rarity:'5' },
+    'Lancelot':      { element:'Radiance', rarity:'5' },
+    'Lilith':        { element:'Chaos',    rarity:'5' },
+    'Lisa':          { element:'Chaos',    rarity:'5' },
+    'Lohengrin':     { element:'Chaos',    rarity:'5' },
+    'Lua':           { element:'Shock',    rarity:'5' },
+    'Lueira':        { element:'Frost',    rarity:'5' },
+    'Merlin':        { element:'Holy',     rarity:'5' },
+    'SMerry':        { element:'Frost',    rarity:'5' },
+    'Morgana':       { element:'Chaos',    rarity:'5' },
+    'MorganLeFay':   { element:'Holy',     rarity:'5' },
+    'Nesha':         { element:'Radiance', rarity:'5' },
+    'Palamedes':     { element:'Nature',   rarity:'5' },
+    'MaidRita':      { element:'Fire',     rarity:'5' },
+    'Ran':           { element:'Holy',     rarity:'5' },
+    'Tiamat':        { element:'Holy',     rarity:'5' },
+    'Tristan':       { element:'Nature',   rarity:'5' },
+    'Vivien':        { element:'Nature',   rarity:'5' },
+    'Yumi':          { element:'Frost',    rarity:'5' },
+    'Lumi':          { element:'Shock',    rarity:'5' },
+};
+
+// ── Gem list ──────────────────────────────────────────────────────────────────
 
 const rawGems = [
-    'amethyst-hexagon', 'amethyst-octagon','amethyst-round', 'amethyst-square',
-    'emerald-hexagon', 'emerald-octagon','emerald-round', 'emerald-square',
-    'opal-hexagon', 'opal-octagon','opal-round', 'opal-square',
-    'ruby-hexagon', 'ruby-octagon','ruby-round', 'ruby-square',
-    'sapphire-hexagon', 'sapphire-octagon','sapphire-round', 'sapphire-square',
-    'topaz-hexagon', 'topaz-octagon','topaz-round', 'topaz-square',
-    'turquoise-hexagon', 'turquoise-octagon','turquoise-round', 'turquoise-square'
+    'amethyst-hexagon', 'amethyst-octagon', 'amethyst-round', 'amethyst-square',
+    'emerald-hexagon',  'emerald-octagon',  'emerald-round',  'emerald-square',
+    'opal-hexagon',     'opal-octagon',     'opal-round',     'opal-square',
+    'ruby-hexagon',     'ruby-octagon',     'ruby-round',     'ruby-square',
+    'sapphire-hexagon', 'sapphire-octagon', 'sapphire-round', 'sapphire-square',
+    'topaz-hexagon',    'topaz-octagon',    'topaz-round',    'topaz-square',
+    'turquoise-hexagon','turquoise-octagon','turquoise-round', 'turquoise-square',
 ];
 
+// ── Gem element map ───────────────────────────────────────────────────────────
+// gem name → element (used to filter gems to a pet's element)
+
 const gemElements = {
-    'amethyst-hexagon': 'Chaos',  'amethyst-octagon': 'Chaos',  'amethyst-round': 'Chaos',  'amethyst-square': 'Chaos',
-    'emerald-hexagon':  'Nature', 'emerald-octagon':  'Nature', 'emerald-round':  'Nature', 'emerald-square':  'Nature',
-    'opal-hexagon':     'Holy',   'opal-octagon':     'Holy',   'opal-round':     'Holy',   'opal-square':     'Holy',
-    'ruby-hexagon':     'Fire',   'ruby-octagon':     'Fire',   'ruby-round':     'Fire',   'ruby-square':     'Fire',
-    'sapphire-hexagon': 'Frost',  'sapphire-octagon': 'Frost',  'sapphire-round': 'Frost',  'sapphire-square': 'Frost',
-    'topaz-hexagon':    'Radiance','topaz-octagon':   'Radiance','topaz-round':   'Radiance','topaz-square':   'Radiance',
-    'turquoise-hexagon':'Shock',  'turquoise-octagon':'Shock',  'turquoise-round':'Shock',  'turquoise-square':'Shock'
+    'amethyst-hexagon':'Chaos',    'amethyst-octagon':'Chaos',    'amethyst-round':'Chaos',    'amethyst-square':'Chaos',
+    'emerald-hexagon': 'Nature',   'emerald-octagon': 'Nature',   'emerald-round': 'Nature',   'emerald-square': 'Nature',
+    'opal-hexagon':    'Holy',     'opal-octagon':    'Holy',     'opal-round':    'Holy',     'opal-square':    'Holy',
+    'ruby-hexagon':    'Fire',     'ruby-octagon':    'Fire',     'ruby-round':    'Fire',     'ruby-square':    'Fire',
+    'sapphire-hexagon':'Frost',    'sapphire-octagon':'Frost',    'sapphire-round':'Frost',    'sapphire-square':'Frost',
+    'topaz-hexagon':   'Radiance', 'topaz-octagon':   'Radiance', 'topaz-round':   'Radiance', 'topaz-square':   'Radiance',
+    'turquoise-hexagon':'Shock',   'turquoise-octagon':'Shock',   'turquoise-round':'Shock',   'turquoise-square':'Shock',
 };
 
 // ── Pets state ─────────────────────────────────────────────────────────────
@@ -290,3 +376,8 @@ function setupPetDragDrop() {
         };
     });
 }
+
+// Populate normalised lookup index for pets (merges into shared _dbIndex from characters.js)
+Object.keys(petDatabase).forEach(k => {
+    if (typeof _dbIndex !== "undefined") _dbIndex[k.replace(/\s+/g, "").toLowerCase()] = k;
+});
