@@ -714,7 +714,7 @@ function decodePresetCode(code) {
 
 const _SC_IDB_NAME    = 'lstb-sharecodes';
 const _SC_IDB_STORE   = 'codes';
-const _SC_IDB_VERSION = 1;
+const _SC_IDB_VERSION = 2;
 let   _scIdb          = null;
 
 function _openScIdb() {
@@ -723,8 +723,10 @@ function _openScIdb() {
         const req = indexedDB.open(_SC_IDB_NAME, _SC_IDB_VERSION);
         req.onupgradeneeded = e => {
             const db = e.target.result;
-            if (!db.objectStoreNames.contains(_SC_IDB_STORE))
-                db.createObjectStore(_SC_IDB_STORE, { keyPath: 'code' });
+            // v1 used keyPath:'code' — drop and recreate cleanly
+            if (db.objectStoreNames.contains(_SC_IDB_STORE))
+                db.deleteObjectStore(_SC_IDB_STORE);
+            db.createObjectStore(_SC_IDB_STORE, { keyPath: 'code' });
         };
         req.onsuccess = e => { _scIdb = e.target.result; resolve(_scIdb); };
         req.onerror   = e => reject(e.target.error);
@@ -1015,10 +1017,6 @@ function _esc(str) {
     return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-async function deleteLoadCodeHistory(code, containerId) {
-    await _scDeleteCode(code);
-    _renderLoadCodeHistory(containerId || 'lc-modal-history');
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ── Legacy inline load-code panel (inside preset dropdown) ────────────────────
@@ -1074,18 +1072,6 @@ function _setLoadCodeStatus(msg, type) {
     el.style.color = type === 'error' ? '#f87171' : type === 'success' ? '#34d399' : '#64748b';
 }
 
-// ── History helpers (used by inline panel) ────────────────────────────────────
-
-function loadCodeFromHistory(code) {
-    const input = document.getElementById('load-code-input');
-    if (input) input.value = code;
-    applyLoadCode();
-}
-
-async function deleteCodeFromHistory(code) {
-    await _scDeleteCode(code);
-    _renderLoadCodeHistory('code-history-list');
-}
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ── DOM wiring ────────────────────────────────────────────────────────────────
