@@ -973,22 +973,40 @@ async function _renderLoadCodeHistory(containerId) {
     [...entries].reverse().forEach(entry => {
         const row = document.createElement('div');
         row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid #2d314230;';
+
         const d = new Date(entry.savedAt);
         const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
         const shortCode = entry.code.length > 32 ? entry.code.slice(0, 28) + '…' : entry.code;
-        row.innerHTML = `
-            <button title="Load" style="flex:1;text-align:left;background:none;border:none;cursor:pointer;padding:0;"
-                onclick="document.getElementById('lc-modal-input').value=${JSON.stringify(entry.code)};applyLoadCodeModal();">
-                <span style="font-size:11px;color:#94a3b8;font-weight:600;">${_esc(entry.title || 'Preset')}</span>
-                <span style="font-size:9px;color:#475569;margin-left:6px;">${dateStr}</span>
-                <span style="display:block;font-size:9px;color:#334155;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;">${_esc(shortCode)}</span>
-            </button>
-            <button title="Delete" onclick="deleteLoadCodeHistory(${JSON.stringify(entry.code)},${JSON.stringify(containerId)})"
-                style="background:none;border:none;cursor:pointer;color:#475569;font-size:11px;
-                       padding:2px 4px;border-radius:3px;transition:color 0.15s;flex-shrink:0;"
-                onmouseover="this.style.color='#f87171'" onmouseout="this.style.color='#475569'">
-                <i class="fa-solid fa-trash" style="font-size:9px;"></i>
-            </button>`;
+
+        // Load button — built with createElement so the code value is never HTML-serialised
+        const loadBtn = document.createElement('button');
+        loadBtn.title = 'Load';
+        loadBtn.style.cssText = 'flex:1;text-align:left;background:none;border:none;cursor:pointer;padding:0;';
+        loadBtn.innerHTML = `
+            <span style="font-size:11px;color:#94a3b8;font-weight:600;">${_esc(entry.title || 'Preset')}</span>
+            <span style="font-size:9px;color:#475569;margin-left:6px;">${dateStr}</span>
+            <span style="display:block;font-size:9px;color:#334155;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:300px;">${_esc(shortCode)}</span>`;
+        loadBtn.addEventListener('click', () => {
+            const input = document.getElementById('lc-modal-input') || document.getElementById('load-code-input');
+            if (input) input.value = entry.code;
+            if (containerId === 'lc-modal-history') applyLoadCodeModal();
+            else applyLoadCode();
+        });
+
+        // Delete button — addEventListener keeps the code value safely in closure
+        const delBtn = document.createElement('button');
+        delBtn.title = 'Delete';
+        delBtn.style.cssText = 'background:none;border:none;cursor:pointer;color:#475569;font-size:11px;padding:2px 4px;border-radius:3px;transition:color 0.15s;flex-shrink:0;';
+        delBtn.innerHTML = '<i class="fa-solid fa-trash" style="font-size:9px;"></i>';
+        delBtn.addEventListener('mouseenter', () => { delBtn.style.color = '#f87171'; });
+        delBtn.addEventListener('mouseleave', () => { delBtn.style.color = '#475569'; });
+        delBtn.addEventListener('click', async () => {
+            await _scDeleteCode(entry.code);
+            _renderLoadCodeHistory(containerId);
+        });
+
+        row.appendChild(loadBtn);
+        row.appendChild(delBtn);
         list.appendChild(row);
     });
 }
