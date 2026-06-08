@@ -678,10 +678,105 @@ function renderTeamGrid() {
 
 // ── Formation ─────────────────────────────────────────────────────────────────
 
+// Image cache for formation slot face-crop icons (reuse battlestats cache if available)
+const _formImgCache = {};
+
+function _drawFormationFace(canvas, imgSrc, size) {
+    function doDraw(img) {
+        const ctx = canvas.getContext('2d');
+        const iw  = img.naturalWidth  || img.width;
+        const ih  = img.naturalHeight || img.height;
+
+        // Use getFacePosition (from index.html) for smart face crop
+        const posStr = (typeof getFacePosition === 'function') ? getFacePosition(imgSrc) : '50% 10%';
+        const parts  = posStr.split(' ');
+        const faceCX = parseFloat(parts[0]) / 100;
+        const faceCY = parseFloat(parts[1]) / 100;
+
+        // Crop a square from the source, centred on the detected face
+        const cropSide = Math.min(iw, ih * 0.65);
+        const srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
+        const srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
+
+        ctx.clearRect(0, 0, size, size);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, size, size);
+        ctx.restore();
+    }
+
+    const cached = _formImgCache[imgSrc] || (typeof _dmgImgCache !== 'undefined' && _dmgImgCache[imgSrc]);
+    if (cached) {
+        doDraw(cached);
+    } else {
+        const img = new Image();
+        img.onload = () => { _formImgCache[imgSrc] = img; doDraw(img); };
+        img.onerror = () => {};
+        img.src = imgSrc;
+    }
+}
+
 function updateFormation() {
+    const ICON_SIZE = 34; // px — diameter of circular avatar
+
     formationSlots.forEach((teamSlotIdx, formIdx) => {
         const el = document.getElementById(`form-slot-${formIdx}`);
-        if (el) el.innerText = teamSlotIdx === -1 ? '-' : (slotData[teamSlotIdx].character || '-');
+        if (!el) return;
+
+        if (teamSlotIdx === -1 || !slotData[teamSlotIdx] || !slotData[teamSlotIdx].character) {
+            el.innerHTML = '<span style="color:#475569;font-size:12px;">-</span>';
+            el.style.position = 'relative';
+            return;
+        }
+
+        const charName  = slotData[teamSlotIdx].character;
+        const charEntry = (typeof db !== 'undefined' && db.characters)
+            ? db.characters.find(c => c.name === charName)
+            : null;
+
+        // Get skin-aware image src
+        const imgSrc = (typeof getSlotCharImg === 'function')
+            ? (getSlotCharImg(teamSlotIdx) || (charEntry && charEntry.img))
+            : (charEntry && charEntry.img);
+
+        // Element border colour for the circle ring
+        const charInfo  = (typeof getCharInfo === 'function') ? getCharInfo(charName) : {};
+        const elColors  = {
+            Fire:'#f97316', Frost:'#60a5fa', Nature:'#4ade80', Holy:'#fde68a',
+            Shock:'#c084fc', Chaos:'#f472b6', Radiance:'#fcd34d'
+        };
+        const ringColor = elColors[charInfo.element] || '#2d3142';
+
+        const canvasId = `form-face-${formIdx}`;
+
+        // Use relative positioning so the icon can be pinned to the right edge
+        el.style.position       = 'relative';
+        el.style.display        = 'flex';
+        el.style.alignItems     = 'center';
+        el.style.justifyContent = 'center';
+        el.style.overflow       = 'hidden';
+        el.style.padding        = '0';
+
+        el.innerHTML = `
+            <span style="font-size:10px;font-weight:700;color:#e2e8f0;
+                         overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                         max-width:calc(100% - ${ICON_SIZE + 6}px);
+                         text-align:center;">${charName}</span>
+            ${imgSrc ? `<canvas id="${canvasId}" width="${ICON_SIZE}" height="${ICON_SIZE}"
+                style="position:absolute;left:4px;top:50%;transform:translateY(-50%);
+                       width:${ICON_SIZE}px;height:${ICON_SIZE}px;flex-shrink:0;
+                       border-radius:50%;border:1.5px solid ${ringColor};
+                       display:block;background:#20222f;"></canvas>` : ''}`;
+
+        // Draw face crop after DOM update
+        if (imgSrc) {
+            requestAnimationFrame(() => {
+                const canvas = document.getElementById(canvasId);
+                if (canvas) _drawFormationFace(canvas, imgSrc, ICON_SIZE);
+            });
+        }
     });
 }
 
