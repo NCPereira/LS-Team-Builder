@@ -330,6 +330,56 @@ async function exportCapturePNG() {
         });
 
         // =====================================================================
+        // Step 5c-canvas: Copy live canvas pixel data into clone canvases.
+        // html2canvas clones canvas elements as blank — we must manually copy
+        // the drawn pixel content (e.g. damage-bar face-crop icons) from the
+        // live DOM canvases into their cloned counterparts BEFORE rendering.
+        //
+        // We also re-flush any pending face-crop draws from the image cache so
+        // icons that hadn't finished loading at render time are painted first.
+        // =====================================================================
+
+        // Re-draw pending queued items synchronously from the image cache
+        if (typeof _dmgFaceDrawQueue !== 'undefined' && typeof _dmgImgCache !== 'undefined') {
+            _dmgFaceDrawQueue.forEach(function(job) {
+                var liveCanvas = document.getElementById(job.canvasId);
+                var cachedImg  = _dmgImgCache[job.imgSrc];
+                if (!liveCanvas || !cachedImg) return;
+                var ctx = liveCanvas.getContext('2d');
+                var iw = cachedImg.naturalWidth  || cachedImg.width;
+                var ih = cachedImg.naturalHeight || cachedImg.height;
+                var posStr  = (typeof getFacePosition === 'function') ? getFacePosition(job.imgSrc) : '50% 10%';
+                var parts   = posStr.split(' ');
+                var faceCX  = parseFloat(parts[0]) / 100;
+                var faceCY  = parseFloat(parts[1]) / 100;
+                var cropSide = Math.min(iw, ih * 0.65);
+                var srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
+                var srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
+                ctx.clearRect(0, 0, job.size, job.size);
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(job.size / 2, job.size / 2, job.size / 2, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(cachedImg, srcX, srcY, cropSide, cropSide, 0, 0, job.size, job.size);
+                ctx.restore();
+            });
+        }
+
+        // Copy every live dmg-face canvas into its clone counterpart
+        var liveCanvases  = Array.from(target.querySelectorAll('canvas[id^="dmg-face-"]'));
+        var cloneCanvases = Array.from(clone.querySelectorAll('canvas[id^="dmg-face-"]'));
+        liveCanvases.forEach(function(liveC, idx) {
+            var cloneC = cloneCanvases[idx];
+            if (!cloneC) return;
+            cloneC.width  = liveC.width;
+            cloneC.height = liveC.height;
+            try {
+                var ctx = cloneC.getContext('2d');
+                ctx.drawImage(liveC, 0, 0);
+            } catch(e) {}
+        });
+
+        // =====================================================================
         // Step 5d: Hide empty content + fix background/border bleed
         // MUST run AFTER Step 5 -- the style-copy loop above would overwrite
         // any display:none or background changes made earlier.
@@ -383,36 +433,28 @@ async function exportCapturePNG() {
                     pd.style.border     = '1px solid ' + elSolid + '88';
                 });
 
-                // Card display container — target by id to avoid matching gear squircles
-                // which also carry the relative + bg-slotBg classes
-                var cardDisplayEl = sec.querySelector('#card-display-' + i);
-                var cardContainer = cardDisplayEl ? cardDisplayEl.parentElement : null;
-                if (cardContainer) {
-                    cardContainer.style.background      = '#20222f';
-                    cardContainer.style.backgroundColor = '#20222f';
-                    cardContainer.style.backgroundImage = 'none';
-                    cardContainer.style.borderColor     = _exportElBorderColor[el] || '#2d3142';
-                    cardContainer.style.borderStyle     = 'solid';
-                    cardContainer.style.boxShadow       = 'none';
-                }
+                // Card display container
+                Array.from(sec.querySelectorAll('.relative.bg-slotBg')).forEach(function(cd) {
+                    cd.style.background      = '#20222f';
+                    cd.style.backgroundColor = '#20222f';
+                    cd.style.backgroundImage = 'none';
+                    cd.style.borderColor     = _exportElBorderColor[el] || '#2d3142';
+                    cd.style.borderStyle     = 'solid';
+                    cd.style.boxShadow       = 'none';
+                });
 
                 // Hide empty gear slot wrappers (squircle + stat badge)
                 var gearCats = ['Weapon', 'Armor', 'Helmet', 'Rune'];
                 var slot = slotData[i];
                 var allGearEmpty = gearCats.every(function(cat) { return !slot.gear[cat]; });
                 gearCats.forEach(function(cat) {
-                    // Use data-gear-cat attribute for precise targeting — avoids
-                    // the ambiguity with the card container which shares bg-slotBg/relative classes
                     var wrapper = sec.querySelector('[data-gear-cat="' + cat + '"]');
                     if (!wrapper) return;
                     if (!slot.gear[cat]) {
                         wrapper.style.visibility = 'hidden';
                         wrapper.style.opacity    = '0';
                     } else {
-                        // Gear equipped — ensure the wrapper is visible
-                        wrapper.style.visibility = '';
-                        wrapper.style.opacity    = '';
-                        // Hide the stat badge only if no stats set
+                        // Gear equipped — hide the stat badge only if no stats set
                         var sp = (slot.statPriority && slot.statPriority[cat]) || [];
                         var statBadge = wrapper.querySelector('[data-stat-badge]') ||
                                         wrapper.children[wrapper.children.length - 1];
@@ -431,14 +473,12 @@ async function exportCapturePNG() {
                     }
                 }
 
-                // Hide empty card slot — reuse cardContainer found above
-                if (cardContainer) {
-                    if (!slot.card) {
-                        cardContainer.style.visibility = 'hidden';
-                        cardContainer.style.opacity    = '0';
-                    } else {
-                        cardContainer.style.visibility = '';
-                        cardContainer.style.opacity    = '';
+                // Hide empty card slot — visibility keeps the space, no reflow
+                if (!slot.card) {
+                    var cardSlot = sec.querySelector('.relative.bg-slotBg');
+                    if (cardSlot) {
+                        cardSlot.style.visibility = 'hidden';
+                        cardSlot.style.opacity    = '0';
                     }
                 }
             });
