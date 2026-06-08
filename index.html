@@ -870,10 +870,13 @@
  
     </div>
  
-    <footer id="page-footer" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xl">
+    <footer id="page-footer" class="w-full bg-cardBg border border-borderCool rounded-xl p-3 flex flex-col sm:flex-row justify-between items-center gap-3 shadow-xl">
         <div class="text-xs text-slate-400">Layout Engine v3.0 | LSTB Web Edition</div>
         <div class="flex gap-3 flex-wrap justify-end items-center">
             <button id="export-png-btn" class="bg-[#1a1e2e] border border-emerald-700 hover:bg-emerald-900/40 text-emerald-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="exportCapturePNG()" title="Export team view as PNG"><i class="fa-solid fa-image"></i>Export PNG</button>
+            <button id="dtg-toggle-btn" class="bg-[#1a1e2e] border border-blue-800 hover:bg-blue-900/30 text-blue-500 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="toggleDamageHistory()" title="Show/hide Damage History graph">
+                <i class="fa-solid fa-chart-area"></i>Dmg History
+            </button>
             <button class="bg-[#1c1e29] border border-slate-700 hover:bg-slate-700 text-slate-300 text-xs font-semibold py-2 px-4 rounded-lg transition-all" onclick="clearAllSlots()"><i class="fa-solid fa-trash-can mr-2"></i>Clear</button>
             <button class="bg-[#1a1e2e] border border-blue-700 hover:bg-blue-900/40 text-blue-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all" onclick="savePreset()"><i class="fa-solid fa-floppy-disk mr-2"></i>Save Preset</button>
             <button class="bg-[#1a1e2e] border border-violet-700 hover:bg-violet-900/40 text-violet-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="showShareCodeModal()" title="Generate a shareable code for this preset">
@@ -919,9 +922,11 @@
         </div>
     </footer>
  
-    <!-- ── Damage Timeline Graph ───────────────────────────────────────── -->
-    <div id="dmg-timeline-section" class="max-w-7xl mx-auto w-full bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex flex-col gap-2">
+
  
+    <!-- ── Damage History (collapsible) ─────────────────────────────────── -->
+    <div id="dmg-timeline-section" class="w-full bg-cardBg border border-borderCool rounded-xl p-3 shadow-xl flex-col gap-2" style="display:none;">
+
         <!-- Header row -->
         <div class="flex items-center justify-between flex-wrap gap-2">
             <div class="flex items-center gap-2">
@@ -931,15 +936,12 @@
             </div>
             <div class="flex items-center gap-2">
                 <span id="dtg-count-label" class="text-[10px] text-slate-500"></span>
-                <!-- View All Raid Scores button -->
                 <button id="dtg-all-raids-btn" onclick="dtgLoadAllRaids()" title="View most recent scores for all raid bosses" class="hidden bg-[#1a1e2e] border border-purple-700 hover:bg-purple-900/30 text-purple-400 text-xs font-semibold py-2 px-3 rounded-lg transition-all flex items-center gap-1.5">
                     <i class="fa-solid fa-dragon text-[11px]"></i>All Raids
                 </button>
-                <!-- Refresh button — visible after a folder is selected -->
                 <button id="dtg-refresh-btn" onclick="dtgLoad()" title="Reload current folder" class="hidden bg-[#1c1e29] border border-slate-700 hover:bg-slate-700/40 text-slate-400 text-xs font-semibold py-2 px-3 rounded-lg transition-all flex items-center gap-1.5">
                     <i class="fa-solid fa-arrows-rotate text-[11px]"></i>
                 </button>
-                <!-- Select Folder dropdown — mirrors Load Preset -->
                 <div class="relative">
                     <button class="bg-[#1a1e2e] border border-blue-700 hover:bg-blue-900/40 text-blue-400 text-xs font-semibold py-2 px-4 rounded-lg transition-all flex items-center gap-2" onclick="toggleDtgDropdown(event)">
                         <i class="fa-solid fa-folder-open"></i>Select Folder<i class="fa-solid fa-chevron-down text-[10px]"></i>
@@ -956,18 +958,33 @@
                 </div>
             </div>
         </div>
- 
-        <!-- Canvas wrapper — dark gradient bg matching the reference image -->
+
+        <!-- Canvas wrapper -->
         <div id="dtg-canvas-wrap" class="relative rounded-xl overflow-hidden" style="background:linear-gradient(160deg,#040d1e 0%,#071628 45%,#040e1c 100%);border:1px solid #0e2040;min-height:360px;">
             <canvas id="dtg-canvas" width="1500" height="380" style="width:100%;display:block;"></canvas>
-            <!-- Placeholder shown before data is loaded -->
             <div id="dtg-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-2 pointer-events-none" style="min-height:360px;">
                 <i class="fa-solid fa-chart-area text-4xl" style="color:rgba(75,107,251,0.15)"></i>
                 <span class="text-xs text-slate-600 italic">Select a preset folder to view damage history</span>
             </div>
         </div>
     </div>
- 
+
+    <script>
+        function toggleDamageHistory() {
+            const section = document.getElementById('dmg-timeline-section');
+            const btn     = document.getElementById('dtg-toggle-btn');
+            const visible = section.style.display !== 'none';
+            section.style.display = visible ? 'none' : 'flex';
+            btn.classList.toggle('border-blue-800', visible);
+            btn.classList.toggle('text-blue-500',   visible);
+            btn.classList.toggle('border-blue-500', !visible);
+            btn.classList.toggle('text-blue-300',   !visible);
+            btn.classList.toggle('bg-[#1a1e2e]',    visible);
+            btn.classList.toggle('bg-blue-900/20',  !visible);
+        }
+    </script>
+    <script src="js/lostsword/damagehistory.js"></script>
+
     <!-- ── Share Code Modal ──────────────────────────────────────────────────── -->
     <div id="share-code-modal" class="hidden fixed inset-0 z-[210] flex items-center justify-center bg-black/80 backdrop-blur-sm">
         <div style="background:#181a24;border:1px solid #2d3142;border-radius:1.25rem;box-shadow:0 0 60px rgba(75,107,251,0.18),0 0 0 1px #4b6bfb22;width:480px;max-width:95vw;overflow:hidden;display:flex;flex-direction:column;">
@@ -1397,7 +1414,6 @@
  
     <script src="js/lostsword/battlestats.js"></script>
     <script src="js/lostsword/presets.js"></script>
-    <script src="js/lostsword/damagehistory.js"></script>
     <script src="js/lostsword/imageExport.js"></script>
     <script src="js/lostsword/sharecode.js"></script>
  
