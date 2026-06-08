@@ -373,6 +373,68 @@ async function exportCapturePNG() {
             } catch(e) {}
         });
 
+        // ── Formation face canvases (form-face-N) ────────────────────────────
+        // These are drawn via _drawFormationFace() in teamgrid.js using
+        // _formImgCache. We must flush any pending draws onto the live canvases
+        // first, then copy pixel data into the clone canvases.
+        var _imgCacheRef = (typeof _formImgCache !== 'undefined' ? _formImgCache : {});
+        // Also include dmgImgCache as a fallback (battlestats shares the same images)
+        if (typeof _dmgImgCache !== 'undefined') {
+            Object.keys(_dmgImgCache).forEach(function(k) {
+                if (!_imgCacheRef[k]) _imgCacheRef[k] = _dmgImgCache[k];
+            });
+        }
+        // Re-draw every live form-face canvas so export captures the latest state
+        Array.from(target.querySelectorAll('canvas[id^="form-face-"]')).forEach(function(liveC) {
+            // Derive the formation slot index from the canvas id (form-face-N)
+            var formIdx = parseInt(liveC.id.replace('form-face-', ''), 10);
+            if (isNaN(formIdx)) return;
+            var teamSlotIdx = (typeof formationSlots !== 'undefined') ? formationSlots[formIdx] : -1;
+            if (teamSlotIdx === -1) return;
+            var charName = (typeof slotData !== 'undefined' && slotData[teamSlotIdx])
+                ? slotData[teamSlotIdx].character : null;
+            if (!charName) return;
+            var charEntry = (typeof db !== 'undefined' && db.characters)
+                ? db.characters.find(function(c) { return c.name === charName; }) : null;
+            var imgSrc = (typeof getSlotCharImg === 'function')
+                ? (getSlotCharImg(teamSlotIdx) || (charEntry && charEntry.img))
+                : (charEntry && charEntry.img);
+            if (!imgSrc) return;
+            var cachedImg = _imgCacheRef[imgSrc];
+            if (!cachedImg) return;
+            var size = liveC.width;
+            var ctx  = liveC.getContext('2d');
+            var iw = cachedImg.naturalWidth  || cachedImg.width;
+            var ih = cachedImg.naturalHeight || cachedImg.height;
+            var posStr = (typeof getFacePosition === 'function') ? getFacePosition(imgSrc) : '50% 10%';
+            var parts  = posStr.split(' ');
+            var faceCX = parseFloat(parts[0]) / 100;
+            var faceCY = parseFloat(parts[1]) / 100;
+            var cropSide = Math.min(iw, ih * 0.65);
+            var srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
+            var srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
+            ctx.clearRect(0, 0, size, size);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(cachedImg, srcX, srcY, cropSide, cropSide, 0, 0, size, size);
+            ctx.restore();
+        });
+        // Now copy all live form-face canvases into their clone counterparts
+        var liveFormCanvases  = Array.from(target.querySelectorAll('canvas[id^="form-face-"]'));
+        var cloneFormCanvases = Array.from(clone.querySelectorAll('canvas[id^="form-face-"]'));
+        liveFormCanvases.forEach(function(liveC, idx) {
+            var cloneC = cloneFormCanvases[idx];
+            if (!cloneC) return;
+            cloneC.width  = liveC.width;
+            cloneC.height = liveC.height;
+            try {
+                var ctx = cloneC.getContext('2d');
+                ctx.drawImage(liveC, 0, 0);
+            } catch(e) {}
+        });
+
         // =====================================================================
         // Step 5d: Hide empty content + fix background/border bleed
         // MUST run AFTER Step 5 -- the style-copy loop above would overwrite

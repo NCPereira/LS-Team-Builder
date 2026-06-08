@@ -38,7 +38,7 @@ const rawCards = [
 // Example: 'Card_Anessa_01' → key is 'Anessa'
 
 const cardNames = {
-//  Key (filename segment)    cardName                    charName
+//  Key (filename segment)   cardName                         charName
     'Agravaine':           { cardName: 'Hidden in the Shadows', charName: 'Agravaine'  },
     'Anessa':              { cardName: 'Lingering Allure',    charName: 'Anessa'       },
     'Asuka':               { cardName: 'Take Training Seriously!',charName: 'Asuka'    },
@@ -114,7 +114,6 @@ const cardNames = {
 
 // ── Helper: get card info from a stored card display name ─────────────────────
 // slot.card stores the display name (e.g. "Lingering Allure (Anessa)").
-// This helper extracts the card info object by scanning cardNames for a match.
 
 function getCardInfo(displayName) {
     if (!displayName) return null;
