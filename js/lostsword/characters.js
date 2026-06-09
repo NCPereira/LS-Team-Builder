@@ -29,7 +29,7 @@ function getCharInfo(displayName) {
     if (characterDatabase[displayName]) return characterDatabase[displayName];
     const stripped = displayName.replace(/\s+\d+$/, '').trim();
     if (characterDatabase[stripped]) return characterDatabase[stripped];
-    const norm = stripped.replace(/\s+/g, '').toLowerCase();
+    const norm = stripped.replace(/[^a-z0-9]/gi, '').toLowerCase();
     const key = _dbIndex[norm];
     if (key) return characterDatabase[key] || (typeof petDatabase !== 'undefined' && petDatabase[key]) || {};
     // Fall through to petDatabase (defined in pets.js, loaded after this file)
@@ -145,5 +145,5 @@ const characterDatabase = {
 // Populate normalised lookup index for characters
 // petDatabase is indexed later in pets.js after it loads
 Object.keys(characterDatabase).forEach(k => {
-    _dbIndex[k.replace(/\s+/g, '').toLowerCase()] = k;
+    _dbIndex[k.replace(/[^a-z0-9]/gi, '').toLowerCase()] = k;
 });
