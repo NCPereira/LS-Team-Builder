@@ -27,10 +27,12 @@
 const _SKIN_MAX_PROBE = 5;
 
 // Override map: display name → skin filename stem (no number, no extension).
-// Only needed when the skin file doesn't match the character's internal name.
-// All current characters follow the standard pattern, so this is empty.
-// Example entry if ever needed: { 'Some Name': 'Sk_IrregularStem' }
-const _SKIN_STEM_OVERRIDES = {};
+// Only needed when the skin filename capitalisation differs from the internal name.
+const _SKIN_STEM_OVERRIDES = {
+    // Internal name is 'Pc_Morganlefay_01' (lowercase l/f) but skin files
+    // on disk use 'Sk_MorganLeFay_*' (capital L and F).
+    'Morgan Le Fay': 'Sk_MorganLeFay',
+};
 
 // ── Auto-generate _skinCandidates from CHARACTERS ────────────────────────────
 // CHARACTERS is defined in characters.js which is loaded before this file.
