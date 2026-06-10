@@ -1,128 +1,137 @@
 // ── Pets & Gems Data and Logic ─────────────────────────────────────────────
 
-// ── Pet list ──────────────────────────────────────────────────────────────────
-// Format: 'Pet_InternalName_01'
-// To add a pet: append a new entry here and add a row to petDatabase below.
-
-const rawPets = [
-    'Pet_Agravaine_01', 'Pet_Anessa_01',    'Pet_Asuka_01',      'Pet_Athena_01',
-    'Pet_Bedivere_01',  'Pet_NeoBedivere_01','Pet_Cheese_01',     'Pet_Momo_01',
-    'Pet_Coco_01',      'Pet_Neo_01',       'Pet_Nabi_01',       'Pet_Chick_01',
-    'Pet_Hen_01',       'Pet_Belsey_01',    'Pet_Cristina_01',   'Pet_DianCecht_01',
-    'Pet_Elizabeth_01', 'Pet_Erin_01',      'Pet_Estheria_01',   'Pet_Eva_01',
-    'Pet_UnleashedEva_01','Pet_Fenrir_01',  'Pet_Galahad_01',    'Pet_Griffon_01',
-    'Pet_Guinevere_01', 'Pet_Hikage_01',    'Pet_Isabel_01',     'Pet_Joanofarc_01',
-    'Pet_Karishara_01', 'Pet_Katrin_01',    'Pet_Kay_01',        'Pet_Circe_01',
-    'Pet_Lancelot_01',  'Pet_Lilith_01',    'Pet_Lisa_01',       'Pet_Lohengrin_01',
-    'Pet_Lua_01',       'Pet_Lueira_01',    'Pet_Merlin_01',     'Pet_SMerry_01',
-    'Pet_Morgana_01',   'Pet_Morganlefay_01','Pet_Nesha_01',     'Pet_Nightsong_01',
-    'Pet_Midnight_01',  'Pet_Palamedes_01', 'Pet_Phoenix_01',    'Pet_Belle_01',
-    'Pet_Raccoon_01',   'Pet_Ran_01',       'Pet_Retriever_01',  'Pet_Gold_01',
-    'Pet_MaidRita_01',  'Pet_Shiba_01',     'Pet_Slime_01',      'Pet_Tiamat_01',
-    'Pet_Tristan_01',   'Pet_Vivien_01',    'Pet_Whitey_01',     'Pet_Yumi_01',
-    'Pet_Lumi_01',
-];
-
-// ── Pet database ──────────────────────────────────────────────────────────────
-// Columns: element, rarity
-// element : Fire | Frost | Nature | Holy | Shock | Chaos | Radiance
-// rarity  : '3' | '4' | '5'
+// ── Master pet list ───────────────────────────────────────────────────────────
+// Each entry:
+//   internalName : the 'Pet_Name_01' filename stem (drives image paths)
+//   element      : Fire | Frost | Nature | Holy | Shock | Chaos | Radiance
+//   rarity       : '3' | '4' | '5'
 //
-// To add a pet: add one line below and one entry in rawPets above.
-// getCharInfo() will fall through to this table for pets used in the filter UI.
+// TO ADD A PET: push one object here. That's it.
 
-const petDatabase = {
-//  Name              element      rarity
-    // ── Creature pets ────────────────────────────────────────────────────────
-    'Whitey':        { element:'Radiance', rarity:'4' },
-    'Gold':          { element:'Fire',     rarity:'3' },
-    'Neo':           { element:'Frost',    rarity:'4' },
-    'Nightsong':     { element:'Chaos',    rarity:'4' },
-    'Shiba':         { element:'Fire',     rarity:'4' },
-    'Belle':         { element:'Nature',   rarity:'4' },
-    'Slime':         { element:'Nature',   rarity:'3' },
-    'Retriever':     { element:'Radiance', rarity:'3' },
-    'Raccoon':       { element:'Shock',    rarity:'3' },
-    'Hen':           { element:'Shock',    rarity:'3' },
-    'Chick':         { element:'Fire',     rarity:'3' },
-    'Momo':          { element:'Nature',   rarity:'3' },
-    'Nabi':          { element:'Chaos',    rarity:'3' },
-    'Cheese':        { element:'Holy',     rarity:'3' },
-    'Coco':          { element:'Frost',    rarity:'3' },
-    'Midnight':      { element:'Shock',    rarity:'4' },
-    'Phoenix':       { element:'Fire',     rarity:'5' },
-    'Fenrir':        { element:'Shock',    rarity:'5' },
-    'Griffon':       { element:'Nature',   rarity:'5' },
-    'Athena':        { element:'Radiance', rarity:'5' },
+const PETS = [
+    // ── Other pets ─────────────────────────────────────────────────────────
+    { internalName: 'Pet_Whitey_01',    element: 'Radiance', rarity: '4' },
+    { internalName: 'Pet_Gold_01',      element: 'Fire',     rarity: '3' },
+    { internalName: 'Pet_Neo_01',       element: 'Frost',    rarity: '4' },
+    { internalName: 'Pet_Nightsong_01', element: 'Chaos',    rarity: '4' },
+    { internalName: 'Pet_Shiba_01',     element: 'Fire',     rarity: '4' },
+    { internalName: 'Pet_Belle_01',     element: 'Nature',   rarity: '4' },
+    { internalName: 'Pet_Slime_01',     element: 'Nature',   rarity: '3' },
+    { internalName: 'Pet_Retriever_01', element: 'Radiance', rarity: '3' },
+    { internalName: 'Pet_Raccoon_01',   element: 'Shock',    rarity: '3' },
+    { internalName: 'Pet_Hen_01',       element: 'Shock',    rarity: '3' },
+    { internalName: 'Pet_Chick_01',     element: 'Fire',     rarity: '3' },
+    { internalName: 'Pet_Momo_01',      element: 'Nature',   rarity: '3' },
+    { internalName: 'Pet_Nabi_01',      element: 'Chaos',    rarity: '3' },
+    { internalName: 'Pet_Cheese_01',    element: 'Holy',     rarity: '3' },
+    { internalName: 'Pet_Coco_01',      element: 'Frost',    rarity: '3' },
+    { internalName: 'Pet_Midnight_01',  element: 'Shock',    rarity: '4' },
+    { internalName: 'Pet_Phoenix_01',   element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Fenrir_01',    element: 'Shock',    rarity: '5' },
+    { internalName: 'Pet_Griffon_01',   element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_Athena_01',    element: 'Radiance', rarity: '5' },
 
     // ── Character-form pets ───────────────────────────────────────────────────
-    'UnleashedEva':  { element:'Shock',    rarity:'5' },
-    'Agravaine':     { element:'Chaos',    rarity:'5' },
-    'Anessa':        { element:'Frost',    rarity:'5' },
-    'Asuka':         { element:'Nature',   rarity:'5' },
-    'Bedivere':      { element:'Nature',   rarity:'4' },
-    'NeoBedivere':   { element:'Holy',     rarity:'5' },
-    'Belsey':        { element:'Fire',     rarity:'5' },
-    'Cristina':      { element:'Fire',     rarity:'5' },
-    'DianCecht':     { element:'Radiance', rarity:'5' },
-    'Elizabeth':     { element:'Fire',     rarity:'5' },
-    'Erin':          { element:'Radiance', rarity:'5' },
-    'Estheria':      { element:'Chaos',    rarity:'5' },
-    'Eva':           { element:'Shock',    rarity:'5' },
-    'Galahad':       { element:'Radiance', rarity:'5' },
-    'Guinevere':     { element:'Frost',    rarity:'5' },
-    'Hikage':        { element:'Nature',   rarity:'5' },
-    'Isabel':        { element:'Frost',    rarity:'5' },
-    'Joanofarc':     { element:'Shock',    rarity:'5' },
-    'Karishara':     { element:'Fire',     rarity:'5' },
-    'Katrin':        { element:'Frost',    rarity:'5' },
-    'Kay':           { element:'Fire',     rarity:'5' },
-    'Circe':         { element:'Chaos',    rarity:'5' },
-    'Lancelot':      { element:'Radiance', rarity:'5' },
-    'Lilith':        { element:'Chaos',    rarity:'5' },
-    'Lisa':          { element:'Chaos',    rarity:'5' },
-    'Lohengrin':     { element:'Chaos',    rarity:'5' },
-    'Lua':           { element:'Shock',    rarity:'5' },
-    'Lueira':        { element:'Frost',    rarity:'5' },
-    'Merlin':        { element:'Holy',     rarity:'5' },
-    'SMerry':        { element:'Frost',    rarity:'5' },
-    'Morgana':       { element:'Chaos',    rarity:'5' },
-    'MorganLeFay':   { element:'Holy',     rarity:'5' },
-    'Nesha':         { element:'Radiance', rarity:'5' },
-    'Palamedes':     { element:'Nature',   rarity:'5' },
-    'MaidRita':      { element:'Fire',     rarity:'5' },
-    'Ran':           { element:'Holy',     rarity:'5' },
-    'Tiamat':        { element:'Holy',     rarity:'5' },
-    'Tristan':       { element:'Nature',   rarity:'5' },
-    'Vivien':        { element:'Nature',   rarity:'5' },
-    'Yumi':          { element:'Frost',    rarity:'5' },
-    'Lumi':          { element:'Shock',    rarity:'5' },
-};
-
-// ── Gem list ──────────────────────────────────────────────────────────────────
-
-const rawGems = [
-    'amethyst-hexagon', 'amethyst-octagon', 'amethyst-round', 'amethyst-square',
-    'emerald-hexagon',  'emerald-octagon',  'emerald-round',  'emerald-square',
-    'opal-hexagon',     'opal-octagon',     'opal-round',     'opal-square',
-    'ruby-hexagon',     'ruby-octagon',     'ruby-round',     'ruby-square',
-    'sapphire-hexagon', 'sapphire-octagon', 'sapphire-round', 'sapphire-square',
-    'topaz-hexagon',    'topaz-octagon',    'topaz-round',    'topaz-square',
-    'turquoise-hexagon','turquoise-octagon','turquoise-round', 'turquoise-square',
+    { internalName: 'Pet_UnleashedEva_01', element: 'Shock',    rarity: '5' },
+    { internalName: 'Pet_Agravaine_01',    element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Anessa_01',       element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Asuka_01',        element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_Bedivere_01',     element: 'Nature',   rarity: '4' },
+    { internalName: 'Pet_NeoBedivere_01',  element: 'Holy',     rarity: '5' },
+    { internalName: 'Pet_Belsey_01',       element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Cristina_01',     element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_DianCecht_01',    element: 'Radiance', rarity: '5' },
+    { internalName: 'Pet_Elizabeth_01',    element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Erin_01',         element: 'Radiance', rarity: '5' },
+    { internalName: 'Pet_Estheria_01',     element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Eva_01',          element: 'Shock',    rarity: '5' },
+    { internalName: 'Pet_Galahad_01',      element: 'Radiance', rarity: '5' },
+    { internalName: 'Pet_Guinevere_01',    element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Hikage_01',       element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_Isabel_01',       element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Joanofarc_01',    element: 'Shock',    rarity: '5' },
+    { internalName: 'Pet_Karishara_01',    element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Katrin_01',       element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Kay_01',          element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Circe_01',        element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Lancelot_01',     element: 'Radiance', rarity: '5' },
+    { internalName: 'Pet_Lilith_01',       element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Lisa_01',         element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Lohengrin_01',    element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Lua_01',          element: 'Shock',    rarity: '5' },
+    { internalName: 'Pet_Lueira_01',       element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Merlin_01',       element: 'Holy',     rarity: '5' },
+    { internalName: 'Pet_SMerry_01',       element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Morgana_01',      element: 'Chaos',    rarity: '5' },
+    { internalName: 'Pet_Morganlefay_01',  element: 'Holy',     rarity: '5' },
+    { internalName: 'Pet_Nesha_01',        element: 'Radiance', rarity: '5' },
+    { internalName: 'Pet_Palamedes_01',    element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_MaidRita_01',     element: 'Fire',     rarity: '5' },
+    { internalName: 'Pet_Ran_01',          element: 'Holy',     rarity: '5' },
+    { internalName: 'Pet_Tiamat_01',       element: 'Holy',     rarity: '5' },
+    { internalName: 'Pet_Tristan_01',      element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_Vivien_01',       element: 'Nature',   rarity: '5' },
+    { internalName: 'Pet_Yumi_01',         element: 'Frost',    rarity: '5' },
+    { internalName: 'Pet_Lumi_01',         element: 'Shock',    rarity: '5' },
 ];
 
-// ── Gem element map ───────────────────────────────────────────────────────────
-// gem name → element (used to filter gems to a pet's element)
+// ── Master gem list ───────────────────────────────────────────────────────────
+// Each entry:
+//   name    : kebab-case gem name used for image filenames and IDs
+//   element : Fire | Frost | Nature | Holy | Shock | Chaos | Radiance
+//   shape   : hexagon | octagon | round | square
+//
+// TO ADD A GEM: push one object here. That's it.
 
-const gemElements = {
-    'amethyst-hexagon':'Chaos',    'amethyst-octagon':'Chaos',    'amethyst-round':'Chaos',    'amethyst-square':'Chaos',
-    'emerald-hexagon': 'Nature',   'emerald-octagon': 'Nature',   'emerald-round': 'Nature',   'emerald-square': 'Nature',
-    'opal-hexagon':    'Holy',     'opal-octagon':    'Holy',     'opal-round':    'Holy',     'opal-square':    'Holy',
-    'ruby-hexagon':    'Fire',     'ruby-octagon':    'Fire',     'ruby-round':    'Fire',     'ruby-square':    'Fire',
-    'sapphire-hexagon':'Frost',    'sapphire-octagon':'Frost',    'sapphire-round':'Frost',    'sapphire-square':'Frost',
-    'topaz-hexagon':   'Radiance', 'topaz-octagon':   'Radiance', 'topaz-round':   'Radiance', 'topaz-square':   'Radiance',
-    'turquoise-hexagon':'Shock',   'turquoise-octagon':'Shock',   'turquoise-round':'Shock',   'turquoise-square':'Shock',
-};
+const GEMS = [
+    { name: 'amethyst-hexagon',  element: 'Chaos',    shape: 'hexagon'  },
+    { name: 'amethyst-octagon',  element: 'Chaos',    shape: 'octagon'  },
+    { name: 'amethyst-round',    element: 'Chaos',    shape: 'round'    },
+    { name: 'amethyst-square',   element: 'Chaos',    shape: 'square'   },
+    { name: 'emerald-hexagon',   element: 'Nature',   shape: 'hexagon'  },
+    { name: 'emerald-octagon',   element: 'Nature',   shape: 'octagon'  },
+    { name: 'emerald-round',     element: 'Nature',   shape: 'round'    },
+    { name: 'emerald-square',    element: 'Nature',   shape: 'square'   },
+    { name: 'opal-hexagon',      element: 'Holy',     shape: 'hexagon'  },
+    { name: 'opal-octagon',      element: 'Holy',     shape: 'octagon'  },
+    { name: 'opal-round',        element: 'Holy',     shape: 'round'    },
+    { name: 'opal-square',       element: 'Holy',     shape: 'square'   },
+    { name: 'ruby-hexagon',      element: 'Fire',     shape: 'hexagon'  },
+    { name: 'ruby-octagon',      element: 'Fire',     shape: 'octagon'  },
+    { name: 'ruby-round',        element: 'Fire',     shape: 'round'    },
+    { name: 'ruby-square',       element: 'Fire',     shape: 'square'   },
+    { name: 'sapphire-hexagon',  element: 'Frost',    shape: 'hexagon'  },
+    { name: 'sapphire-octagon',  element: 'Frost',    shape: 'octagon'  },
+    { name: 'sapphire-round',    element: 'Frost',    shape: 'round'    },
+    { name: 'sapphire-square',   element: 'Frost',    shape: 'square'   },
+    { name: 'topaz-hexagon',     element: 'Radiance', shape: 'hexagon'  },
+    { name: 'topaz-octagon',     element: 'Radiance', shape: 'octagon'  },
+    { name: 'topaz-round',       element: 'Radiance', shape: 'round'    },
+    { name: 'topaz-square',      element: 'Radiance', shape: 'square'   },
+    { name: 'turquoise-hexagon', element: 'Shock',    shape: 'hexagon'  },
+    { name: 'turquoise-octagon', element: 'Shock',    shape: 'octagon'  },
+    { name: 'turquoise-round',   element: 'Shock',    shape: 'round'    },
+    { name: 'turquoise-square',  element: 'Shock',    shape: 'square'   },
+];
+
+// ── Compatibility shims ───────────────────────────────────────────────────────
+// The rest of the codebase reads rawPets, petDatabase, rawGems, and gemElements.
+// All are derived from the unified arrays above.
+
+// parseName is defined in characters.js (loaded before this file).
+
+const rawPets = PETS.map(p => p.internalName);
+
+const petDatabase = Object.fromEntries(
+    PETS.map(p => {
+        const displayName = parseName(p.internalName);
+        return [displayName, { element: p.element, rarity: p.rarity }];
+    })
+);
+
+const rawGems = GEMS.map(g => g.name);
+
+const gemElements = Object.fromEntries(GEMS.map(g => [g.name, g.element]));
 
 // ── Pets state ─────────────────────────────────────────────────────────────
 

@@ -1,280 +1,178 @@
 // ── equipment.js ─────────────────────────────────────────────────────────────
-// All weapon, armor, helmet, and rune data arrays, filename maps, and class
-// restriction objects. Loaded before index.html scripts that depend on these globals.
+// Weapon, armor, helmet, and rune databases.
+// Loaded before teamgrid.js which builds db.Weapon / db.Armor / etc.
+//
+// EACH ENTRY SUPPORTS:
+//   name         : display name (required)
+//   file         : kebab-case image filename, no extension (required)
+//   class        : 'Knight' | 'Archer' | 'Wizard' | 'Healer'  — single class only
+//   classes      : ['Wizard','Healer']  — array of allowed classes
+//   excludeClass : 'Healer'             — everyone EXCEPT this class
+//   unique       : true                 — only one character on the team can equip it
+//
+// TO ADD AN ITEM: push a new object to the relevant array below.
 
-// ─── Weapon Database ──────────────────────────────────────────────────────────
-// ADD WEAPONS: push the display name to rawWeapons, add the filename to
-// weaponFilenames (kebab-case, no extension), and restrict by class in
-// weaponClasses if needed. Image must live at: weapons/<filename>.webp
+// ─── Weapons ──────────────────────────────────────────────────────────────────
+// Images live at: Assets/lostsword/weapons/<file>.webp
 
-const rawWeapons = [
-    'Abyssal Bow', 'Abyssal Greatsword',
-    'Abyssal Staff', 'Aquarius',
-    'Arbalest', 'Arguros Toxos',
-    'Arondight', 'Balisada',
-    'Claiomh Solais Chaotic', 'Cosmic Axe',
-    'Death Scythe', 'Demon Blade Hellhad',
-    'Dragon Buster', 'Dragon Killer',
-    'Dragon Slayer', 'DualBlade',
-    'Durendal', 'Failnaught',
-    'Fire Dragon\'s Banner', 'Fire Dragon\'s Curved Sword',
-    'Fire Dragon\'s Great Bow', 'Fragarach',
-    'Gambanteinn', 'Goblin Slasher',
-    'Goddess Bow', 'Goddess Greatsword',
-    'Goddess Staff', 'Heavy Bow',
-    'Holy Fire Bow', 'Holy Fire Staff',
-    'Holy Fire Sword', 'Infinity Staff',
-    'Iokheira', 'Rampage Bow',
-    'Red Dragon Tooth', 'Red Ribboned Bow',
-    'Red Ribboned Staff', 'Red Ribboned Sword',
-    'Royal Cow Axe', 'Royal Cow Bowgun',
-    'Royal Cow Staff', 'Sagittarius',
-    'Sumarbrander', 'Tempest Bow',
-    'Tempest Staff', 'Tempest Sword',
-    'Thunderclap', 'Trident',
-    'Tyrfingr', 'Void Staff',
-    'White Feather Fan',
+const WEAPONS = [
+    { name: 'Abyssal Bow',                file: 'abyssal-bow',               class: 'Archer'  },
+    { name: 'Abyssal Greatsword',         file: 'abyssal-greatsword',        class: 'Knight'  },
+    { name: 'Abyssal Staff',              file: 'abyssal-staff',             class: 'Wizard'  },
+    { name: 'Aquarius',                   file: 'aquarius',                  class: 'Healer'  },
+    { name: 'Arbalest',                   file: 'arbalest',                  class: 'Archer'  },
+    { name: 'Arguros Toxos',              file: 'arguros-toxos',             class: 'Archer'  },
+    { name: 'Arondight',                  file: 'arondight',                 class: 'Knight'  },
+    { name: 'Balisada',                   file: 'balisada',                  class: 'Knight',  unique: true },
+    { name: 'Claiomh Solais Chaotic',     file: 'claiomh-solais-chaotic',    class: 'Wizard',  unique: true },
+    { name: 'Cosmic Axe',                 file: 'cosmic-axe',                class: 'Knight'  },
+    { name: 'Death Scythe',               file: 'death-scythe',              class: 'Wizard'  },
+    { name: 'Demon Blade Hellhad',        file: 'demon-blade-hellhad',       class: 'Knight'  },
+    { name: 'Dragon Buster',              file: 'dragon-buster',             class: 'Wizard'  },
+    { name: 'Dragon Killer',              file: 'dragon-killer',             class: 'Archer'  },
+    { name: 'Dragon Slayer',              file: 'dragon-slayer',             class: 'Knight'  },
+    { name: 'DualBlade',                  file: 'dual-blade',                class: 'Knight',  unique: true },
+    { name: 'Durendal',                   file: 'durendal',                  class: 'Knight'  },
+    { name: 'Failnaught',                 file: 'failnaught',                class: 'Archer',  unique: true },
+    { name: 'Fire Dragon\'s Banner',      file: 'fire-dragons-banner',       class: 'Healer'  },
+    { name: 'Fire Dragon\'s Curved Sword',file: 'fire-dragons-curved-sword', class: 'Knight'  },
+    { name: 'Fire Dragon\'s Great Bow',   file: 'fire-dragons-great-bow',    class: 'Archer'  },
+    { name: 'Fragarach',                  file: 'fragarach',                 class: 'Knight'  },
+    { name: 'Gambanteinn',                file: 'gambanteinn',               classes: ['Wizard','Healer'] },
+    { name: 'Goblin Slasher',             file: 'goblin-slasher',            class: 'Knight'  },
+    { name: 'Goddess Bow',                file: 'goddess-bow',               class: 'Archer'  },
+    { name: 'Goddess Greatsword',         file: 'goddess-greatsword',        class: 'Knight'  },
+    { name: 'Goddess Staff',              file: 'goddess-staff',             class: 'Wizard'  },
+    { name: 'Heavy Bow',                  file: 'heavy-bow',                 class: 'Archer'  },
+    { name: 'Holy Fire Bow',              file: 'holy-fire-bow',             class: 'Archer'  },
+    { name: 'Holy Fire Staff',            file: 'holy-fire-staff',           class: 'Wizard'  },
+    { name: 'Holy Fire Sword',            file: 'holy-fire-sword',           class: 'Knight'  },
+    { name: 'Infinity Staff',             file: 'infinity-staff',            classes: ['Wizard','Healer'], unique: true },
+    { name: 'Iokheira',                   file: 'iokheira',                  class: 'Archer'  },
+    { name: 'Rampage Bow',                file: 'rampage-bow',               class: 'Archer'  },
+    { name: 'Red Dragon Tooth',           file: 'red-dragon-tooth',          class: 'Knight'  },
+    { name: 'Red Ribboned Bow',           file: 'red-ribboned-bow',          class: 'Archer'  },
+    { name: 'Red Ribboned Staff',         file: 'red-ribboned-staff',        class: 'Wizard'  },
+    { name: 'Red Ribboned Sword',         file: 'red-ribboned-sword',        class: 'Knight'  },
+    { name: 'Royal Cow Axe',              file: 'royal-cow-axe',             class: 'Knight'  },
+    { name: 'Royal Cow Bowgun',           file: 'royal-cow-bowgun',          class: 'Archer'  },
+    { name: 'Royal Cow Staff',            file: 'royal-cow-staff',           class: 'Wizard'  },
+    { name: 'Sagittarius',                file: 'sagittarius',               class: 'Archer'  },
+    { name: 'Sumarbrander',               file: 'sumarbrander',              class: 'Knight'  },
+    { name: 'Tempest Bow',                file: 'tempest-bow',               class: 'Archer'  },
+    { name: 'Tempest Staff',              file: 'tempest-staff',             classes: ['Wizard','Healer'] },
+    { name: 'Tempest Sword',              file: 'tempest-sword',             class: 'Knight'  },
+    { name: 'Thunderclap',                file: 'thunderclap',               class: 'Wizard'  },
+    { name: 'Trident',                    file: 'trident',                   class: 'Knight',  unique: true },
+    { name: 'Tyrfingr',                   file: 'tyrfingr',                  class: 'Knight'  },
+    { name: 'Void Staff',                 file: 'void-staff',                classes: ['Wizard','Healer'] },
+    { name: 'White Feather Fan',          file: 'white-feather-fan',         class: 'Wizard'  },
 ];
 
-const weaponFilenames = {
-    'Abyssal Bow':                  'abyssal-bow',
-    'Abyssal Greatsword':           'abyssal-greatsword',
-    'Abyssal Staff':                'abyssal-staff',
-    'Aquarius':                     'aquarius',
-    'Arbalest':                     'arbalest',
-    'Arguros Toxos':                'arguros-toxos',
-    'Arondight':                    'arondight',
-    'Balisada':                     'balisada',
-    'Claiomh Solais Chaotic':       'claiomh-solais-chaotic',
-    'Cosmic Axe':                   'cosmic-axe',
-    'Death Scythe':                 'death-scythe',
-    'Demon Blade Hellhad':          'demon-blade-hellhad',
-    'Dragon Buster':                'dragon-buster',
-    'Dragon Killer':                'dragon-killer',
-    'Dragon Slayer':                'dragon-slayer',
-    'DualBlade':                    'dual-blade',
-    'Durendal':                     'durendal',
-    'Failnaught':                   'failnaught',
-    'Fire Dragon\'s Banner':        'fire-dragons-banner',
-    'Fire Dragon\'s Curved Sword':  'fire-dragons-curved-sword',
-    'Fire Dragon\'s Great Bow':     'fire-dragons-great-bow',
-    'Fragarach':                    'fragarach',
-    'Gambanteinn':                  'gambanteinn',
-    'Goblin Slasher':               'goblin-slasher',
-    'Goddess Bow':                  'goddess-bow',
-    'Goddess Greatsword':           'goddess-greatsword',
-    'Goddess Staff':                'goddess-staff',
-    'Heavy Bow':                    'heavy-bow',
-    'Holy Fire Bow':                'holy-fire-bow',
-    'Holy Fire Staff':              'holy-fire-staff',
-    'Holy Fire Sword':              'holy-fire-sword',
-    'Infinity Staff':               'infinity-staff',
-    'Iokheira':                     'iokheira',
-    'Rampage Bow':                  'rampage-bow',
-    'Red Dragon Tooth':             'red-dragon-tooth',
-    'Red Ribboned Bow':             'red-ribboned-bow',
-    'Red Ribboned Staff':           'red-ribboned-staff',
-    'Red Ribboned Sword':           'red-ribboned-sword',
-    'Royal Cow Axe':                'royal-cow-axe',
-    'Royal Cow Bowgun':             'royal-cow-bowgun',
-    'Royal Cow Staff':              'royal-cow-staff',
-    'Sagittarius':                  'sagittarius',
-    'Sumarbrander':                 'sumarbrander',
-    'Tempest Bow':                  'tempest-bow',
-    'Tempest Staff':                'tempest-staff',
-    'Tempest Sword':                'tempest-sword',
-    'Thunderclap':                  'thunderclap',
-    'Trident':                      'trident',
-    'Tyrfingr':                     'tyrfingr',
-    'Void Staff':                   'void-staff',
-    'White Feather Fan':            'white-feather-fan',
-};
+// ─── Armor ────────────────────────────────────────────────────────────────────
+// Images live at: Assets/lostsword/armor/<file>.webp
 
-// Add unique: true to prevent an item being equipped on multiple characters.
-const weaponClasses = {
-    'Abyssal Bow':                { class: 'Archer' },
-    'Abyssal Greatsword':         { class: 'Knight' },
-    'Abyssal Staff':              { class: 'Wizard' },
-    'Aquarius':                   { class: 'Healer' },
-    'Arbalest':                   { class: 'Archer' },
-    'Arguros Toxos':              { class: 'Archer' },
-    'Arondight':                  { class: 'Knight' },
-    'Balisada':                   { class: 'Knight',  unique: true },
-    'Claiomh Solais Chaotic':     { class: 'Wizard',  unique: true },
-    'Cosmic Axe':                 { class: 'Knight' },
-    'Death Scythe':               { class: 'Wizard' },
-    'Demon Blade Hellhad':        { class: 'Knight' },
-    'Dragon Buster':              { class: 'Wizard' },
-    'Dragon Killer':              { class: 'Archer' },
-    'Dragon Slayer':              { class: 'Knight' },
-    'DualBlade':                  { class: 'Knight',  unique: true },
-    'Durendal':                   { class: 'Knight' },
-    'Failnaught':                 { class: 'Archer',  unique: true },
-    'Fire Dragon\'s Banner':      { class: 'Healer' },
-    'Fire Dragon\'s Curved Sword':{ class: 'Knight' },
-    'Fire Dragon\'s Great Bow':   { class: 'Archer' },
-    'Fragarach':                  { class: 'Knight' },
-    'Gambanteinn':                { classes: ['Wizard', 'Healer'] },
-    'Goblin Slasher':             { class: 'Knight' },
-    'Goddess Bow':                { class: 'Archer' },
-    'Goddess Greatsword':         { class: 'Knight' },
-    'Goddess Staff':              { class: 'Wizard' },
-    'Heavy Bow':                  { class: 'Archer' },
-    'Holy Fire Bow':              { class: 'Archer' },
-    'Holy Fire Staff':            { class: 'Wizard' },
-    'Holy Fire Sword':            { class: 'Knight' },
-    'Infinity Staff':             { classes: ['Wizard', 'Healer'], unique: true },
-    'Iokheira':                   { class: 'Archer' },
-    'Rampage Bow':                { class: 'Archer' },
-    'Red Dragon Tooth':           { class: 'Knight' },
-    'Red Ribboned Bow':           { class: 'Archer' },
-    'Red Ribboned Staff':         { class: 'Wizard' },
-    'Red Ribboned Sword':         { class: 'Knight' },
-    'Royal Cow Axe':              { class: 'Knight' },
-    'Royal Cow Bowgun':           { class: 'Archer' },
-    'Royal Cow Staff':            { class: 'Wizard' },
-    'Sagittarius':                { class: 'Archer' },
-    'Sumarbrander':               { class: 'Knight' },
-    'Tempest Bow':                { class: 'Archer' },
-    'Tempest Staff':              { classes: ['Wizard', 'Healer'] },
-    'Tempest Sword':              { class: 'Knight' },
-    'Thunderclap':                { class: 'Wizard' },
-    'Trident':                    { class: 'Knight',  unique: true },
-    'Tyrfingr':                   { class: 'Knight' },
-    'Void Staff':                 { classes: ['Wizard', 'Healer'] },
-    'White Feather Fan':          { class: 'Wizard' },
-};
-
-// ─── Armor Database ───────────────────────────────────────────────────────────
-// ADD ARMOR: push the display name to rawArmor, add the filename to
-// armorFilenames (kebab-case, no extension), and optionally restrict
-// it to a class in armorClasses. Image must live at: armor/<filename>.webp
-
-const rawArmor = [
-    'Royal Cow Armor', 'Silver Armor',
-    'Gold Armor', 'Abyssal Armor',
-    'Dragon Armor', 'Red Ribboned Robe',
-    'Tempest Armor', 'Gorgon Armor',
-    'Holy Fire Armor', 'Mirror armor',
-    'Mithril armor', 'Merlin\'s Robe',
-    'Armor of the dead', 'Fire Dragon\'s Armor',
-    'Wild Combat Suit', 'Wrath of Agnes',
-    'Goddess Armor', 'Absolute Armor',
+const ARMORS = [
+    { name: 'Royal Cow Armor',      file: 'royal-cow-armor'      },
+    { name: 'Silver Armor',         file: 'silver-armor'         },
+    { name: 'Gold Armor',           file: 'gold-armor'           },
+    { name: 'Abyssal Armor',        file: 'abyssal-armor'        },
+    { name: 'Dragon Armor',         file: 'dragon-armor'         },
+    { name: 'Red Ribboned Robe',    file: 'red-ribboned-robe'    },
+    { name: 'Tempest Armor',        file: 'tempest-armor'        },
+    { name: 'Gorgon Armor',         file: 'gorgon-armor'         },
+    { name: 'Holy Fire Armor',      file: 'holy-fire-armor'      },
+    { name: 'Mirror armor',         file: 'mirror-armor',         unique: true },
+    { name: 'Mithril armor',        file: 'mithril-armor'        },
+    { name: 'Merlin\'s Robe',       file: 'merlins-robe'         },
+    { name: 'Armor of the dead',    file: 'armor-of-the-dead'    },
+    { name: 'Fire Dragon\'s Armor', file: 'fire-dragons-armor'   },
+    { name: 'Wild Combat Suit',     file: 'wild-combat-suit'     },
+    { name: 'Wrath of Agnes',       file: 'wrath-of-agnes',       unique: true },
+    { name: 'Goddess Armor',        file: 'goddess-armor'        },
+    { name: 'Absolute Armor',       file: 'absolute-armor',       unique: true },
 ];
 
-const armorFilenames = {
-    'Royal Cow Armor':      'royal-cow-armor',
-    'Silver Armor':         'silver-armor',
-    'Gold Armor':           'gold-armor',
-    'Abyssal Armor':        'abyssal-armor',
-    'Dragon Armor':         'dragon-armor',
-    'Red Ribboned Robe':    'red-ribboned-robe',
-    'Tempest Armor':        'tempest-armor',
-    'Gorgon Armor':         'gorgon-armor',
-    'Holy Fire Armor':      'holy-fire-armor',
-    'Mirror armor':         'mirror-armor',
-    'Mithril armor':        'mithril-armor',
-    'Merlin\'s Robe':       'merlins-robe',
-    'Armor of the dead':    'armor-of-the-dead',
-    'Fire Dragon\'s Armor': 'fire-dragons-armor',
-    'Wild Combat Suit':     'wild-combat-suit',
-    'Wrath of Agnes':       'wrath-of-agnes',
-    'Goddess Armor':        'goddess-armor',
-    'Absolute Armor':       'absolute-armor',
-};
+// ─── Helmets ──────────────────────────────────────────────────────────────────
+// Images live at: Assets/lostsword/helmets/<file>.webp
 
-// Add unique: true to make that armor a one-slot-only item.
-const armorClasses = {
-    'Wrath of Agnes': { unique: true },
-    'Mirror armor':   { unique: true },
-    'Absolute Armor': { unique: true },
-};
-
-// ─── Helmet Database ──────────────────────────────────────────────────────────
-// ADD HELMETS: same pattern as armor above.
-// Image path: helmets/<filename>.webp
-
-const rawHelmets = [
-    'Abyssal Ring', 'Achilles Helmet',
-    'Aegis', 'Claiomh Solais Ring',
-    'Crown Of The Dead', 'Fire Dragon\'s Helmet',
-    'Goddess Ring', 'Healing Goddess Statue',
-    'Holy Fire Helmet', 'jade Seal', 'Red Hare',
-    'Red Ribboned Ring', 'Royal Cow Crown',
-    'Stiletto Of Jealousy', 'Tempest Helmet',
-    'Tiamat\'s Signature', 'Transformation Scroll',
-    'Wild Hair Band', 'Destrutions Favor',
+const HELMETS = [
+    { name: 'Abyssal Ring',           file: 'abyssal-ring'           },
+    { name: 'Achilles Helmet',        file: 'achilles-helmet'        },
+    { name: 'Aegis',                  file: 'aegis'                  },
+    { name: 'Claiomh Solais Ring',    file: 'claiomh-solais-ring'    },
+    { name: 'Crown Of The Dead',      file: 'crown-of-the-dead'      },
+    { name: 'Fire Dragon\'s Helmet',  file: 'fire-dragons-helmet'    },
+    { name: 'Goddess Ring',           file: 'goddess-ring'           },
+    { name: 'Healing Goddess Statue', file: 'healing-goddess-statue' },
+    { name: 'Holy Fire Helmet',       file: 'holy-fire-helmet'       },
+    { name: 'jade Seal',              file: 'jade-seal'              },
+    { name: 'Red Hare',               file: 'red-hare',               unique: true },
+    { name: 'Red Ribboned Ring',      file: 'red-ribboned-ring'      },
+    { name: 'Royal Cow Crown',        file: 'royal-cow-crown'        },
+    { name: 'Stiletto Of Jealousy',   file: 'stiletto-of-jealousy',   unique: true },
+    { name: 'Tempest Helmet',         file: 'tempest-helmet'         },
+    { name: 'Tiamat\'s Signature',    file: 'tiamat-signature',       unique: true },
+    { name: 'Transformation Scroll',  file: 'transformation-scroll',  unique: true },
+    { name: 'Wild Hair Band',         file: 'wild-hair-band'         },
+    { name: 'Destrutions Favor',      file: 'destructions-favor',     unique: true },
 ];
 
-const helmetFilenames = {
-    'Abyssal Ring':           'abyssal-ring',
-    'Achilles Helmet':        'achilles-helmet',
-    'Aegis':                  'aegis',
-    'Claiomh Solais Ring':    'claiomh-solais-ring',
-    'Crown Of The Dead':      'crown-of-the-dead',
-    'Fire Dragon\'s Helmet':  'fire-dragons-helmet',
-    'Goddess Ring':           'goddess-ring',
-    'Healing Goddess Statue': 'healing-goddess-statue',
-    'Holy Fire Helmet':       'holy-fire-helmet',
-    'jade Seal':              'jade-seal',
-    'Red Hare':               'red-hare',
-    'Red Ribboned Ring':      'red-ribboned-ring',
-    'Royal Cow Crown':        'royal-cow-crown',
-    'Stiletto Of Jealousy':   'stiletto-of-jealousy',
-    'Tempest Helmet':         'tempest-helmet',
-    'Tiamat\'s Signature':    'tiamat-signature',
-    'Transformation Scroll':  'transformation-scroll',
-    'Wild Hair Band':         'wild-hair-band',
-    'Destrutions Favor':      'destructions-favor',
-};
+// ─── Runes ────────────────────────────────────────────────────────────────────
+// Images live at: Assets/lostsword/runes/<file>.webp
 
-// Add unique: true to make that helmet a one-slot-only item.
-const helmetClasses = {
-    'Stiletto Of Jealousy':  { unique: true },
-    'Transformation Scroll': { unique: true },
-    'Tiamat\'s Signature':   { unique: true },
-    'Red Hare':              { unique: true },
-    'Destrutions Favor':     { unique: true },
-};
-
-// ─── Rune Database ────────────────────────────────────────────────────────────
-// ADD RUNES: same pattern as armor above.
-// Image path: runes/<filename>.webp
-
-const rawRunes = [
-    'Abyssal Rune', 'Celestial Rune',
-    'Claiomh Solais Rune', 'Extreme Rune',
-    'Goddess Rune', 'Holy Fire Rune',
-    'Memories Of Flame', 'Red Ribboned Rune',
-    'Royal Cow Rune', 'Rune Of Healing',
-    'Rune Of Focus', 'Rune Of The Deep Sea',
-    'Swordbringer Rune', 'Tempest Rune',
-    'ThunderHeart',
+const RUNES = [
+    { name: 'Abyssal Rune',         file: 'abyssal-rune'         },
+    { name: 'Celestial Rune',       file: 'celestial-rune',       unique: true },
+    { name: 'Claiomh Solais Rune',  file: 'claiomh-solais-rune'  },
+    { name: 'Extreme Rune',         file: 'extreme-rune',         unique: true },
+    { name: 'Goddess Rune',         file: 'goddess-rune'         },
+    { name: 'Holy Fire Rune',       file: 'holy-fire-rune'       },
+    { name: 'Memories Of Flame',    file: 'memories-of-flame',    unique: true },
+    { name: 'Red Ribboned Rune',    file: 'red-ribboned-rune'    },
+    { name: 'Royal Cow Rune',       file: 'royal-cow-rune'       },
+    { name: 'Rune Of Healing',      file: 'rune-of-healing',      class: 'Healer' },
+    { name: 'Rune Of Focus',        file: 'rune-of-focus',        excludeClass: 'Healer' },
+    { name: 'Rune Of The Deep Sea', file: 'rune-of-the-deep-sea' },
+    { name: 'Swordbringer Rune',    file: 'swordbringer-rune'    },
+    { name: 'Tempest Rune',         file: 'tempest-rune'         },
+    { name: 'ThunderHeart',         file: 'thunderheart'         },
 ];
 
-const runeFilenames = {
-    'Abyssal Rune':        'abyssal-rune',
-    'Celestial Rune':      'celestial-rune',
-    'Claiomh Solais Rune': 'claiomh-solais-rune',
-    'Extreme Rune':        'extreme-rune',
-    'Goddess Rune':        'goddess-rune',
-    'Holy Fire Rune':      'holy-fire-rune',
-    'Memories Of Flame':   'memories-of-flame',
-    'Red Ribboned Rune':   'red-ribboned-rune',
-    'Royal Cow Rune':      'royal-cow-rune',
-    'Rune Of Healing':     'rune-of-healing',
-    'Rune Of Focus':       'rune-of-focus',
-    'Rune Of The Deep Sea':'rune-of-the-deep-sea',
-    'Swordbringer Rune':   'swordbringer-rune',
-    'Tempest Rune':        'tempest-rune',
-    'ThunderHeart':        'thunderheart',
-};
+// ─── Compatibility shims for teamgrid.js ──────────────────────────────────────
+// teamgrid.js reads rawWeapons / weaponFilenames / weaponClasses etc. to build
+// db.Weapon. These shims derive those three shapes from the unified arrays above
+// so teamgrid.js needs no changes.
 
-// Add unique: true or excludeClass: 'ClassName' as needed.
-const runeClasses = {
-    'Rune Of Healing':   { class: 'Healer' },
-    'Rune Of Focus':     { excludeClass: 'Healer' },
-    'Memories Of Flame': { unique: true },
-    'Extreme Rune':      { unique: true },
-    'Celestial Rune':    { unique: true },
-};
+const rawWeapons = WEAPONS.map(w => w.name);
+const weaponFilenames = Object.fromEntries(WEAPONS.map(w => [w.name, w.file]));
+const weaponClasses   = Object.fromEntries(WEAPONS.map(w => [w.name, {
+    ...(w.class        && { class:        w.class        }),
+    ...(w.classes      && { classes:      w.classes      }),
+    ...(w.excludeClass && { excludeClass: w.excludeClass }),
+    ...(w.unique       && { unique:       w.unique       }),
+}]));
+
+const rawArmor = ARMORS.map(a => a.name);
+const armorFilenames = Object.fromEntries(ARMORS.map(a => [a.name, a.file]));
+const armorClasses   = Object.fromEntries(ARMORS.filter(a => a.unique || a.class || a.excludeClass).map(a => [a.name, {
+    ...(a.class        && { class:        a.class        }),
+    ...(a.excludeClass && { excludeClass: a.excludeClass }),
+    ...(a.unique       && { unique:       a.unique       }),
+}]));
+
+const rawHelmets = HELMETS.map(h => h.name);
+const helmetFilenames = Object.fromEntries(HELMETS.map(h => [h.name, h.file]));
+const helmetClasses   = Object.fromEntries(HELMETS.filter(h => h.unique || h.class || h.excludeClass).map(h => [h.name, {
+    ...(h.class        && { class:        h.class        }),
+    ...(h.excludeClass && { excludeClass: h.excludeClass }),
+    ...(h.unique       && { unique:       h.unique       }),
+}]));
+
+const rawRunes = RUNES.map(r => r.name);
+const runeFilenames = Object.fromEntries(RUNES.map(r => [r.name, r.file]));
+const runeClasses   = Object.fromEntries(RUNES.filter(r => r.unique || r.class || r.excludeClass).map(r => [r.name, {
+    ...(r.class        && { class:        r.class        }),
+    ...(r.excludeClass && { excludeClass: r.excludeClass }),
+    ...(r.unique       && { unique:       r.unique       }),
+}]));
