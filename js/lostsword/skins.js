@@ -107,6 +107,9 @@ async function _probeSkins(charName) {
 
     // Re-render panels so the swap button / dots reflect the real count.
     if (typeof renderTeamGrid         === 'function') renderTeamGrid();
+    // renderTeamGrid calls updateFormation internally, but also call it
+    // directly so formation icons always reflect the active skin.
+    if (typeof updateFormation        === 'function') updateFormation();
     if (typeof renderUltimateRotation === 'function') renderUltimateRotation();
     if (typeof bstatDealt !== 'undefined' && bstatDealt && typeof renderBStatBars === 'function') renderBStatBars();
 }
@@ -157,6 +160,9 @@ function cycleSkin(slotIndex, event) {
     slotSkinIndex[slotIndex] = (slotSkinIndex[slotIndex] + 1) % total;
 
     if (typeof renderTeamGrid         === 'function') renderTeamGrid();
+    // renderTeamGrid calls updateFormation internally, but also call it
+    // directly so formation icons always reflect the active skin.
+    if (typeof updateFormation        === 'function') updateFormation();
     if (typeof renderUltimateRotation === 'function') renderUltimateRotation();
     if (typeof bstatDealt !== 'undefined' && bstatDealt && typeof renderBStatBars === 'function') renderBStatBars();
 }
