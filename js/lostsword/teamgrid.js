@@ -696,6 +696,16 @@ const _formImgCache = {};
 
 function _drawFormationFace(canvas, imgSrc, size) {
     function doDraw(img) {
+        // Scale canvas backing store by devicePixelRatio for sharp rendering
+        // on high-DPI screens. CSS width/height stay at the logical size.
+        const dpr  = window.devicePixelRatio || 1;
+        const phys = Math.round(size * dpr);
+
+        if (canvas.width !== phys || canvas.height !== phys) {
+            canvas.width  = phys;
+            canvas.height = phys;
+        }
+
         const ctx = canvas.getContext('2d');
         const iw  = img.naturalWidth  || img.width;
         const ih  = img.naturalHeight || img.height;
@@ -711,12 +721,12 @@ function _drawFormationFace(canvas, imgSrc, size) {
         const srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
         const srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
 
-        ctx.clearRect(0, 0, size, size);
+        ctx.clearRect(0, 0, phys, phys);
         ctx.save();
         ctx.beginPath();
-        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
+        ctx.arc(phys / 2, phys / 2, phys / 2, 0, Math.PI * 2);
         ctx.clip();
-        ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, size, size);
+        ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, phys, phys);
         ctx.restore();
     }
 
@@ -781,7 +791,9 @@ function updateFormation() {
                 style="position:absolute;left:4px;top:50%;transform:translateY(-50%);
                        width:${ICON_SIZE}px;height:${ICON_SIZE}px;flex-shrink:0;
                        border-radius:50%;border:1.5px solid ${ringColor};
-                       display:block;background:#20222f;"></canvas>` : ''}`;
+                       display:block;background:#20222f;
+                       image-rendering:-webkit-optimize-contrast;
+                       image-rendering:crisp-edges;"></canvas>` : ''}`;
 
         // Draw face crop after DOM update
         if (imgSrc) {
