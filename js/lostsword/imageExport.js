@@ -535,11 +535,27 @@ async function exportCapturePNG() {
                             // Gear equipped — explicitly keep visible
                             wrapper.style.visibility = 'visible';
                             wrapper.style.opacity    = '1';
-                            // Find the squircle and force it visible too
+                            // Find the squircle and force it visible + correct bg/border
                             var squircle = wrapper.querySelector('.slot-squircle');
                             if (squircle) {
                                 squircle.style.visibility = 'visible';
                                 squircle.style.opacity    = '1';
+                                var gearEntry = (typeof db !== 'undefined' && db[cat])
+                                    ? db[cat].find(function(g) { return g.name === slot.gear[cat]; })
+                                    : null;
+                                if (gearEntry && gearEntry.unique) {
+                                    squircle.style.background  = '#180f2a';
+                                    squircle.style.borderColor = '#a855f7';
+                                    squircle.style.borderStyle = 'solid';
+                                    squircle.style.borderWidth = '1.5px';
+                                    squircle.style.boxShadow   = 'none';
+                                } else {
+                                    squircle.style.background  = '#20222f';
+                                    squircle.style.borderColor = '#334155';
+                                    squircle.style.borderStyle = 'solid';
+                                    squircle.style.borderWidth = '1px';
+                                    squircle.style.boxShadow   = 'none';
+                                }
                             }
                             // Stat badge: hide only if no priority stats saved
                             var sp = (slot.statPriority && slot.statPriority[cat]) || [];

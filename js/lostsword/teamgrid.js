@@ -625,9 +625,14 @@ function renderTeamGrid() {
                     const statColors = { ATK:'#fb923c', CD:'#f472b6', IDR:'#a78bfa', HP:'#34d399' };
                     const firstStat  = sp[0] || '';
                     const badgeColor = statColors[firstStat] || '#4b6bfb';
+                    const gearEntry  = slot.gear[cat] ? db[cat].find(g => g.name === slot.gear[cat]) : null;
+                    const isUnique   = gearEntry?.unique || false;
+                    const squircleStyle = isUnique
+                        ? 'background:#180f2a !important;border-color:#a855f7 !important;box-shadow:0 0 0 1px #a855f733 inset !important;'
+                        : '';
                     return `
                     <div class="flex flex-col gap-0.5" data-gear-cat="${cat}">
-                        <div class="slot-squircle bg-slotBg border border-slate-700 flex flex-col items-center justify-center cursor-pointer p-1 relative" onclick="openModal('${index}', 'gear', '${cat}')">
+                        <div class="slot-squircle bg-slotBg border border-slate-700 flex flex-col items-center justify-center cursor-pointer p-1 relative" style="${squircleStyle}" onclick="openModal('${index}', 'gear', '${cat}')">
                             <div id="gear-display-${index}-${cat}" class="gear-display">
                                 ${slot.gear[cat] ? (() => {
                                     const gearData = db[cat].find(g => g.name === slot.gear[cat]);
@@ -947,6 +952,32 @@ function renderModalGrid(items, isChar) {
         }
     }
 
+    // For character modals: pin all currently-slotted characters to the top (in slot order)
+    const slottedCharNames = currentActiveCategory === 'character'
+        ? slotData.map(s => s.character).filter(Boolean)
+        : [];
+    if (slottedCharNames.length > 0) {
+        const slottedSet  = new Set(slottedCharNames);
+        const slottedItems = slottedCharNames
+            .map(name => items.find(i => i.name === name))
+            .filter(Boolean);
+        const restItems    = items.filter(i => !slottedSet.has(i.name));
+        items = [...slottedItems, ...restItems];
+    }
+
+    // For card modals: pin all currently-equipped cards to the top
+    if (currentActiveCategory === 'card') {
+        const equippedCardNames = slotData.map(s => s.card).filter(Boolean);
+        if (equippedCardNames.length > 0) {
+            const equippedSet   = new Set(equippedCardNames);
+            const equippedItems = equippedCardNames
+                .map(name => items.find(i => i.name === name))
+                .filter(Boolean);
+            const restItems     = items.filter(i => !equippedSet.has(i.name));
+            items = [...equippedItems, ...restItems];
+        }
+    }
+
     // None tile
     const noneBox = document.createElement('div');
     noneBox.className = "item-card bg-[#1a1c28] border border-dashed border-slate-600 rounded-lg p-1.5 flex flex-col items-center justify-center cursor-pointer hover:border-red-500 hover:bg-[#1f1014] transition-all";
@@ -982,8 +1013,12 @@ function renderModalGrid(items, isChar) {
         const el          = info.element || '';
         const rar         = info.rarity  || '';
         const rarColor    = rar === '5' ? '#fbbf24' : rar === '4' ? '#a78bfa' : '#64748b';
-        const isEquipped  = equippedGearName && item.name === equippedGearName;
-        const isSelected  = multiSelectMode && multiSelectedItems.has(item.name);
+        const isEquipped     = equippedGearName && item.name === equippedGearName;
+        const isSelected     = multiSelectMode && multiSelectedItems.has(item.name);
+        const isSlotted      = slottedCharNames.includes(item.name);
+        const isSlottedPet   = isPet && petsData.some(p => p.name === item.name);
+        const isSlottedCard  = currentActiveCategory === 'card' && slotData.some(s => s.card === item.name);
+        const isHighlighted  = isSlotted || isSlottedPet || isSlottedCard || isEquipped;
         const maxSlots    = currentActiveCategory === 'pet' ? 3 : 5;
         const atCap       = multiSelectMode && multiSelectedItems.size >= maxSlots && !isSelected;
         const imgFit      = (isChar || isPet) ? 'object-cover object-top' : 'object-contain';
@@ -991,11 +1026,11 @@ function renderModalGrid(items, isChar) {
         const itemBox     = document.createElement('div');
         itemBox.className = "item-card bg-[#1a1c28] border border-[#2d3142] rounded-lg p-1.5 flex flex-col items-center justify-between transition-all"
             + (isSelected ? ' multi-selected' : '')
-            + (isEquipped ? ' equipped-item' : '')
+            + (isHighlighted ? ' equipped-item' : '')
             + (atCap ? '' : ' cursor-pointer hover:border-[#4b6bfb] hover:bg-[#1e2240]');
         itemBox.style.cssText = atCap
             ? 'aspect-ratio:3/4;opacity:0.35;cursor:not-allowed;'
-            : isEquipped
+            : isHighlighted
                 ? 'aspect-ratio:3/4;border-color:#4b6bfb;background:#1a1e36;box-shadow:0 0 0 2px #4b6bfb44 inset;'
                 : 'aspect-ratio:3/4;';
         itemBox.onclick = () => selectItem(item);
@@ -1004,24 +1039,27 @@ function renderModalGrid(items, isChar) {
             ? '<div style="position:absolute;inset:0;background:rgba(75,107,251,0.25);display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-check text-white" style="font-size:20px;filter:drop-shadow(0 1px 3px #000)"></i></div>'
             : '';
         const rarBadge = rar ? `<span style="position:absolute;top:3px;right:3px;font-size:8px;font-weight:700;color:${rarColor};text-shadow:0 1px 3px #000">${rar}★</span>` : '';
+        const inTeamBadge = (isSlotted || isSlottedPet)
+            ? `<div style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);background:#1e3a5f;border:1px solid #3b82f655;color:#60a5fa;font-size:7px;font-weight:800;padding:1px 5px;border-radius:3px;letter-spacing:0.05em;white-space:nowrap;">${isSlottedPet ? 'EQUIPPED' : 'IN TEAM'}</div>`
+            : '';
 
         if (isChar || isPet) {
             itemBox.innerHTML = `
                 <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
                     <img src="${item.img}" alt="${item.name}" class="w-full h-full ${imgFit}" loading="lazy" onerror="this.style.display='none'">
-                    ${rarBadge}${selOverlay}
+                    ${rarBadge}${selOverlay}${inTeamBadge}
                 </div>
                 <span class="text-[10px] font-bold text-slate-300 text-center leading-tight w-full truncate">${item.name}</span>
                 ${el ? `<span class="char-el-badge badge-${el} mt-0.5">${el}</span>` : ''}`;
         } else {
-            const equippedBadge = isEquipped
+            const equippedBadge = (isEquipped || isSlottedCard)
                 ? `<div style="position:absolute;bottom:3px;left:50%;transform:translateX(-50%);background:#4b6bfb;color:#fff;font-size:7px;font-weight:800;padding:1px 5px;border-radius:3px;letter-spacing:0.05em;white-space:nowrap;">EQUIPPED</div>`
                 : '';
             // Cards: show cardName + (charName) as two stacked lines
             const isCard     = currentActiveCategory === 'card';
             const dispName   = isCard ? (item.cardName || item.name) : item.name;
             const dispSub    = isCard && item.charName && item.charName !== dispName ? item.charName : null;
-            const nameColor  = isEquipped ? '#7c9dff' : '#e2e8f0';
+            const nameColor  = isHighlighted ? '#7c9dff' : '#e2e8f0';
             itemBox.innerHTML = `
                 <div class="w-full flex-1 bg-[#111218] rounded mb-1 flex items-center justify-center text-[10px] text-slate-600 overflow-hidden relative" style="min-height:60px">
                     <img src="${item.img}" alt="${item.name}" class="w-full h-full object-contain" loading="lazy" onerror="this.style.display='none'">

@@ -238,19 +238,49 @@ function selectUltimateCharacter(slotIdx) {
 }
 
 function selectUltimateX2() {
+    if (_ultSeqActive && _ultSeqEnabled) {
+        // Sequence mode: place x2 at the next slot after the queued characters
+        const targetIdx = _ultSeqStartIdx + _ultSeqQueue.length;
+        if (targetIdx < ultimateRotation.length) {
+            ultimateRotation[targetIdx].character = 'x2';
+            ultimateRotation[targetIdx].time = '';
+            // Clear any slots beyond this marker so they don't show stale data
+            for (let i = targetIdx + 1; i < ultimateRotation.length; i++) {
+                ultimateRotation[i].character = null;
+                ultimateRotation[i].time = '';
+            }
+        }
+        renderUltimateRotation();
+        closeModal();
+        return;
+    }
     if (typeof currentActiveSection !== 'number') return;
     ultimateRotation[currentActiveSection].character = 'x2';
     ultimateRotation[currentActiveSection].time = '';
-    _ultSeqQueue = [];
     renderUltimateRotation();
     closeModal();
 }
 
 function selectUltimateAuto() {
+    if (_ultSeqActive && _ultSeqEnabled) {
+        // Sequence mode: place auto at the next slot after the queued characters
+        const targetIdx = _ultSeqStartIdx + _ultSeqQueue.length;
+        if (targetIdx < ultimateRotation.length) {
+            ultimateRotation[targetIdx].character = 'auto';
+            ultimateRotation[targetIdx].time = '';
+            // Clear any slots beyond this marker so they don't show stale data
+            for (let i = targetIdx + 1; i < ultimateRotation.length; i++) {
+                ultimateRotation[i].character = null;
+                ultimateRotation[i].time = '';
+            }
+        }
+        renderUltimateRotation();
+        closeModal();
+        return;
+    }
     if (typeof currentActiveSection !== 'number') return;
     ultimateRotation[currentActiveSection].character = 'auto';
     ultimateRotation[currentActiveSection].time = '';
-    _ultSeqQueue = [];
     renderUltimateRotation();
     closeModal();
 }
