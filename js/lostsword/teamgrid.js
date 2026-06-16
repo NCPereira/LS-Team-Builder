@@ -695,59 +695,16 @@ function renderTeamGrid() {
 }
 
 // ── Formation ─────────────────────────────────────────────────────────────────
+// Formation slots use the pre-cropped _xs icon images — no canvas/face-crop needed.
+// The _formImgCache and _drawFormationFace are kept as stubs so imageExport.js
+// (which references them) continues to compile without errors.
 
-// Image cache for formation slot face-crop icons (reuse battlestats cache if available)
-const _formImgCache = {};
+const _formImgCache = {}; // kept for imageExport.js compatibility (no longer drawn into)
 
-function _drawFormationFace(canvas, imgSrc, size) {
-    function doDraw(img) {
-        // Scale canvas backing store by devicePixelRatio for sharp rendering
-        // on high-DPI screens. CSS width/height stay at the logical size.
-        const dpr  = window.devicePixelRatio || 1;
-        const phys = Math.round(size * dpr);
-
-        if (canvas.width !== phys || canvas.height !== phys) {
-            canvas.width  = phys;
-            canvas.height = phys;
-        }
-
-        const ctx = canvas.getContext('2d');
-        const iw  = img.naturalWidth  || img.width;
-        const ih  = img.naturalHeight || img.height;
-
-        // Use getFacePosition (from index.html) for smart face crop
-        const posStr = (typeof getFacePosition === 'function') ? getFacePosition(imgSrc) : '50% 10%';
-        const parts  = posStr.split(' ');
-        const faceCX = parseFloat(parts[0]) / 100;
-        const faceCY = parseFloat(parts[1]) / 100;
-
-        // Crop a square from the source, centred on the detected face
-        const cropSide = Math.min(iw, ih * 0.65);
-        const srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
-        const srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
-
-        ctx.clearRect(0, 0, phys, phys);
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(phys / 2, phys / 2, phys / 2, 0, Math.PI * 2);
-        ctx.clip();
-        ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, phys, phys);
-        ctx.restore();
-    }
-
-    const cached = _formImgCache[imgSrc] || (typeof _dmgImgCache !== 'undefined' && _dmgImgCache[imgSrc]);
-    if (cached) {
-        doDraw(cached);
-    } else {
-        const img = new Image();
-        img.onload = () => { _formImgCache[imgSrc] = img; doDraw(img); };
-        img.onerror = () => {};
-        img.src = imgSrc;
-    }
-}
+function _drawFormationFace() {} // no-op stub — replaced by direct icon img
 
 function updateFormation() {
-    const ICON_SIZE = 34; // px — diameter of circular avatar
+    const ICON_SIZE = 34; // px — display size of the circular icon
 
     formationSlots.forEach((teamSlotIdx, formIdx) => {
         const el = document.getElementById(`form-slot-${formIdx}`);
@@ -759,15 +716,12 @@ function updateFormation() {
             return;
         }
 
-        const charName  = slotData[teamSlotIdx].character;
-        const charEntry = (typeof db !== 'undefined' && db.characters)
-            ? db.characters.find(c => c.name === charName)
-            : null;
+        const charName = slotData[teamSlotIdx].character;
 
-        // Get skin-aware image src
-        const imgSrc = (typeof getSlotCharImg === 'function')
-            ? (getSlotCharImg(teamSlotIdx) || (charEntry && charEntry.img))
-            : (charEntry && charEntry.img);
+        // Use the pre-cropped _xs icon — skin-aware via getSlotIconPath
+        const iconSrc = (typeof getSlotIconPath === 'function')
+            ? getSlotIconPath(teamSlotIdx, 'xs')
+            : (typeof getCharIconPath === 'function' ? getCharIconPath(charName, 'xs') : null);
 
         // Element border colour for the circle ring
         const charInfo  = (typeof getCharInfo === 'function') ? getCharInfo(charName) : {};
@@ -777,36 +731,25 @@ function updateFormation() {
         };
         const ringColor = elColors[charInfo.element] || '#2d3142';
 
-        const canvasId = `form-face-${formIdx}`;
-
-        // Use relative positioning so the icon can be pinned to the right edge
         el.style.position       = 'relative';
         el.style.display        = 'flex';
         el.style.alignItems     = 'center';
         el.style.justifyContent = 'center';
+        el.style.gap            = '4px';
         el.style.overflow       = 'hidden';
-        el.style.padding        = '0';
+        el.style.padding        = '2px 4px';
 
         el.innerHTML = `
+            ${iconSrc ? `<img src="${iconSrc}" alt="${charName}" data-no-replace="1"
+                style="width:${ICON_SIZE}px;height:${ICON_SIZE}px;flex-shrink:0;
+                       border-radius:50%;border:1.5px solid ${ringColor};
+                       display:block;background:#20222f;object-fit:cover;
+                       image-rendering:-webkit-optimize-contrast;"
+                onerror="this.style.display='none'">` : ''}
             <span style="font-size:10px;font-weight:700;color:#e2e8f0;
                          overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-                         max-width:calc(100% - ${ICON_SIZE + 6}px);
-                         text-align:center;">${charName}</span>
-            ${imgSrc ? `<canvas id="${canvasId}" width="${ICON_SIZE}" height="${ICON_SIZE}"
-                style="position:absolute;left:4px;top:50%;transform:translateY(-50%);
-                       width:${ICON_SIZE}px;height:${ICON_SIZE}px;flex-shrink:0;
-                       border-radius:50%;border:1.5px solid ${ringColor};
-                       display:block;background:#20222f;
-                       image-rendering:-webkit-optimize-contrast;
-                       image-rendering:crisp-edges;"></canvas>` : ''}`;
-
-        // Draw face crop after DOM update
-        if (imgSrc) {
-            requestAnimationFrame(() => {
-                const canvas = document.getElementById(canvasId);
-                if (canvas) _drawFormationFace(canvas, imgSrc, ICON_SIZE);
-            });
-        }
+                         flex:1;min-width:0;
+                         text-align:center;">${charName}</span>`;
     });
 }
 

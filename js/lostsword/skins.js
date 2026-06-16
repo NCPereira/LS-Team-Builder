@@ -10,6 +10,21 @@
 // skin stem ("Sk_Lancelot"), then _SKIN_MAX_PROBE variants (_01 … _0N) are
 // probed at runtime.  Only files that actually load are kept.
 //
+// ICON SYSTEM
+// ─────────────────────────────────────────────────────────────────────────────
+// Every character and skin has two pre-cropped icon sizes:
+//   Large  : Assets/lostsword/icons/Icon_<NamePart>_01.webp
+//            Used for: ult-rotation slots, damage-dealt bars
+//   Small  : Assets/lostsword/icons/Icon_<NamePart>_01_xs.webp
+//            Used for: formation slot icons
+//
+// Skin icon variants follow the same pattern under the Skins subfolder:
+//   Large  : Assets/lostsword/icons/Skins/Icon_<SkinStem>_01.webp
+//   Small  : Assets/lostsword/icons/Skins/Icon_<SkinStem>_01_xs.webp
+//
+// The full-resolution character portrait (rawCharacters/Pc_*) is still used
+// for the main team card portrait — only the icon slots switch to these files.
+//
 // IRREGULAR FILENAMES
 // A small override map handles cases where the skin filename doesn't match the
 // character's internal name (e.g. Ray's skins are filed under "Sk_Rey_*").
@@ -33,6 +48,80 @@ const _SKIN_STEM_OVERRIDES = {
     // on disk use 'Sk_MorganLeFay_*' (capital L and F).
     'Morgan Le Fay': 'Sk_MorganLeFay',
 };
+
+// ── Icon path helpers ─────────────────────────────────────────────────────────
+// Derive the NamePart from a character's internalName (e.g. 'Pc_Lancelot_01' → 'Lancelot').
+// This matches the Icon_<NamePart>_01[_xs].webp filename convention on disk.
+
+function _charIconStem(charNameOrInternal) {
+    // Accept either a display name or raw internal name
+    // First try to find the CHARACTERS entry by display name
+    const entry = CHARACTERS.find(c => parseName(c.internalName) === charNameOrInternal);
+    if (entry) {
+        // Extract the middle segment: 'Pc_Lancelot_01' → 'Lancelot'
+        return entry.internalName.split('_')[1] || entry.internalName;
+    }
+    // Fallback: assume charNameOrInternal is already the NamePart or display name
+    // Strip spaces for names like 'Joan Of Arc' → 'Joanofarc' won't match, but
+    // we handle those through the CHARACTERS lookup above so this is a last resort.
+    return charNameOrInternal.replace(/\s+/g, '');
+}
+
+/**
+ * Return the icon path for a character (base skin, no skin active).
+ * Files live at: Assets/lostsword/icons/Characters/Icon_<NamePart>_01[_xs].webp
+ * @param {string} charName  - display name, e.g. "Lancelot"
+ * @param {'large'|'xs'} size
+ */
+function getCharIconPath(charName, size) {
+    const stem = _charIconStem(charName);
+    const suffix = size === 'xs' ? '_xs' : '';
+    return `Assets/lostsword/icons/Characters/Icon_${stem}_01${suffix}.webp`;
+}
+
+/**
+ * Return the icon path for a skin variant.
+ * @param {string} skinStem  - e.g. "Sk_Lancelot_01" (the confirmed skin stem)
+ * @param {'large'|'xs'} size
+ */
+function getSkinIconPath(skinStem, size) {
+    const suffix = size === 'xs' ? '_xs' : '';
+    return `Assets/lostsword/icons/Skins/Icon_${skinStem}${suffix}.webp`;
+}
+
+/**
+ * Return the appropriate icon URL for a team slot.
+ * Uses the skin icon when a skin is active, otherwise the base character icon.
+ * @param {number} slotIndex
+ * @param {'large'|'xs'} size
+ */
+function getSlotIconPath(slotIndex, size) {
+    if (typeof slotData === 'undefined') return null;
+    const slot = slotData[slotIndex];
+    if (!slot || !slot.character) return null;
+
+    const skinIdx = slotSkinIndex[slotIndex];
+    if (skinIdx > 0) {
+        const skins = _resolvedSkins[slot.character];
+        if (Array.isArray(skins) && skins[skinIdx - 1]) {
+            return getSkinIconPath(skins[skinIdx - 1], size);
+        }
+    }
+
+    return getCharIconPath(slot.character, size);
+}
+
+/**
+ * Return the icon URL for any character by display name (ignores skin state).
+ * Used by ult-rotation and damage bars where we just need "this character's icon".
+ * @param {string} charName
+ * @param {'large'|'xs'} size
+ * @param {string|null} [activeSkinStem]  - pass the active skin stem to get skin icon
+ */
+function getCharOrSkinIconPath(charName, size, activeSkinStem) {
+    if (activeSkinStem) return getSkinIconPath(activeSkinStem, size);
+    return getCharIconPath(charName, size);
+}
 
 // ── Auto-generate _skinCandidates from CHARACTERS ────────────────────────────
 // CHARACTERS is defined in characters.js which is loaded before this file.
@@ -93,7 +182,10 @@ async function _probeSkins(charName) {
     const confirmed  = [];
 
     for (const stem of candidates) {
-        const url = `Assets/lostsword/skins/${stem}.webp`;
+        // Probe using the skin icon (large) — if the icon exists the skin is available.
+        // We still store the Sk_* stem for building rawCharacters portrait paths,
+        // but all icon rendering will use getSkinIconPath() going forward.
+        const url = getSkinIconPath(stem, 'large');
         const ok  = await _probeImage(url);
         if (ok) {
             confirmed.push(stem);
@@ -130,7 +222,8 @@ function getSkins(charName) {
 // 0 = base character image, 1+ = index into the confirmed skins array.
 let slotSkinIndex = [0, 0, 0, 0, 0];
 
-// Return the correct image src for a team slot (base or active skin).
+// Return the correct FULL PORTRAIT src for a team slot (base rawCharacter or skin portrait).
+// This is still used for the main team card portrait area (not icon slots).
 function getSlotCharImg(slotIndex) {
     const slot = slotData[slotIndex];
     if (!slot || !slot.character) return null;
@@ -139,6 +232,7 @@ function getSlotCharImg(slotIndex) {
     if (skinIdx > 0) {
         const skins = _resolvedSkins[slot.character];
         if (Array.isArray(skins) && skins[skinIdx - 1]) {
+            // Return the full-res skin portrait (Assets/lostsword/skins/Sk_*.webp)
             return `Assets/lostsword/skins/${skins[skinIdx - 1]}.webp`;
         }
     }

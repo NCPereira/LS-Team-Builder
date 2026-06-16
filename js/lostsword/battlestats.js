@@ -367,58 +367,14 @@ async function processBStatImage(file) {
     }
 }
 
-// ── Canvas face-crop for damage bar icons ─────────────────────────────────────
-// Avoids CSS object-fit zoom distortion by drawing a 1:1 crop of the face area.
+// ── Damage bar icon cache ─────────────────────────────────────────────────────
+// Kept for imageExport.js compatibility (it references _dmgFaceDrawQueue / _dmgImgCache).
+// Icon rendering now uses pre-cropped image files directly — no canvas needed.
 
-let _dmgFaceDrawQueue = [];
+let _dmgFaceDrawQueue = [];  // no longer used at runtime; kept for export compat
+const _dmgImgCache    = {};  // kept for export compat
 
-// Image cache so we don't reload the same source repeatedly
-const _dmgImgCache = {};
-
-function _flushDmgFaceQueue() {
-    const queue = _dmgFaceDrawQueue.splice(0);
-    queue.forEach(({ canvasId, imgSrc, size }) => {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-
-        function drawCrop(img) {
-            const ctx = canvas.getContext('2d');
-            const iw = img.naturalWidth  || img.width;
-            const ih = img.naturalHeight || img.height;
-
-            // Determine the face-region vertical centre from getFacePosition
-            // getFacePosition returns "X% Y%" — we use the Y% to position the crop window
-            const posStr = (typeof getFacePosition === 'function') ? getFacePosition(imgSrc) : '50% 10%';
-            const parts  = posStr.split(' ');
-            const faceCX = parseFloat(parts[0]) / 100;  // 0–1 horizontal
-            const faceCY = parseFloat(parts[1]) / 100;  // 0–1 vertical
-
-            // Crop a square from the source image — use the full width as the crop side
-            // so the face is never zoomed in, just repositioned.
-            const cropSide = Math.min(iw, ih * 0.65); // portrait images: take upper portion
-            const srcX = Math.max(0, Math.min(iw - cropSide, (iw * faceCX) - cropSide / 2));
-            const srcY = Math.max(0, Math.min(ih - cropSide, (ih * faceCY) - cropSide / 2));
-
-            // Clip to circle and draw
-            ctx.clearRect(0, 0, size, size);
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2);
-            ctx.clip();
-            ctx.drawImage(img, srcX, srcY, cropSide, cropSide, 0, 0, size, size);
-            ctx.restore();
-        }
-
-        if (_dmgImgCache[imgSrc]) {
-            drawCrop(_dmgImgCache[imgSrc]);
-        } else {
-            const img = new Image();
-            img.onload = () => { _dmgImgCache[imgSrc] = img; drawCrop(img); };
-            img.onerror = () => {};
-            img.src = imgSrc;
-        }
-    });
-}
+function _flushDmgFaceQueue() {}  // no-op stub
 
 // ── Render bar chart ───────────────────────────────────────────────────────────
 
@@ -465,9 +421,6 @@ function renderBStatBars() {
         return { teamSlotIdx, value: ocrRow.value, pct: ocrRow.pct };
     });
 
-    // Reset the draw queue — each row push will add its canvas job
-    _dmgFaceDrawQueue = [];
-
     barsEl.innerHTML = displayRows.map((entry, i) => {
         const { teamSlotIdx, value, pct } = entry;
         const barPct = maxVal > 0 ? (value / maxVal * 100).toFixed(1) : 0;
@@ -483,25 +436,28 @@ function renderBStatBars() {
                 ? 'linear-gradient(90deg,#f59e0b,#fbbf24)'
                 : 'linear-gradient(90deg,#4b6bfb,#7c9dff)';
 
-        const ICON_SIZE = 72; // px — display size of the circular avatar
-        const slotChar = (typeof slotData !== 'undefined' && slotData[teamSlotIdx]) ? slotData[teamSlotIdx].character : null;
+        const ICON_SIZE   = 72; // px — display size of the circular icon
+        const slotChar    = (typeof slotData !== 'undefined' && slotData[teamSlotIdx]) ? slotData[teamSlotIdx].character : null;
         const borderColor = elColors ? elColors[0] : '#2d3142';
-        const ringStyle = `width:${ICON_SIZE}px;height:${ICON_SIZE}px;border-radius:50%;border:2px solid ${borderColor};overflow:hidden;background:#20222f;flex-shrink:0;box-shadow:0 0 8px ${borderColor}55;`;
+        const ringStyle   = `width:${ICON_SIZE}px;height:${ICON_SIZE}px;border-radius:50%;border:2px solid ${borderColor};overflow:hidden;background:#20222f;flex-shrink:0;box-shadow:0 0 8px ${borderColor}55;`;
 
         let iconHtml = '';
         if (slotChar) {
             const charEntry = (typeof db !== 'undefined' && db.characters) ? db.characters.find(c => c.name === slotChar) : null;
             if (charEntry) {
-                const imgSrc = (typeof getSlotCharImg === 'function')
+                // Use the pre-cropped large icon — skin-aware via getSlotIconPath
+                const iconSrc = (typeof getSlotIconPath === 'function')
+                    ? (getSlotIconPath(teamSlotIdx, 'large') || getCharIconPath(slotChar, 'large'))
+                    : (typeof getCharIconPath === 'function' ? getCharIconPath(slotChar, 'large') : charEntry.img);
+                // onerror falls back to the full portrait with face-position
+                const fallbackSrc = (typeof getSlotCharImg === 'function')
                     ? (getSlotCharImg(teamSlotIdx) || charEntry.img)
                     : charEntry.img;
-                // Use a canvas element that we fill via JS after render — avoids CSS zoom distortion
-                const canvasId = `dmg-face-${teamSlotIdx}-${Date.now()}`;
-                iconHtml = `<div style="${ringStyle}position:relative;" title="${slotChar}">` +
-                    `<canvas id="${canvasId}" width="${ICON_SIZE}" height="${ICON_SIZE}" style="width:${ICON_SIZE}px;height:${ICON_SIZE}px;display:block;border-radius:50%;"></canvas>` +
+                iconHtml = `<div style="${ringStyle}" title="${slotChar}">` +
+                    `<img src="${iconSrc}" alt="${slotChar}"` +
+                    ` style="width:100%;height:100%;object-fit:cover;object-position:50% 15%;display:block;"` +
+                    ` onerror="this.onerror=null;this.src='${fallbackSrc}';this.style.objectPosition='50% 10%';">` +
                     `</div>`;
-                // Schedule the face-crop draw after this HTML is injected into the DOM
-                _dmgFaceDrawQueue.push({ canvasId, imgSrc, size: ICON_SIZE });
             } else {
                 iconHtml = `<div style="${ringStyle}display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:#475569;" title="${slotChar}">${teamSlotIdx + 1}</div>`;
             }
@@ -537,9 +493,6 @@ function renderBStatBars() {
                 </div>
         </div>`;
     }).join('');
-
-    // Canvas elements are now in the DOM — draw face crops
-    requestAnimationFrame(_flushDmgFaceQueue);
 
     totalVal.textContent = total.toLocaleString();
 

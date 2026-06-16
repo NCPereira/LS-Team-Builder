@@ -87,17 +87,24 @@ function renderUltimateRotation() {
         } else if (slot.character) {
             const charEntry = db.characters ? db.characters.find(c => c.name === slot.character) : null;
             if (charEntry) {
-                // Use skin-aware image if this character occupies a team slot
+                // Use the pre-cropped large icon — skin-aware via getSlotIconPath / getCharIconPath
                 const teamSlotIdx = (typeof slotData !== 'undefined')
                     ? slotData.findIndex(s => s.character === slot.character)
                     : -1;
-                const imgSrc = (teamSlotIdx !== -1 && typeof getSlotCharImg === 'function')
-                    ? (getSlotCharImg(teamSlotIdx) || charEntry.img)
-                    : charEntry.img;
+                const iconSrc = (teamSlotIdx !== -1 && typeof getSlotIconPath === 'function')
+                    ? (getSlotIconPath(teamSlotIdx, 'large') || getCharIconPath(slot.character, 'large'))
+                    : (typeof getCharIconPath === 'function' ? getCharIconPath(slot.character, 'large') : charEntry.img);
                 const img = document.createElement('img');
-                img.src = imgSrc;
-                img.alt = slot.character;
-                img.style.objectPosition = getFacePosition(imgSrc);
+                img.src   = iconSrc;
+                img.alt   = slot.character;
+                img.style.objectFit      = 'cover';
+                img.style.objectPosition = '50% 15%';
+                // Fallback to portrait if icon is missing
+                img.onerror = function() {
+                    this.onerror = null;
+                    this.src = charEntry.img;
+                    this.style.objectPosition = getFacePosition(charEntry.img);
+                };
                 iconDiv.innerHTML = '';
                 iconDiv.appendChild(img);
             } else {
