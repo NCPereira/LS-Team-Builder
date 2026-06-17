@@ -207,7 +207,11 @@ function _cardVal(idx) {
 //   g  gem            (1-based index into _SC_GEMS)
 //   f  formation slot value (0-based team-slot index; omitted for empty)
 //   u  ult-rotation character (1-based index into _SC_CHARS)
-//   t  ult time in tenths of a second (e.g. t15 = 1.5 s)
+//   t  ult time in tenths of a second — DPS/Time row (e.g. t15 = 1.5 s)
+//   d  ult DEF time in tenths of a second (e.g. d20 = 2.0 s)
+//   e  ult raw time text (digits = UTF-8 byte-length, then raw chars follow)
+//      Used instead of t/d when the time string contains ranges or free text
+//      (e.g. "dps=11.6-13.56s") that can't be round-tripped through tenths.
 //   n  null / empty   (no digits; skips the next logical slot in sequence)
 //   x  title text     (digits = UTF-8 byte-length, then raw UTF-8 chars follow)
 //   m  comments text  (digits = UTF-8 byte-length, then raw UTF-8 chars follow)
@@ -313,6 +317,59 @@ function _encodeV4(payload) {
     }
 
     // ── Ultimate rotation (non-null entries only) ─────────────────────────────
+    // Time is stored as either a plain "1.5s" string (legacy) or
+    // "dps=1.5s|def=2.0s" (new format from _serializeTime).
+    // Simple numeric values encode as 't<tenths>' / 'd<tenths>'.
+    // Complex values (ranges, free text like "11.6-13.56s") encode as
+    // 'e<byteLen><rawUTF8>' so they survive the round-trip exactly.
+
+    // Returns true when a single value segment (after stripping 's') is a
+    // plain decimal that can be losslessly encoded as integer tenths.
+    function _isSimpleTimeVal(val) {
+        const stripped = val.trim().replace(/s$/i, '').trim();
+        return /^\d+(\.\d+)?$/.test(stripped);
+    }
+
+    // Returns true if the whole serialised time string can be encoded with
+    // numeric t/d tokens (every value part is a simple decimal).
+    function _timeIsSimple(raw) {
+        if (!raw || !raw.trim()) return true;
+        if (!raw.includes('=')) return _isSimpleTimeVal(raw); // legacy plain
+        return raw.split('|').every(part => {
+            const eq = part.indexOf('=');
+            if (eq === -1) return true; // no value — skip
+            return _isSimpleTimeVal(part.slice(eq + 1));
+        });
+    }
+
+    function _encodeTimeStr(raw) {
+        if (!raw || !raw.trim()) return { dps: 0, def: 0 };
+        if (!raw.includes('=')) {
+            // Legacy plain value
+            const v = Math.round(parseFloat(raw) * 10);
+            return { dps: isNaN(v) ? 0 : v, def: 0 };
+        }
+        let dps = 0, def = 0;
+        raw.split('|').forEach(part => {
+            const eq = part.indexOf('=');
+            if (eq === -1) return;
+            const key = part.slice(0, eq).trim();
+            const val = Math.round(parseFloat(part.slice(eq + 1)) * 10);
+            if ((key === 'dps' || key === 'range') && !isNaN(val)) dps = val;
+            if (key === 'def' && !isNaN(val)) def = val;
+        });
+        return { dps, def };
+    }
+
+    // Encode a raw time string as the 'e' length-prefixed token.
+    function _encodeRawTime(raw) {
+        const bytes = new TextEncoder().encode(raw);
+        // Store as raw char codes so the decoder can slice by byte length
+        let payload = '';
+        bytes.forEach(b => { payload += String.fromCharCode(b); });
+        return 'e' + bytes.length + payload;
+    }
+
     const ur = payload.ultimateRotation || [];
     for (let ui = 0; ui < Math.min(ur.length, 11); ui++) {
         const e = ur[ui] || {};
@@ -321,8 +378,15 @@ function _encodeV4(payload) {
         if (ci === -1) continue;
         parts.push('u' + (ci + 1));
         if (e.time) {
-            const tenths = Math.round(parseFloat(e.time) * 10);
-            if (tenths > 0) parts.push('t' + tenths);
+            if (_timeIsSimple(e.time)) {
+                // Simple numeric — use compact t/d tokens
+                const { dps, def } = _encodeTimeStr(e.time);
+                if (dps > 0) parts.push('t' + dps);
+                if (def > 0) parts.push('d' + def);
+            } else {
+                // Complex (range, free text) — store raw string via e token
+                parts.push(_encodeRawTime(e.time));
+            }
         }
     }
 
@@ -357,8 +421,8 @@ function _decodeV4(body) {
         const letter = body[i++];
         if (letter < 'a' || letter > 'z') continue; // skip unexpected chars
 
-        // 'x' and 'm' are length-prefixed text payloads
-        if (letter === 'x' || letter === 'm') {
+        // 'x', 'm', and 'e' are length-prefixed text payloads
+        if (letter === 'x' || letter === 'm' || letter === 'e') {
             // Read length digits
             let lenStr = '';
             while (i < body.length && body[i] >= '0' && body[i] <= '9') lenStr += body[i++];
@@ -370,8 +434,12 @@ function _decodeV4(body) {
                 const bytes = new Uint8Array(raw.length);
                 for (let b = 0; b < raw.length; b++) bytes[b] = raw.charCodeAt(b);
                 const decoded = new TextDecoder().decode(bytes);
-                // x = legacy title (ignored), m = comments
                 if (letter === 'm') comments = decoded;
+                // e = raw ult time string — applies to the most-recently-pushed ult entry
+                else if (letter === 'e' && ultimateRotation.length > 0) {
+                    ultimateRotation[ultimateRotation.length - 1].time = decoded;
+                }
+                // x = legacy title (ignored)
             } catch (_) {}
             continue;
         }
@@ -464,10 +532,33 @@ function _decodeV4(body) {
                 ultimateRotation.push({ character: ch, time: '' });
                 break;
             }
-            case 't': { // ult time (tenths of a second)
+            case 't': { // ult DPS time (tenths of a second)
                 if (ultimateRotation.length > 0 && num != null && num > 0) {
-                    ultimateRotation[ultimateRotation.length - 1].time =
-                        (num / 10).toFixed(1) + 's';
+                    const entry = ultimateRotation[ultimateRotation.length - 1];
+                    const dpsVal = (num / 10).toFixed(1) + 's';
+                    // Preserve existing DEF value if already set
+                    if (entry.time && entry.time.includes('def=')) {
+                        const defMatch = entry.time.match(/def=([^|]+)/);
+                        const defVal = defMatch ? defMatch[1] : '';
+                        entry.time = defVal ? 'dps=' + dpsVal + '|def=' + defVal : 'dps=' + dpsVal;
+                    } else {
+                        entry.time = 'dps=' + dpsVal;
+                    }
+                }
+                break;
+            }
+            case 'd': { // ult DEF time (tenths of a second)
+                if (ultimateRotation.length > 0 && num != null && num > 0) {
+                    const entry = ultimateRotation[ultimateRotation.length - 1];
+                    const defVal = (num / 10).toFixed(1) + 's';
+                    // Preserve existing DPS value if already set
+                    if (entry.time && entry.time.includes('dps=')) {
+                        const dpsMatch = entry.time.match(/dps=([^|]+)/);
+                        const dpsVal = dpsMatch ? dpsMatch[1] : '';
+                        entry.time = dpsVal ? 'dps=' + dpsVal + '|def=' + defVal : 'def=' + defVal;
+                    } else {
+                        entry.time = 'def=' + defVal;
+                    }
                 }
                 break;
             }
@@ -578,7 +669,9 @@ function _decodeV3(bytes) {
     for (let u = 0; u < urLen; u++) {
         const character = _val(_SC_CHARS, bytes[i++]);
         const timeTenths = bytes[i++];
-        const time = timeTenths > 0 ? (timeTenths / 10).toFixed(1) + 's' : '';
+        const timeRaw = timeTenths > 0 ? (timeTenths / 10).toFixed(1) + 's' : '';
+        // Wrap in new dps= format so _parseTime() in rotation.js reads it correctly
+        const time = timeRaw ? 'dps=' + timeRaw : '';
         ultimateRotation.push({ character, time });
     }
     while (ultimateRotation.length < 11) ultimateRotation.push({ character: null, time: '' });

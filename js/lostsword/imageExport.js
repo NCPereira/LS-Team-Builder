@@ -49,23 +49,66 @@ async function exportCapturePNG() {
             clonePanelCol.style.flexGrow   = '0';
         }
 
-        // Step 2c: Freeze ult-time-wrapper open/closed state
-        const liveTimeWrappers  = Array.from(target.querySelectorAll('.ult-time-wrapper'));
-        const cloneTimeWrappers = Array.from(clone.querySelectorAll('.ult-time-wrapper'));
-        liveTimeWrappers.forEach(function(liveW, idx) {
-            var cloneW = cloneTimeWrappers[idx];
-            if (!cloneW) return;
-            var isVisible = liveW.classList.contains('visible');
-            cloneW.style.transition = 'none';
-            if (isVisible) {
-                cloneW.style.maxHeight = '40px';
-                cloneW.style.opacity   = '1';
-                cloneW.style.overflow  = 'visible';
-            } else {
-                cloneW.style.maxHeight = '0px';
-                cloneW.style.opacity   = '0';
-                cloneW.style.overflow  = 'hidden';
+        // Step 2c: Freeze ult timing rows open/closed state.
+        // The new rotation.js drives everything via inline style.maxHeight/opacity
+        // (no .ult-time-wrapper CSS class). We match each live slot's timeWrapper
+        // and defWrap divs by reading their live inline styles, then freeze the
+        // clone to match exactly. We also force the hover control pill hidden.
+        var liveUltSlots  = Array.from(target.querySelectorAll('.ult-rotation-slot'));
+        var cloneUltSlots = Array.from(clone.querySelectorAll('.ult-rotation-slot'));
+        liveUltSlots.forEach(function(liveSlot, si) {
+            var cloneSlot = cloneUltSlots[si];
+            if (!cloneSlot) return;
+
+            // ── Hide the hover control pill in the export ──────────────────────
+            // The pill is the absolute-positioned div with z-index:20 at the top.
+            // It has opacity:0 at rest but Step 5's computed-style copy can raise it.
+            var livePillEl  = liveSlot.querySelector('div[style*="z-index:20"]') ||
+                              liveSlot.querySelector('div[style*="z-index: 20"]');
+            var clonePillEl = cloneSlot.querySelector('div[style*="z-index:20"]') ||
+                              cloneSlot.querySelector('div[style*="z-index: 20"]');
+            if (clonePillEl) {
+                clonePillEl.style.opacity       = '0';
+                clonePillEl.style.pointerEvents = 'none';
+                clonePillEl.style.visibility    = 'hidden';
             }
+
+            // ── Freeze the time-row wrapper (the flex column below the icon) ───
+            // It's the div immediately after the pill (or after the icon if no pill).
+            // Identified by having margin-top:3px and flex-direction in its style.
+            var liveChildren  = Array.from(liveSlot.children);
+            var cloneChildren = Array.from(cloneSlot.children);
+
+            liveChildren.forEach(function(liveChild, ci) {
+                var cloneChild = cloneChildren[ci];
+                if (!cloneChild) return;
+                // The time wrapper has 'margin-top:3px' and 'flex-direction:column'
+                // in its inline style — that's our match.
+                var cs = liveChild.style.cssText || '';
+                var isTimeWrapper = cs.includes('margin-top:3px') && cs.includes('flex-direction:column');
+                if (!isTimeWrapper) return;
+
+                var liveMaxH  = liveChild.style.maxHeight  || '0';
+                var liveOpac  = liveChild.style.opacity    || '0';
+                cloneChild.style.transition = 'none';
+                cloneChild.style.maxHeight  = liveMaxH;
+                cloneChild.style.opacity    = liveOpac;
+                cloneChild.style.overflow   = parseFloat(liveMaxH) > 0 ? 'visible' : 'hidden';
+
+                // Freeze the inner DEF sub-wrapper (first child div with max-height)
+                Array.from(liveChild.children).forEach(function(liveGrandChild, gi) {
+                    var cloneGrandChild = cloneChild.children[gi];
+                    if (!cloneGrandChild) return;
+                    var gcs = liveGrandChild.style.cssText || '';
+                    if (!gcs.includes('max-height') || !gcs.includes('overflow')) return;
+                    var gLiveMaxH = liveGrandChild.style.maxHeight || '0';
+                    var gLiveOpac = liveGrandChild.style.opacity   || '0';
+                    cloneGrandChild.style.transition = 'none';
+                    cloneGrandChild.style.maxHeight  = gLiveMaxH;
+                    cloneGrandChild.style.opacity    = gLiveOpac;
+                    cloneGrandChild.style.overflow   = 'hidden';
+                });
+            });
         });
 
         // Step 3: Replace textareas + text inputs with static divs
@@ -102,11 +145,20 @@ async function exportCapturePNG() {
                     div.textContent = value;
                 }
             } else {
-                // Single-line inputs: centred as before
-                div.style.display        = 'flex';
-                div.style.alignItems     = 'center';
-                div.style.justifyContent = 'center';
-                div.style.overflow       = 'hidden';
+                // Single-line inputs: use line-height = box height for reliable
+                // vertical centering in html2canvas (flex align-items:center can
+                // drift when line-height is 'normal' on small fixed-height divs).
+                var computedH = cs ? cs.height : '';
+                div.style.display       = 'block';
+                div.style.overflow      = 'hidden';
+                div.style.whiteSpace    = 'nowrap';
+                div.style.textAlign     = 'center';
+                div.style.verticalAlign = 'middle';
+                // Set line-height to the pixel height so the single line of text
+                // sits exactly in the middle of the box.
+                div.style.lineHeight    = computedH || div.style.height || '22px';
+                div.style.paddingTop    = '0';
+                div.style.paddingBottom = '0';
                 if (value.trim() === '') {
                     div.textContent     = cloneEl.getAttribute('placeholder') || '';
                     div.style.color     = '#475569';
@@ -628,19 +680,46 @@ async function exportCapturePNG() {
                 if (ultSec) { ultSec.style.display = 'none'; ultSec.style.visibility = 'hidden'; }
             }
         } else if (cloneUltCont) {
-            Array.from(cloneUltCont.querySelectorAll('.ult-rotation-slot')).forEach(function(slot) {
+            Array.from(cloneUltCont.querySelectorAll('.ult-rotation-slot')).forEach(function(slot, slotIdx) {
                 var idx = parseInt(slot.dataset.ultIdx);
-                if (!isNaN(idx) && ultimateRotation[idx] && ultimateRotation[idx].character) return;
-                // visibility:hidden keeps the flex row layout intact — display:none
-                // would collapse the slot and shift the arrows/remaining slots.
-                slot.style.visibility = 'hidden';
-                slot.style.opacity    = '0';
-                var next = slot.nextElementSibling;
-                if (next && next.classList.contains('ult-arrow')) {
-                    next.style.visibility = 'hidden';
-                    next.style.opacity    = '0';
+                var hasChar = !isNaN(idx) && ultimateRotation[idx] && ultimateRotation[idx].character;
+                
+                if (!hasChar) {
+                    // visibility:hidden keeps the flex row layout intact — display:none
+                    // would collapse the slot and shift the arrows/remaining slots.
+                    slot.style.visibility = 'hidden';
+                    slot.style.opacity    = '0';
+                    slot.style.pointerEvents = 'none';
+                }
+                
+                // Hide the arrow AFTER this slot if the slot is empty
+                if (!hasChar) {
+                    var next = slot.nextElementSibling;
+                    if (next && next.classList.contains('ult-arrow')) {
+                        next.style.visibility = 'hidden';
+                        next.style.opacity    = '0';
+                    }
+                }
+
+                // Always hide the hover control pill — Step 5 computed-style copy
+                // may have raised its opacity from 0.
+                var pill = slot.querySelector('div[style*="z-index:20"]') ||
+                           slot.querySelector('div[style*="z-index: 20"]');
+                if (pill) {
+                    pill.style.opacity       = '0';
+                    pill.style.visibility    = 'hidden';
+                    pill.style.pointerEvents = 'none';
                 }
             });
+
+            // Hide the Reset button and +/- slot-count controls in the ult header row
+            var ultHeader = cloneUltCont ? cloneUltCont.closest('.border-t') : null;
+            if (ultHeader) {
+                var resetBtn = ultHeader.querySelector('[onclick*="resetUltimateRotation"]');
+                if (resetBtn) { resetBtn.style.display = 'none'; resetBtn.style.visibility = 'hidden'; }
+                var ctrlsDiv = ultHeader.querySelector('#ultimate-rotation-controls');
+                if (ctrlsDiv) { ctrlsDiv.style.display = 'none'; ctrlsDiv.style.visibility = 'hidden'; }
+            }
         }
 
         // =====================================================================
